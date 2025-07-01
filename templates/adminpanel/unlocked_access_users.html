@@ -1,0 +1,144 @@
+{% extends "adminpanel/adminbase.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <h3>🔓 Unlocked Access Users</h3>
+
+  <!-- Unlocked Exclusive Jobs -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <span>💼 Exclusive Job Access</span>
+      <span class="badge bg-light text-dark">{{ unlocked_jobs.count }}</span>
+    </div>
+    <div class="card-body p-0">
+      {% if unlocked_jobs %}
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Seeker ID</th>
+                <th>Username</th>
+                <th>Unlocked At</th>
+                <th>Expires At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for unlock in unlocked_jobs %}
+              <tr>
+                <td>{{ unlock.seeker.seeker_id }}</td>
+                <td>{{ unlock.seeker.username }}</td>
+                <td>{{ unlock.unlocked_at|date:"M d, Y H:i" }}</td>
+                <td>{{ unlock.expires_at|date:"M d, Y H:i" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted text-center p-3">No exclusive job access currently active.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Unlocked Visa Guides -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+      <span>🛂 Visa Guide Access</span>
+      <span class="badge bg-light text-dark">{{ unlocked_visa_guides.count }}</span>
+    </div>
+    <div class="card-body p-0">
+      {% if unlocked_visa_guides %}
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Seeker ID</th>
+                <th>Username</th>
+                <th>Guide Title</th>
+                <th>Unlocked At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for unlock in unlocked_visa_guides %}
+                <tr>
+                  <td>{{ unlock.seeker.seeker_id }}</td>
+                  <td>{{ unlock.seeker.username }}</td>
+                  <td>
+                    {% if unlock.guide.country %}
+                      {{ unlock.guide.country }}
+                    {% else %}
+                      <span class="text-muted">N/A</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ unlock.unlocked_at|date:"M d, Y H:i" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted text-center p-3">No visa guide unlocks found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <!-- Visa Consultancy Discount Purchases -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+      <span>✈️ Visa Consultancy Discount Purchases</span>
+      <span class="badge bg-light text-dark">{{ visa_purchases.count }}</span>
+    </div>
+    <div class="card-body p-0">
+      {% if visa_purchases %}
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Order ID</th>
+                <th>Seeker ID</th>
+                <th>Username</th>
+                <th>Purchased At</th>
+                <th>Coupon Code</th>
+                <th>Valid Until</th>
+                <th>PDF</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for purchase in visa_purchases %}
+              <tr>
+                <td>{{ purchase.order_id|default:"—" }}</td>
+                <td>{{ purchase.seeker.seeker_id }}</td>
+                <td>{{ purchase.seeker.username }}</td>
+                <td>{{ purchase.purchased_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  {% if purchase.coupon_code %}
+                    <span class="badge bg-dark text-white">{{ purchase.coupon_code }}</span>
+                  {% else %}
+                    <span class="text-muted">N/A</span>
+                  {% endif %}
+                </td>
+                <td>{{ purchase.valid_until|date:"M d, Y" }}</td>
+                <td>
+                  {% if purchase.pdf_file %}
+                    <a href="{{ purchase.pdf_file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
+                  {% else %}
+                    <span class="text-muted">No PDF</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted text-center p-3">No visa consultancy discount purchases found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <a href="{% url 'adminpanel:admin_dashboard' %}" class="btn btn-secondary mt-3">← Back to Dashboard</a>
+</div>
+{% endblock %}

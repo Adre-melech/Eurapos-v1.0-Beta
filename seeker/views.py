@@ -191,30 +191,37 @@ def buy_ats_cv(request):
     return redirect("seeker:dashboard")
 
 
+@require_POST
+@login_required
 def buy_whatsapp_recommendations(request):
     seeker = request.user
+    whatsapp_number = request.POST.get("whatsapp_number", "").strip()
+
+    if not whatsapp_number:
+        messages.error(request, "Please enter your WhatsApp number.")
+        return redirect("seeker:dashboard")
 
     if seeker.credits >= 20:
         seeker.credits -= 20
         seeker.receive_whatsapp_jobs = True
-        seeker.whatsapp_optin_started = now()  # <-- Save start date
+        seeker.whatsapp_number = whatsapp_number
+        seeker.whatsapp_optin_started = now()
         seeker.whatsapp_optin_expires = now() + timedelta(days=10)
         seeker.save(update_fields=[
-            "credits", "receive_whatsapp_jobs", "whatsapp_optin_started", "whatsapp_optin_expires"
+            "credits", "receive_whatsapp_jobs", "whatsapp_number",
+            "whatsapp_optin_started", "whatsapp_optin_expires"
         ])
 
-        # Email admin
         send_mail(
             subject="📢 New WhatsApp Job Notification Purchase!",
-            message=f"User {seeker.username} has purchased WhatsApp job recommendations for 10 days. Please process it.",
+            message=f"User {seeker.username} ({whatsapp_number}) has purchased WhatsApp job recommendations for 10 days.",
             from_email="noreply@eurapos.com",
             recipient_list=["admin@eurapos.com"],
         )
 
-        messages.success(request, "✅ You have enabled WhatsApp job notifications for 10 days!")
-
+        messages.success(request, "✅ WhatsApp job notifications enabled for 10 days!")
     else:
-        messages.error(request, "Not enough credits to enable WhatsApp job notifications.")
+        messages.error(request, "❌ Not enough credits to enable WhatsApp job notifications.")
 
     return redirect("seeker:dashboard")
 

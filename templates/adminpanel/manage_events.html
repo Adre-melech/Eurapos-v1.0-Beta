@@ -1,0 +1,54 @@
+{% extends "adminpanel/adminbase.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>🎫 Manage Events</h4>
+    <a href="{% url 'adminpanel:add_event' %}" class="btn btn-sm btn-success">➕ Add New Event</a>
+  </div>
+
+  {% if events %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Credits Required</th>
+            <th>Available Until</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in events %}
+          <tr>
+            <td>
+              {% if event.image %}
+                <img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-thumbnail" style="max-width: 80px;">
+              {% else %}
+                <span class="text-muted">No Image</span>
+              {% endif %}
+            </td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.credits_required }}</td>
+            <td>{{ event.available_until|date:"M d, Y" }}</td>
+            <td>{{ event.description|truncatewords:20 }}</td>
+            <td>
+              <a href="{% url 'adminpanel:edit_event' event.id %}" class="btn btn-sm btn-primary">✏️ Edit</a>
+              <form method="post" action="{% url 'adminpanel:delete_event' event.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this event?');">🗑️ Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted text-center">No events available. Add some to get started.</p>
+  {% endif %}
+</div>
+{% endblock %}

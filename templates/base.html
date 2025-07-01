@@ -116,8 +116,8 @@
     <div class="container mt-3">
       {% if not request.user.receive_whatsapp_jobs %}
         <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
-          🚀 Unlock Personalized WhatsApp Job Recommendations for 10 Days!
-          <a href="{% url 'seeker:buy_whatsapp_recommendations' %}" class="btn btn-sm btn-primary ms-2">Activate Now</a>
+          🚀 Unlock Personalized WhatsApp Job Recommendations for 10 Days Only at 20 credits!
+          <a href="{% url 'seeker:buy_whatsapp_recommendations' %}" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#whatsappModal">Activate Now</a>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% endif %}
@@ -129,21 +129,6 @@
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% endif %}
-
-      {% for guide in visa_guides %}
-        {% if guide.id %}
-          <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
-            🚀 Unlock Visa Guidelines for Your Destination!
-            <a href="{% url 'seeker:unlock_visa_guide' guide.id %}" class="btn btn-sm btn-primary ms-2">Unlock Now</a>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% else %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            Visa Guide ID missing! Please contact support.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endif %}
-      {% endfor %}
     </div>
   {% endif %}
 
@@ -194,6 +179,30 @@
     </div>
   </div>
 </footer>
+
+
+
+<!-- WhatsApp Number Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{% url 'seeker:buy_whatsapp_recommendations' %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="whatsappModalLabel">Enter WhatsApp Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="whatsapp_number" class="form-label">WhatsApp Number</label>
+        <input type="text" name="whatsapp_number" id="whatsapp_number" class="form-control" placeholder="+8801XXXXXXXXX" required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Confirm Purchase</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

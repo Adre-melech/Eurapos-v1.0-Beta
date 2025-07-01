@@ -19,7 +19,8 @@ from .views import (
 
     # ATS Management
     mark_ats_processed, upload_event_ticket, confirm_event_ticket, mark_priority_done, all_applications,
-    priority_applications_list, whatsapp_subscribers_list, ats_requests_list
+    priority_applications_list, whatsapp_subscribers_list, ats_requests_list, delivered_ats_resumes_list,
+    all_pending_event_tickets, delivered_event_tickets, unlocked_access_users
 )
 
 app_name = "adminpanel"
@@ -29,6 +30,8 @@ urlpatterns = [
     path("", admin_login, name="admin_login"),
     path("dashboard/", admin_dashboard, name="admin_dashboard"),
     path("logout/", admin_logout, name="admin_logout"),
+
+    path("unlocked-access/", unlocked_access_users, name="unlocked_access_users"),
 
     # Applications
     path("applications/", all_applications, name="all_applications"),
@@ -90,9 +93,12 @@ urlpatterns = [
     path("ats-requests/", ats_requests_list, name="ats_requests_list"),
     path("ats-request/<int:request_id>/mark-processed/", mark_ats_processed, name="mark_ats_processed"),
     path("ats-request/<int:request_id>/upload/", upload_ats_cv, name="upload_ats_cv"),
+    path("ats/delivered/", delivered_ats_resumes_list, name="delivered_ats_resumes"),
 
+    path('pending-tickets/', all_pending_event_tickets, name='pending_tickets_list'),
     path('event-ticket/upload/<int:ticket_id>/', upload_event_ticket, name='upload_event_ticket'),
     path('event-ticket/confirm/<int:ticket_id>/', confirm_event_ticket, name='confirm_event_ticket'),
+    path("event-tickets/delivered/", delivered_event_tickets, name="delivered_event_tickets"),
 
     path('priority-applications/', priority_applications_list, name='priority_applications_list'),
     path('whatsapp-subscribers/', whatsapp_subscribers_list, name='whatsapp_subscribers_list'),

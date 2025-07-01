@@ -15,34 +15,26 @@
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
+            <th>Order ID</th>
             <th>Seeker ID</th>
             <th>Seeker Name</th>
             <th>Requested At</th>
             <th>Status</th>
-            <th>Download CV</th>
             <th>Upload ATS CV</th>
           </tr>
         </thead>
         <tbody>
           {% for ats in ats_requests %}
           <tr>
-            <td>ats-{{ ats.id }}</td>
+            <td>{{ ats.order_id }}</td>
             <td>{{ ats.seeker.seeker_id }}</td>
             <td>{{ ats.seeker.username }}</td>
-            <td>{{ ats.requested_at|date:"M d, Y H:i" }}</td>
+            <td>{{ ats.requested_at|date:"M d, Y" }}</td>
             <td>
               {% if ats.is_processed %}
                 <span class="badge bg-success">Processed</span>
               {% else %}
-                <span class="badge bg-secondary">Pending</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if ats.cv_file %}
-                <a href="{{ ats.cv_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 Download</a>
-              {% else %}
-                <span class="text-muted">No File</span>
+                <span class="badge bg-danger">Pending</span>
               {% endif %}
             </td>
             <td>

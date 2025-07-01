@@ -45,7 +45,7 @@
   <div class="card mb-4 shadow-sm">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <span>📝 Recent Applications</span>
-      <span class="badge bg-light text-primary">{{ total_applications }}</span>
+      <span class="badge bg-light text-primary">{{ applications_count }}</span>
     </div>
     <div class="card-body p-0">
       {% if applications %}
@@ -184,8 +184,8 @@
               <table class="table table-sm table-hover mb-0 align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th>Seeker ID</th>
-                    <th>Username</th>
+                    <th>ID</th>
+                    <th>WhatsApp Number</th>
                     <th>Subscribed On</th>
                     <th>Subscription Expires</th>
                   </tr>
@@ -194,7 +194,13 @@
                   {% for user in whatsapp_users %}
                   <tr>
                     <td>{{ user.seeker_id }}</td>
-                    <td>{{ user.username }}</td>
+                    <td>
+                      {% if user.whatsapp_number %}
+                        {{ user.whatsapp_number }}
+                      {% else %}
+                        <span class="text-muted">N/A</span>
+                      {% endif %}
+                    </td>
                     <td>{{ user.whatsapp_optin_started|date:"M d, Y" }}</td>
                     <td>{{ user.whatsapp_optin_expires|date:"M d, Y" }}</td>
                   </tr>
@@ -217,6 +223,7 @@
 
 
 
+
     <!-- ATS CV Requests -->
     <div class="card mb-4 shadow-sm">
       <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
@@ -232,14 +239,13 @@
               <th>Seeker</th>
               <th>Requested On</th>
               <th>Status</th>
-              <th>Download CV</th>
               <th>Upload PDF</th>
             </tr>
           </thead>
           <tbody>
             {% for ats in ats_requests|slice:":10" %}
             <tr>
-              <td>ats-{{ ats.id }}</td>
+              <td>{{ ats.order_id }}</td>
               <td>{{ ats.seeker.seeker_id }}</td>
               <td>{{ ats.seeker.username }}</td>
               <td>{{ ats.requested_at|date:"Y-m-d H:i" }}</td>
@@ -247,25 +253,18 @@
                 {% if ats.is_processed %}
                   <span class="badge bg-success">Processed</span>
                 {% else %}
-                  <span class="badge bg-secondary">Pending</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if ats.cv_file %}
-                  <a href="{{ ats.cv_file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
-                {% else %}
-                  <span class="text-muted">No file</span>
+                  <span class="badge bg-danger">Pending</span>
                 {% endif %}
               </td>
               <td>
                 {% if not ats.is_processed %}
-                  <form action="{% url 'adminpanel:upload_ats_cv' ats.id %}" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
-                    {% csrf_token %}
-                    <input type="file" name="cv_file" accept="application/pdf" required class="form-control form-control-sm" style="max-width: 160px;">
-                    <button class="btn btn-sm btn-outline-success" type="submit">Upload</button>
-                  </form>
+                <form method="post" enctype="multipart/form-data" action="{% url 'adminpanel:upload_ats_cv' ats.id %}" class="d-flex gap-2">
+                  {% csrf_token %}
+                  <input type="file" name="cv_file" accept="application/pdf" class="form-control form-control-sm" required>
+                  <button type="submit" class="btn btn-sm btn-outline-success">Upload</button>
+                </form>
                 {% else %}
-                  <span class="text-muted">Already Uploaded</span>
+                <span class="text-muted">Already uploaded</span>
                 {% endif %}
               </td>
             </tr>
@@ -284,84 +283,61 @@
     </div>
 
 
+    <!-- Pending Event Tickets -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>🎟️ Pending Event Ticket Orders</span>
+        <span class="badge bg-light text-danger">{{ pending_tickets.count }}</span>
+      </div>
+      <div class="card-body p-0">
+        {% if pending_tickets %}
+          <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Seeker</th>
+                  <th>Event</th>
+                  <th>Date Purchased</th>
+                  <th>Upload Ticket PDF</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ticket in pending_tickets %}
+                  <tr>
+                    <td>{{ ticket.order_id }}</td>
+                    <td>{{ ticket.seeker.username }}</td>
+                    <td>{{ ticket.event.title }}</td>
+                    <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                      <form action="{% url 'adminpanel:upload_event_ticket' ticket.id %}" method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+                        {% csrf_token %}
+                        <input type="file" name="ticket_file" accept="application/pdf" required class="form-control form-control-sm" style="max-width: 150px;">
+                        <button type="submit" class="btn btn-sm btn-outline-success">Upload</button>
+                      </form>
+                    </td>
+                    <td>
+                      <form action="{% url 'adminpanel:mark_ticket_delivered' ticket.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-primary">✅ Mark Delivered</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if pending_tickets.count > 10 %}
+            <div class="card-footer text-center">
+              <a href="{% url 'adminpanel:pending_tickets_list' %}" class="btn btn-sm btn-primary">Show More</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="text-muted text-center p-3">No pending tickets found.</p>
+        {% endif %}
+      </div>
+    </div>
 
-  <!-- Visa Guide Purchases -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header bg-info text-white">
-      🛂 Visa Guide Purchases
-    </div>
-    <div class="table-responsive">
-      <table class="table table-striped align-middle">
-        <thead>
-          <tr>
-            <th>Buyer</th>
-            <th>Visa Guide</th>
-            <th>Purchase Date</th>
-            <th>Credits Used</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for purchase in visa_purchases %}
-          <tr>
-            <td>{{ purchase.seeker.username }}</td>
-            <td>{{ purchase.visa_guide.country }}</td>
-            <td>{{ purchase.created_at|date:"Y-m-d H:i" }}</td>
-            <td>{{ purchase.credits_used }}</td>
-            <td>
-              {% if purchase.completed %}
-                <span class="badge bg-success">Completed</span>
-              {% else %}
-                <span class="badge bg-warning text-dark">Pending</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="5" class="text-center text-muted">No visa guide purchases found.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-
-  <!-- Pending Event Tickets -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header bg-primary text-white">
-      🎟️ Pending Event Ticket Orders
-    </div>
-    <div class="card-body p-0">
-      {% if pending_tickets %}
-        <table class="table table-striped mb-0">
-          <thead>
-            <tr>
-              <th>Seeker</th>
-              <th>Event</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for ticket in pending_tickets %}
-              <tr>
-                <td>{{ ticket.seeker.username }}</td>
-                <td>{{ ticket.event.title }}</td>
-                <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
-                <td>
-                  <form action="{% url 'adminpanel:mark_ticket_delivered' ticket.id %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-primary">✅ Mark Delivered</button>
-                  </form>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p class="text-muted text-center p-3">No pending tickets found.</p>
-      {% endif %}
-    </div>
-  </div>
-</div>
 
 {% endblock %}

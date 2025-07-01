@@ -1,0 +1,48 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}Delivered ATS Resumes | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h4 class="mb-4">✅ Delivered ATS Resumes</h4>
+
+  {% if delivered_resumes %}
+    <div class="table-responsive shadow-sm border rounded">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-success">
+          <tr>
+            <th>Order ID</th>
+            <th>Seeker ID</th>
+            <th>Username</th>
+            <th>Requested On</th>
+            <th>Delivered On</th>
+            <th>CV File</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ats in delivered_resumes %}
+            <tr>
+              <td>{{ ats.order_id }}</td>
+              <td>{{ ats.seeker.seeker_id }}</td>
+              <td>{{ ats.seeker.username }}</td>
+              <td>{{ ats.requested_at|date:"M d, Y" }}</td>
+              <td>{{ ats.updated_at|date:"M d, Y" }}</td>
+              <td>
+                {% if ats.cv_file %}
+                  <a href="{{ ats.cv_file.url }}" class="btn btn-sm btn-outline-success" target="_blank">
+                    📄 Download
+                  </a>
+                {% else %}
+                  <span class="text-muted">No file</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-muted">No delivered ATS resumes yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

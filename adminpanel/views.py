@@ -26,8 +26,12 @@ def admin_dashboard(request):
     notifications_count = Notification.objects.filter(read=False).count()
     seekers = Seeker.objects.filter(is_staff=False)
     jobs = JobPost.objects.all()
+    categories = Category.objects.all()
+    job_titles = JobTitle.objects.all()
+    job_countries = JobCountry.objects.all()
+    seeker_countries = SeekerCountry.objects.all()
+
     recent_applications = Application.objects.select_related('seeker', 'job').order_by('-applied_at')[:10]
-    total_applications = Application.objects.count()
     priority_applications = Application.objects.filter(
         priority_review=True
     ).select_related('seeker', 'job').order_by('-purchased_priority_at')[:10]
@@ -36,36 +40,9 @@ def admin_dashboard(request):
         receive_whatsapp_jobs=True,
         whatsapp_optin_expires__gte=now()
     ).order_by("-whatsapp_optin_expires")[:10]
-    categories = Category.objects.all()
-    job_titles = JobTitle.objects.all()
-    job_countries = JobCountry.objects.all()
-    seeker_countries = SeekerCountry.objects.all()
-    notifications = AdminNotification.objects.filter(read=False).order_by("-created_at")
-    events = EventTicket.objects.all().order_by('-available_until')
-    unlocked_jobs_access = (
-        UnlockedExclusiveJob.objects
-        .filter(expires_at__gte=now())  # still valid
-        .select_related("seeker")
-        .order_by("-unlocked_at")
-    )
     pending_tickets = TicketPurchase.objects.filter(confirmed=False).select_related('seeker', 'event').order_by(
-        '-purchased_at')
-    delivered_tickets = TicketPurchase.objects.filter(
-        confirmed=True
-    ).select_related('seeker', 'event').order_by('-purchased_at')
+        '-purchased_at')[:10]
     ats_requests = ATSResumeRequest.objects.filter(processed=False).order_by("-requested_at")
-    delivered_ats_resumes = (
-        ATSResumeRequest.objects
-        .filter(processed=True, cv_file__isnull=False)
-        .select_related("seeker")
-        .order_by("-requested_at")
-    )
-    visa_purchases = VisaDiscount.objects.order_by("-purchased_at")
-    visa_guides_all = VisaGuide.objects.all().order_by("country")
-    visa_guides = UnlockedVisaGuide.objects.order_by("-unlocked_at")
-
-
-
 
     return render(request, "adminpanel/dashboard.html", {
         "jobs_count": jobs_count,
@@ -74,23 +51,14 @@ def admin_dashboard(request):
         "notifications_count": notifications_count,
         "seekers": seekers,
         "applications": recent_applications,
-        "total_applications": total_applications,
         "jobs": jobs,
-        "events": events,
         "categories": categories,
         "job_titles": job_titles,
         "job_countries": job_countries,
         "seeker_countries": seeker_countries,
-        "notifications": notifications,
-        "unlocked_jobs_access": unlocked_jobs_access,
         "whatsapp_users": whatsapp_users,
         "pending_tickets": pending_tickets,
-        "delivered_tickets": delivered_tickets,
         "ats_requests": ats_requests,
-        "delivered_ats_resumes": delivered_ats_resumes,
-        "visa_purchases": visa_purchases,
-        "visa_guides_all": visa_guides_all,
-        "visa_guides": visa_guides,
         "priority_applications": priority_applications,
         "now": now,
     })
@@ -146,6 +114,21 @@ def mark_ats_processed(request, request_id):
         ats_request.save(update_fields=["processed"])
         messages.success(request, f"ATS CV order {ats_request.order_id} marked as processed.")
     return redirect("adminpanel:admin_dashboard")
+
+
+@staff_member_required
+def delivered_ats_resumes_list(request):
+    """Lists all successfully processed ATS resume deliveries."""
+    delivered_ats_resumes = (
+        ATSResumeRequest.objects
+        .filter(processed=True, cv_file__isnull=False)
+        .select_related("seeker")
+        .order_by("-requested_at")
+    )
+
+    return render(request, "adminpanel/delivered_ats_resumes.html", {
+        "delivered_resumes": delivered_ats_resumes
+    })
 
 
 def admin_login(request):
@@ -759,3 +742,62 @@ def mark_priority_done(request, app_id):
         application.save(update_fields=['priority_review'])
         messages.success(request, f"✅ Priority review marked as done for {application.seeker.username}.")
     return redirect('adminpanel:admin_dashboard')
+
+
+@staff_member_required
+def all_pending_event_tickets(request):
+    """Lists all pending event ticket requests for admin review."""
+    pending_tickets = (
+        TicketPurchase.objects
+        .filter(confirmed=False)
+        .select_related("seeker", "event")  # Adjust related fields if applicable
+        .order_by("-purchased_at")
+    )
+
+    return render(request, "adminpanel/all_pending_event_tickets.html", {
+        "pending_tickets": pending_tickets
+    })
+
+
+@staff_member_required
+def delivered_event_tickets(request):
+    """Lists all confirmed (delivered) event ticket purchases."""
+    delivered_tickets = (
+        TicketPurchase.objects
+        .filter(confirmed=True)
+        .select_related('seeker', 'event')
+        .order_by('-purchased_at')
+    )
+
+    return render(request, "adminpanel/delivered_event_tickets.html", {
+        "delivered_tickets": delivered_tickets
+    })
+
+
+@staff_member_required
+def unlocked_access_users(request):
+    """Lists seekers who have unlocked exclusive jobs, visa guides, or purchased visa discounts."""
+    unlocked_jobs_access = (
+        UnlockedExclusiveJob.objects
+        .filter(expires_at__gte=now())
+        .select_related("seeker")
+        .order_by("-unlocked_at")
+    )
+
+    unlocked_visa_guides = (
+        UnlockedVisaGuide.objects
+        .select_related("seeker", "guide")
+        .order_by("-unlocked_at")
+    )
+
+    visa_purchases = (
+        VisaDiscount.objects
+        .select_related("seeker")
+        .order_by("-purchased_at")
+    )
+
+    return render(request, "adminpanel/unlocked_access_users.html", {
+        "unlocked_jobs": unlocked_jobs_access,
+        "unlocked_visa_guides": unlocked_visa_guides,
+        "visa_purchases": visa_purchases,
+    })

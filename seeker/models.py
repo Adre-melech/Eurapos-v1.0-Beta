@@ -19,6 +19,7 @@ class Seeker(AbstractUser):
     preferred_categories = models.ManyToManyField("jobs.Category", blank=True, related_name='preferred_seekers')
 
     # WhatsApp Job Recommendations
+    whatsapp_number = models.CharField(max_length=20, blank=True, null=True)
     receive_whatsapp_jobs = models.BooleanField(default=False)
     whatsapp_number = models.CharField(max_length=15, blank=True, null=True)
     whatsapp_optin_started = models.DateTimeField(null=True, blank=True)
@@ -132,6 +133,7 @@ class ATSResumeRequest(models.Model):
     processed = models.BooleanField(default=False)  # Admin marks as processed
     order_id = models.CharField(max_length=12, unique=True, blank=True)  # Order tracking ID
     cv_file = models.FileField(upload_to="ats_cvs/", blank=True, null=True)  # Final CV uploaded by admin
+    updated_at = models.DateTimeField(auto_now=True)
 
     def generate_order_id(self):
         """Generates a unique order ID"""

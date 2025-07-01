@@ -526,8 +526,9 @@ def unlock_exclusive_jobs(request):
     seeker = request.user
 
     # ✅ Check cooldown
-    can_unlock, days_remaining = seeker.can_unlock_exclusive_jobs()
+    can_unlock, seconds_remaining, cooldown_end = seeker.can_unlock_exclusive_jobs()
     if not can_unlock:
+        days_remaining = int(seconds_remaining // 86400)
         messages.warning(request, f"⏳ You can unlock exclusive jobs again in {days_remaining} day(s).")
         return redirect("seeker:dashboard")
 
