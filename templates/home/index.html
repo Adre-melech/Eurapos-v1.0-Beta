@@ -243,28 +243,32 @@
 
 
 <!-- Visa Guides -->
-{% if request.user.is_authenticated %}
-  <div class="mt-5">
-    <h3 class="fw-semibold">Visa Guidelines</h3>
-    <p class="text-muted">Explore visa requirements and guidelines for different countries.</p>
-    <div class="row g-4">
-      {% for visa_guide in visa_guides %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm">
-            <img src="{{ visa_guide.image.url }}" class="card-img-top" alt="Visa Guide Image">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ visa_guide.country }}</h5>
-              <p class="card-text">Credits Required: <strong>{{ visa_guide.credits_required }}</strong></p>
-              <a href="{% url 'seeker:unlock_visa_guide' visa_guide.id %}" class="btn btn-success btn-sm">Buy Guide</a>
-            </div>
+<div class="mt-5">
+  <h3 class="fw-semibold">Visa Guidelines</h3>
+  <p class="text-muted">Explore visa requirements and guidelines for different countries.</p>
+  <div class="row g-4">
+    {% for visa_guide in visa_guides %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <img src="{{ visa_guide.image.url }}" class="card-img-top" alt="Visa Guide Image">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ visa_guide.country }}</h5>
+            <p class="card-text">Credits Required: <strong>{{ visa_guide.credits_required }}</strong></p>
+
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'seeker:unlock_visa_guide' visa_guide.id %}" class="btn btn-success btn-sm mt-auto">Buy Guide</a>
+            {% else %}
+              <a href="{% url 'seeker:seeker_login' %}?next={% url 'home:visa_guides' %}" class="btn btn-outline-primary btn-sm mt-auto">Login to Buy</a>
+            {% endif %}
           </div>
         </div>
-      {% empty %}
-        <p>No visa guides available at the moment.</p>
-      {% endfor %}
-    </div>
+      </div>
+    {% empty %}
+      <p>No visa guides available at the moment.</p>
+    {% endfor %}
   </div>
-{% endif %}
+</div>
+
 
 <script>
   function fetchHomepageJobs() {

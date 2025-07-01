@@ -24,7 +24,10 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
     <div class="container">
-      <a class="navbar-brand fw-bold text-primary" href="{% url 'home:home' %}">Eurapos</a>
+      <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="{% url 'home:home' %}">
+        <img src="{% static 'img/logo.png' %}" alt="Eurapos" style="height: 40px;">
+      </a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
         aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

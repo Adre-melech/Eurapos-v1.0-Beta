@@ -5,18 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55ceac5c-e5e2-4a9d-a35f-ad0d49c37ebe" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adminpanel/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adminpanel/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jobs/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobs/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/seeker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/seeker/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/seeker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/seeker/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/adminpanel/adminbase.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/adminbase.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/adminpanel/ats_requests_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/ats_requests_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/adminpanel/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/EURAPOS__1_-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/apple-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/favicon-16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/favicon-32x32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/favicon-64x64.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/img/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/img/logo.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/seeker/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/dashboard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
