@@ -1,0 +1,47 @@
+{% extends "adminpanel/adminbase.html" %}
+
+{% block content %}
+<h2 class="text-center mt-3">Manage Visa Guidelines</h2>
+<a href="{% url 'adminpanel:add_visa_guide' %}" class="btn btn-success mb-3">➕ Upload Visa Guide</a>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Country</th>
+            <th>Image</th>
+            <th>Credits Required</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for visa_guide in visa_guides %}
+        <tr>
+            <td>{{ visa_guide.country }}</td>
+            <td><img src="{{ visa_guide.image.url }}" alt="{{ visa_guide.country }}" class="img-fluid" width="80"></td>
+            <td>{{ visa_guide.credits_required }}</td>
+            <td>
+                <a href="{% url 'adminpanel:edit_visa_guide' visa_guide.id %}" class="btn btn-warning btn-sm">✏ Edit</a>
+                <form method="POST" action="{% url 'adminpanel:delete_visa_guide' visa_guide.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this Visa Guide?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center alert alert-warning">No Visa Guides uploaded yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

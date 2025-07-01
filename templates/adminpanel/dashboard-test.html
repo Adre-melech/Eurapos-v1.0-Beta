@@ -1,0 +1,481 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block content %}
+
+<h2>Admin Dashboard</h2>
+
+<!-- Admin Actions -->
+<div class="d-flex justify-content-between mb-3">
+    <a href="{% url 'adminpanel:admin_logout' %}" class="btn btn-danger">Logout</a>
+</div>
+
+<p>Welcome to the admin panel! Manage jobs, applications, seekers, credits, and notifications.</p>
+
+<h3>Admin Notifications</h3>
+{% if notifications %}
+    <ul class="list-group">
+        {% for notification in notifications %}
+            <li class="list-group-item list-group-item-warning">
+                {{ notification.message }}
+                <small class="text-muted">{{ notification.created_at|date:"F j, Y, g:i A" }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="alert alert-info">✅ No pending notifications!</p>
+{% endif %}
+
+<h3>ATS CV Orders</h3>
+{% if ats_requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Requested On</th>
+                <th>Processed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in ats_requests %}
+                <tr>
+                    <td>{{ request.order_id }}</td>
+                    <td>{{ request.seeker.username }}</td>
+                    <td>{{ request.requested_at|date:"F j, Y, g:i A" }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'adminpanel:mark_ats_processed' request.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Mark as Processed</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No pending ATS CV orders!</p>
+{% endif %}
+
+
+
+<h3>Visa Consultancy Discount Orders</h3>
+{% if visa_purchases %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Purchased On</th>
+                <th>Coupon Code</th>
+                <th>Download PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in visa_purchases %}
+                <tr>
+                    <td>{{ purchase.order_id }}</td>
+                    <td>{{ purchase.seeker.username }}</td>
+                    <td>{{ purchase.purchased_at|date:"F j, Y, g:i A" }}</td>
+                    <td>{{ purchase.coupon_code }}</td>
+                    <td><a href="{{ purchase.pdf_file.url }}" class="btn btn-info">Download PDF</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No Visa Discount purchases yet!</p>
+{% endif %}
+
+
+<h3>Hidden Job Listings Purchases</h3>
+{% if hidden_jobs_access %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Unlocked On</th>
+                <th>Expires On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for access in hidden_jobs_access %}
+                <tr>
+                    <td>{{ access.seeker.username }}</td>
+                    <td>{{ access.unlocked_at|date:"F j, Y, g:i A" }}</td>
+                    <td>{{ access.expires_at|date:"F j, Y, g:i A" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No users have purchased Hidden Job Listings access!</p>
+{% endif %}
+
+<h3>WhatsApp Job Recommendation Purchases</h3>
+{% if whatsapp_users %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Purchased On</th>
+                <th>Expires On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in whatsapp_users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.whatsapp_optin_expires|date:"F j, Y, g:i A" }}</td>
+                    <td>{{ user.whatsapp_optin_expires|date:"F j, Y, g:i A" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No active WhatsApp job recommendation purchases!</p>
+{% endif %}
+
+
+<!-- Statistics Overview -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <h5 class="card-header">Total Jobs</h5>
+            <div class="card-body"><h3>{{ jobs_count|default:"0" }}</h3></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <h5 class="card-header">Total Applications</h5>
+            <div class="card-body"><h3>{{ applications_count|default:"0" }}</h3></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <h5 class="card-header">Total Seekers</h5>
+            <div class="card-body"><h3>{{ seekers_count|default:"0" }}</h3></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <h5 class="card-header">Unread Notifications</h5>
+            <div class="card-body"><h3>{{ notifications_count|default:"0" }}</h3></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Job & Seeker Management -->
+<h3 class=mt-3>Manage Job Listings</h3>
+<a href="{% url 'adminpanel:add_category' %}" class="btn btn-secondary">Add Category</a>
+<a href="{% url 'adminpanel:add_job_title' %}" class="btn btn-secondary">Add Job Title</a>
+<a href="{% url 'adminpanel:add_seeker_country' %}" class="btn btn-secondary">Add Seeker Country</a>
+<a href="{% url 'adminpanel:add_job_country' %}" class="btn btn-secondary">Add Job Country</a>
+
+<h3 class="mt-3">Manage Listings</h3>
+<a href="{% url 'adminpanel:manage_categories' %}" class="btn btn-info">View Categories</a>
+<a href="{% url 'adminpanel:manage_job_titles' %}" class="btn btn-info">View Job Titles</a>
+<a href="{% url 'adminpanel:manage_seeker_countries' %}" class="btn btn-info">View Seeker Countries</a>
+<a href="{% url 'adminpanel:manage_job_countries' %}" class="btn btn-info">View Job Countries</a>
+
+
+
+<h3 class="mt-3">Manage Job Posts</h3>
+<a href="{% url 'adminpanel:add_job' %}" class="btn btn-success">Post New Job</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Salary</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td>{{ job.company_name }}</td>
+            <td>{{ job.salary }}</td>
+            <td>{{ job.deadline|date:"F j, Y" }}</td>
+            <td>
+                <a href="{% url 'adminpanel:edit_job' job.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <form method="POST" action="{% url 'adminpanel:delete_job' job.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+                <a href="{% url 'adminpanel:manage_jobs'%}" class="btn btn-primary btn-sm">Manage</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No job postings found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h3 class="mt-3">Job Applications</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Seeker</th>
+            <th>Status</th>
+            <th>CV</th>
+            <th>Priority Review</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in applications %}
+        <tr>
+            <td>{{ application.job.title }}</td>
+            <td>{{ application.seeker.username }}</td>
+            <td>
+                <form method="POST" action="{% url 'adminpanel:update_application_status' application.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="Submitted" {% if application.status == "Submitted" %}selected{% endif %}>Submitted</option>
+                        <option value="Under Review" {% if application.status == "Under Review" %}selected{% endif %}>Under Review</option>
+                        <option value="Interview Scheduled" {% if application.status == "Interview Scheduled" %}selected{% endif %}>Interview Scheduled</option>
+                        <option value="Rejected" {% if application.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                        <option value="Accepted" {% if application.status == "Accepted" %}selected{% endif %}>Accepted</option>
+                    </select>
+                </form>
+            </td>
+            <td>
+                {% if application.cv %}
+                    <a href="{{ application.cv.url }}" class="btn btn-primary btn-sm">Download CV</a>
+                {% else %}
+                    <span class="text-muted">No CV uploaded</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if application.priority_review %}
+                    <span class="badge bg-success">✅ Priority</span>
+                {% else %}
+                    <span class="badge bg-secondary">Not Marked</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="POST" action="{% url 'adminpanel:delete_seeker' application.seeker.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this seeker?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Delete Seeker</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No applications found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3 class="mt-4">Priority Review Applications</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Seeker</th>
+            <th>Status</th>
+            <th>Purchased Priority At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in priority_applications %}
+        <tr>
+            <td>{{ application.job.title }}</td>
+            <td>{{ application.seeker.username }}</td>
+            <td>{{ application.status }}</td>
+            <td>{{ application.purchased_priority_at|date:"F j, Y, g:i A" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No priority applications found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3 class=mt-3>Manage Seeker Credits</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Seeker</th>
+            <th>Credits</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for seeker in seekers %}
+        <tr>
+            <td>{{ seeker.username }}</td>
+            <td>{{ seeker.credits }}</td>
+            <td>
+                <a href="{% url 'adminpanel:manage_credits' seeker.id %}" class="btn btn-info btn-sm">Manage Credits</a>
+                <a href="{% url 'adminpanel:manage_seeker' seeker.id %}" class="btn btn-primary btn-sm">Manage</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No seekers found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Events Management -->
+<!-- ////////////////// -->
+<h2>Manage Events</h2>
+<a href="{% url 'adminpanel:add_event' %}" class="btn btn-success mb-3">➕ Add New Event</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Image</th>
+            <th>Credits Required</th>
+            <th>Available Until</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td>{{ event.title }}</td>
+            <td><img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-fluid" width="80"></td>
+            <td>{{ event.credits_required }}</td>
+            <td>{{ event.available_until }}</td>
+            <td>
+                <a href="{% url 'adminpanel:edit_event' event.id %}" class="btn btn-warning btn-sm">✏ Edit</a>
+                <a href="{% url 'adminpanel:delete_event' event.id %}" class="btn btn-danger btn-sm">🗑 Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No events uploaded yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Pending Event Ticket Deliveries</h3>
+{% if pending_tickets %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Event</th>
+                <th>Purchased On</th>
+                <th>Confirmation Code</th>
+                <th>Deliver</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in pending_tickets %}
+                <tr>
+                    <td>{{ ticket.order_id }}</td>
+                    <td>{{ ticket.seeker.username }}</td>
+                    <td>{{ ticket.event.title }}</td>
+                    <td>{{ ticket.purchased_at|date:"F j, Y, g:i A" }}</td>
+                    <td>{{ ticket.confirmation_code }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'adminpanel:mark_ticket_delivered' ticket.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Mark as Delivered</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No pending ticket deliveries!</p>
+{% endif %}
+<!-- ////////////////// -->
+<!-- Events Management -->
+
+<h2>Manage Visa Guidelines</h2>
+<a href="{% url 'adminpanel:add_visa_guide' %}" class="btn btn-success mb-3">➕ Upload Visa Guide</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Country</th>
+            <th>Image</th>
+            <th>Credits Required</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for visa_guide in visa_guides %}
+        <tr>
+            <td>{{ visa_guide.country }}</td>
+            <td><img src="{{ visa_guide.image.url }}" alt="{{ visa_guide.country }}" class="img-fluid" width="80"></td>
+            <td>{{ visa_guide.credits_required }}</td>
+            <td>
+                <a href="{% url 'adminpanel:edit_visa_guide' visa_guide.id %}" class="btn btn-warning btn-sm">✏ Edit</a>
+                <a href="{% url 'adminpanel:delete_visa_guide' visa_guide.id %}" class="btn btn-danger btn-sm">🗑 Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No visa guides uploaded yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h3>Visa Guide Purchases</h3>
+{% if visa_purchases %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Visa Guide</th>
+                <th>Unlocked On</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in visa_purchases %}
+                <tr>
+                    <td>{{ purchase.seeker.username }}</td>
+                    <td>{{ purchase.guide.country }}</td>
+                    <td>{{ purchase.unlocked_at|date:"F j, Y, g:i A" }}</td>
+                    <td><a href="{{ purchase.guide.pdf_file.url }}" class="btn btn-info">Download PDF</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="alert alert-info">✅ No Visa Guide purchases yet!</p>
+{% endif %}
+
+
+<h3>Send Alerts</h3>
+<form method="POST" id="alertForm">
+    {% csrf_token %}
+    <label>Select User:</label>
+    <select name="seeker_id" id="seekerSelect" class="form-select">
+        {% for seeker in seekers %}
+            <option value="{{ seeker.id }}">{{ seeker.username }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Message:</label>
+    <input type="text" name="message" required class="form-control">
+
+    <button type="submit" class="btn btn-warning mt-2">Send Alert</button>
+</form>
+
+<script>
+    document.getElementById("alertForm").addEventListener("submit", function (event) {
+        var seekerId = document.getElementById("seekerSelect").value;
+        if (!seekerId) {
+            event.preventDefault();
+            alert("Please select a user.");
+            return;
+        }
+        this.action = "/notifications/send-alert/" + seekerId + "/";
+    });
+</script>
+
+{% endblock %}

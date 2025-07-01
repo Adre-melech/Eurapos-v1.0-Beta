@@ -1,0 +1,22 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}WhatsApp Subscribers | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h3 class="mb-4">📱 All WhatsApp Job Subscribers</h3>
+
+  {% if whatsapp_users %}
+    <ul class="list-group">
+      {% for user in whatsapp_users %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ user.username }}
+          <span class="badge bg-success">{{ user.whatsapp_optin_expires|date:"M d, Y" }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted text-center p-3">No WhatsApp subscribers found.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

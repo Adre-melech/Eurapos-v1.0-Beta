@@ -1,0 +1,116 @@
+{% if jobs_matching_title %}
+  <h3 class="mt-5">🎯 Jobs Matching Your Title</h3>
+  <div class="row g-4">
+    {% for job in jobs_matching_title %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm job-card animate-fade-in">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-primary">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> Deadline: {{ job.deadline|date:"F j, Y" }}</p>
+            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary mt-auto">View Job</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if jobs_matching_category %}
+  <h3 class="mt-5">🛠️ Jobs in Your Category</h3>
+  <div class="row g-4">
+    {% for job in jobs_matching_category %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm job-card animate-fade-in">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-primary">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> Deadline: {{ job.deadline|date:"F j, Y" }}</p>
+            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary mt-auto">View Job</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if jobs_near_deadline %}
+  <h3 class="mt-5 text-danger">⏰ Jobs Near Deadline</h3>
+  <div class="row g-4">
+    {% for job in jobs_near_deadline %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-danger job-card animate-fade-in">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-danger">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            <p class="text-muted mb-2">
+              <i class="bi bi-calendar-event"></i>
+              {% if job.deadline < today %}
+                <span class="text-danger">Deadline Over</span>
+              {% else %}
+                Deadline: {{ job.deadline|date:"F j, Y" }}
+              {% endif %}
+            </p>
+            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-danger mt-auto">View Job</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if jobs_most_viewed %}
+  <h3 class="mt-5 text-success">🔥 Most Viewed Jobs</h3>
+  <div class="row g-4">
+    {% for job in jobs_most_viewed %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-success job-card animate-fade-in">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-success">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> Deadline: {{ job.deadline|date:"F j, Y" }}</p>
+            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success mt-auto">View Job</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if jobs_newest %}
+  <h3 class="mt-5">🆕 New Jobs</h3>
+  <div class="row g-4">
+    {% for job in jobs_newest %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-primary job-card animate-fade-in">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-primary">
+                {{ job.title }}
+              </a>
+            </h5>
+            <p class="text-muted mb-1"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> Deadline: {{ job.deadline|date:"F j, Y" }}</p>
+            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary mt-auto">View Job</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

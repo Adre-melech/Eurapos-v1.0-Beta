@@ -1,0 +1,27 @@
+<h3>Send Alerts</h3>
+<form method="POST" id="alertForm">
+    {% csrf_token %}
+    <label>Select User:</label>
+    <select name="seeker_id" id="seekerSelect" class="form-select">
+        {% for seeker in seekers %}
+            <option value="{{ seeker.id }}">{{ seeker.username }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Message:</label>
+    <input type="text" name="message" required class="form-control">
+
+    <button type="submit" class="btn btn-warning mt-2">Send Alert</button>
+</form>
+
+<script>
+    document.getElementById("alertForm").addEventListener("submit", function (event) {
+        var seekerId = document.getElementById("seekerSelect").value;
+        if (!seekerId) {
+            event.preventDefault();
+            alert("Please select a user.");
+            return;
+        }
+        this.action = "/notifications/send-alert/" + seekerId + "/";
+    });
+</script>

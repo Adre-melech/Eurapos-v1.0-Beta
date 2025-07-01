@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mt-4 text-danger">⏳ Near Deadline Jobs</h2>
+
+{% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- Search & Filters -->
+<div class="row g-3 mb-4 align-items-end">
+  <div class="col-md-6">
+    <label for="searchInput" class="form-label">🔍 Search for Jobs</label>
+    <input type="text" id="searchInput" class="form-control form-control-lg shadow-sm" placeholder="Search jobs..." oninput="fetchJobs()">
+  </div>
+  <div class="col-md-3">
+    <label for="categoryFilter" class="form-label">📂 Category</label>
+    <select id="categoryFilter" class="form-select" onchange="fetchJobs()">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label for="countryFilter" class="form-label">🌍 Country</label>
+    <select id="countryFilter" class="form-select" onchange="fetchJobs()">
+      <option value="">All Countries</option>
+      {% for country in countries %}
+        <option value="{{ country.id }}">{{ country.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- Spinner -->
+<div id="loadingSpinner" class="text-center my-5 d-none">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- Job Results (AJAX injected here) -->
+<div id="jobResults" class="row g-4 fade-in">
+  {% include "jobs/partials/near_deadline_jobs_result.html" %}
+</div>
+
+<!-- Load More Section -->
+<div id="loadMoreSection" class="text-center mt-4">
+  {% if has_more_jobs %}
+    <button id="loadMoreBtn" class="btn btn-danger">Load More Jobs</button>
+    <div id="noMoreJobsMsg" class="text-success fw-semibold mt-3 d-none">
+      ✅ This is all jobs.
+    </div>
+  {% elif near_deadline_jobs %}
+    <button id="loadMoreBtn" class="btn btn-danger d-none">Load More Jobs</button>
+    <div id="noMoreJobsMsg" class="text-success fw-semibold mt-3">
+      ✅ This is all jobs.
+    </div>
+  {% else %}
+    <p class="text-muted">No jobs found near deadline.</p>
+  {% endif %}
+</div>
+
+
+
+<script>
+  let currentFilters = {
+    search: "",
+    category: "",
+    country: ""
+  };
+
+  function fetchJobs() {
+    const searchQuery = document.getElementById("searchInput").value.trim();
+    const categoryId = document.getElementById("categoryFilter").value;
+    const countryId = document.getElementById("countryFilter").value;
+
+    currentFilters = { search: searchQuery, category: categoryId, country: countryId };
+
+    const jobContainer = document.getElementById("jobResults");
+    const spinner = document.getElementById("loadingSpinner");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const noMoreJobsMsg = document.getElementById("noMoreJobsMsg");
+
+    spinner.classList.remove("d-none");
+    loadMoreBtn.style.display = "none";
+    noMoreJobsMsg.classList.add("d-none");
+
+    fetch(`/jobs/ajax-near-deadline-search/?search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(categoryId)}&country=${encodeURIComponent(countryId)}`)
+      .then(response => response.json())
+      .then(data => {
+        jobContainer.innerHTML = data.html;
+        spinner.classList.add("d-none");
+
+        const jobCards = jobContainer.querySelectorAll("[data-job-id]");
+        if (jobCards.length >= 10) {
+          loadMoreBtn.style.display = "inline-block";
+        } else if (jobCards.length > 0) {
+          loadMoreBtn.style.display = "none";
+          noMoreJobsMsg.classList.remove("d-none");
+        } else {
+          loadMoreBtn.style.display = "none";
+        }
+      })
+      .catch(error => {
+        console.error("AJAX error:", error);
+        spinner.classList.add("d-none");
+      });
+  }
+
+  function loadMoreJobs() {
+    const jobContainer = document.getElementById("jobResults");
+    const spinner = document.getElementById("loadingSpinner");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const noMoreJobsMsg = document.getElementById("noMoreJobsMsg");
+
+    const lastJobCard = jobContainer.querySelector("[data-job-id]:last-of-type");
+    if (!lastJobCard) return;
+
+    const lastJobId = lastJobCard.dataset.jobId;
+
+    spinner.classList.remove("d-none");
+    loadMoreBtn.style.display = "none";
+
+    fetch(`/jobs/load-more-near-deadline-jobs/?last_job_id=${lastJobId}`)
+      .then(response => response.json())
+      .then(data => {
+        data.jobs.forEach(job => {
+          const jobHtml = `
+            <div class="col-md-6 col-lg-4" data-job-id="${job.id}">
+              <div class="card h-100 shadow-sm border border-danger">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">
+                    <a href="/jobs/${job.id}/" class="text-decoration-none text-danger">${job.title}</a>
+                  </h5>
+                  <p class="mb-1 text-muted"><strong>Company:</strong> ${job.company_name}</p>
+                  <p class="mb-1 text-muted"><strong>Salary:</strong> ${job.salary}</p>
+                  <p class="mb-1 text-muted"><strong>Deadline:</strong> ${job.deadline}</p>
+                  <p class="mb-3 text-muted"><strong>Location:</strong> ${job.country}</p>
+                  <a href="/jobs/${job.id}/" class="btn btn-outline-danger mt-auto">View Job</a>
+                </div>
+              </div>
+            </div>
+          `;
+          jobContainer.insertAdjacentHTML("beforeend", jobHtml);
+        });
+
+        spinner.classList.add("d-none");
+
+        if (data.has_more_jobs) {
+          loadMoreBtn.style.display = "inline-block";
+          noMoreJobsMsg.classList.add("d-none");
+        } else {
+          loadMoreBtn.style.display = "none";
+          noMoreJobsMsg.classList.remove("d-none");
+        }
+      })
+      .catch(error => {
+        console.error("Load More AJAX error:", error);
+        spinner.classList.add("d-none");
+      });
+  }
+
+  document.getElementById("loadMoreBtn").addEventListener("click", loadMoreJobs);
+</script>
+
+{% endblock %}

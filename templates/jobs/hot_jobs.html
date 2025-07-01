@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mt-4 text-warning">🔥 Hot Jobs</h2>
+
+{% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- Search & Filters -->
+<div class="row g-3 mb-4 align-items-end">
+  <div class="col-md-6">
+    <label for="searchInput" class="form-label">🔍 Search Hot Jobs</label>
+    <input type="text" id="searchInput" class="form-control form-control-lg shadow-sm" placeholder="Search jobs..." oninput="fetchHotJobs()">
+  </div>
+  <div class="col-md-3">
+    <label for="categoryFilter" class="form-label">📂 Category</label>
+    <select id="categoryFilter" class="form-select" onchange="fetchHotJobs()">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label for="countryFilter" class="form-label">🌍 Country</label>
+    <select id="countryFilter" class="form-select" onchange="fetchHotJobs()">
+      <option value="">All Countries</option>
+      {% for country in countries %}
+        <option value="{{ country.id }}">{{ country.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- Spinner -->
+<div id="loadingSpinner" class="text-center my-5 d-none">
+  <div class="spinner-border text-warning" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- Job Results (AJAX injected here) -->
+<div id="jobResults" class="row g-4 fade-in">
+  {% include "jobs/partials/hot_jobs_result.html" %}
+</div>
+
+<!-- Load More Button -->
+<div class="text-center mt-4" id="loadMoreSection">
+  {% if has_more_jobs %}
+    <button id="loadMoreBtn" class="btn btn-warning" onclick="loadMoreHotJobs()">Load More Hot Jobs</button>
+  {% else %}
+    <div id="noMoreJobsMsg" class="text-success fw-semibold mt-3">
+      ✅ This is all hot jobs.
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  function fetchHotJobs() {
+    let searchQuery = document.getElementById("searchInput").value.trim();
+    let categoryId = document.getElementById("categoryFilter").value;
+    let countryId = document.getElementById("countryFilter").value;
+
+    fetch(`/jobs/ajax-hot-jobs-search/?search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(categoryId)}&country=${encodeURIComponent(countryId)}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("jobResults").innerHTML = data.html;
+      });
+  }
+
+  let offset = 10;
+  function loadMoreHotJobs() {
+    fetch(`/jobs/load-more-hot-jobs/?offset=${offset}`)
+      .then(response => response.json())
+      .then(data => {
+        let jobContainer = document.getElementById("jobResults");
+        data.jobs.forEach(job => {
+          let jobHtml = `
+            <div class="col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm border border-warning">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">
+                    <a href="/jobs/${job.id}/" class="text-decoration-none text-warning">
+                      ${job.title}
+                    </a>
+                  </h5>
+                  <p class="mb-1 text-muted"><strong>Company:</strong> ${job.company_name}</p>
+                  <p class="mb-1 text-muted"><strong>Salary:</strong> ${job.salary}</p>
+                  <p class="mb-1 text-muted"><strong>Views:</strong> ${job.views}</p>
+                  <p class="mb-3 text-muted"><strong>Location:</strong> ${job.country}</p>
+                  <a href="/jobs/${job.id}/" class="btn btn-outline-warning mt-auto">View Job</a>
+                </div>
+              </div>
+            </div>
+          `;
+          jobContainer.insertAdjacentHTML("beforeend", jobHtml);
+        });
+
+        offset += 10;
+        if (!data.has_more_jobs) {
+          document.getElementById("loadMoreBtn").style.display = "none";
+          document.getElementById("noMoreJobsMsg").classList.remove("d-none");
+        }
+      });
+  }
+</script>
+
+{% endblock %}

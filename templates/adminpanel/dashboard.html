@@ -1,0 +1,367 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}Dashboard | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h3 class="mb-4">📊 Admin Dashboard</h3>
+
+  <!-- Overview Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-start border-primary border-4 shadow h-100">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Total Jobs</h6>
+          <h3 class="fw-bold text-primary">{{ jobs_count }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-start border-success border-4 shadow h-100">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Applications</h6>
+          <h3 class="fw-bold text-success">{{ applications_count }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-start border-warning border-4 shadow h-100">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Registered Seekers</h6>
+          <h3 class="fw-bold text-warning">{{ seekers_count }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-start border-danger border-4 shadow h-100">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Unread Notifications</h6>
+          <h3 class="fw-bold text-danger">{{ notifications_count }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Applications Management -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <span>📝 Recent Applications</span>
+      <span class="badge bg-light text-primary">{{ total_applications }}</span>
+    </div>
+    <div class="card-body p-0">
+      {% if applications %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Seeker</th>
+                <th>Job</th>
+                <th>Job ID</th>
+                <th>Applied At</th>
+                <th>Status</th>
+                <th>Update Status</th>
+                <th>CV</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app in applications %}
+                <tr>
+                  <td>{{ app.seeker.seeker_id }}</td>
+                  <td>{{ app.seeker.username }}</td>
+                  <td>{{ app.job.job_id }}</td>
+                  <td>{{ app.job.title }}</td>
+                  <td>{{ app.applied_at|date:"M d, Y H:i" }}</td>
+                  <td>
+                    {% if app.status == "Submitted" %}
+                      <span class="badge bg-secondary">{{ app.status }}</span>
+                    {% elif app.status == "Under Review" %}
+                      <span class="badge bg-warning text-dark">{{ app.status }}</span>
+                    {% elif app.status == "Selected" %}
+                      <span class="badge bg-success">{{ app.status }}</span>
+                    {% elif app.status == "Rejected" %}
+                      <span class="badge bg-danger">{{ app.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form method="post" action="{% url 'adminpanel:update_application_status' app.id %}" class="d-flex gap-2 align-items-center">
+                      {% csrf_token %}
+                      <select name="status" class="form-select form-select-sm">
+                        {% for value, label in app.STATUS_CHOICES %}
+                          <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                      <button class="btn btn-sm btn-outline-primary">Update</button>
+                    </form>
+                  </td>
+                  <td>
+                    {% if app.cv %}
+                      <a href="{{ app.cv.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">📄 View</a>
+                    {% else %}
+                      <span class="text-muted">No CV</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted text-center p-3">No applications submitted yet.</p>
+      {% endif %}
+    </div>
+
+    {% if total_applications > 10 %}
+      <div class="card-footer text-end">
+        <a href="{% url 'adminpanel:all_applications' %}" class="btn btn-sm btn-outline-primary">Show More</a>
+      </div>
+    {% endif %}
+  </div>
+
+
+  <div class="row my-4 g-3">
+    <!-- Priority Applications -->
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+          <span>🔥 Priority Applications</span>
+          <span class="badge bg-light text-danger">{{ priority_applications.count }}</span>
+        </div>
+        <div class="card-body p-0">
+          {% if priority_applications %}
+            <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Seeker</th>
+                    <th>Job ID</th>
+                    <th>Job</th>
+                    <th>Priority Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for app in priority_applications %}
+                  <tr>
+                    <td>{{ app.seeker.seeker_id }}</td>
+                    <td>{{ app.seeker.username }}</td>
+                    <td>{{ app.job.job_id }}</td>
+                    <td>{{ app.job.title }}</td>
+                    <td>{{ app.purchased_priority_at|date:"M d, Y" }}</td>
+                    <td>
+                      <form method="post" action="{% url 'adminpanel:mark_priority_done' app.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger">✅ Done</button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted text-center p-3">No priority applications right now.</p>
+          {% endif %}
+        </div>
+        {% if priority_applications.count > 10 %}
+        <div class="card-footer text-center">
+          <a href="{% url 'adminpanel:priority_applications_list' %}" class="btn btn-sm btn-danger">Show More</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- WhatsApp Job Subscribers -->
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <span>📱 WhatsApp Job Subscribers</span>
+          <span class="badge bg-light text-danger">{{ whatsapp_users.count }}</span>
+        </div>
+        <div class="card-body p-0" style="max-height: 320px; overflow-y: auto;">
+          {% if whatsapp_users %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Seeker ID</th>
+                    <th>Username</th>
+                    <th>Subscribed On</th>
+                    <th>Subscription Expires</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in whatsapp_users %}
+                  <tr>
+                    <td>{{ user.seeker_id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.whatsapp_optin_started|date:"M d, Y" }}</td>
+                    <td>{{ user.whatsapp_optin_expires|date:"M d, Y" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted text-center p-3">No active WhatsApp subscribers.</p>
+          {% endif %}
+        </div>
+        {% if whatsapp_users.count > 10 %}
+        <div class="card-footer text-center">
+          <a href="{% url 'adminpanel:whatsapp_subscribers_list' %}" class="btn btn-sm btn-success">Show More</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+
+
+
+    <!-- ATS CV Requests -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+        <span>📄 ATS CV Requests</span>
+        <span class="badge bg-light text-danger">{{ ats_requests.count }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Seeker ID</th>
+              <th>Seeker</th>
+              <th>Requested On</th>
+              <th>Status</th>
+              <th>Download CV</th>
+              <th>Upload PDF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ats in ats_requests|slice:":10" %}
+            <tr>
+              <td>ats-{{ ats.id }}</td>
+              <td>{{ ats.seeker.seeker_id }}</td>
+              <td>{{ ats.seeker.username }}</td>
+              <td>{{ ats.requested_at|date:"Y-m-d H:i" }}</td>
+              <td>
+                {% if ats.is_processed %}
+                  <span class="badge bg-success">Processed</span>
+                {% else %}
+                  <span class="badge bg-secondary">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if ats.cv_file %}
+                  <a href="{{ ats.cv_file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
+                {% else %}
+                  <span class="text-muted">No file</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if not ats.is_processed %}
+                  <form action="{% url 'adminpanel:upload_ats_cv' ats.id %}" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                    {% csrf_token %}
+                    <input type="file" name="cv_file" accept="application/pdf" required class="form-control form-control-sm" style="max-width: 160px;">
+                    <button class="btn btn-sm btn-outline-success" type="submit">Upload</button>
+                  </form>
+                {% else %}
+                  <span class="text-muted">Already Uploaded</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No ATS CV requests.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if ats_requests.count > 10 %}
+      <div class="card-footer text-center">
+        <a href="{% url 'adminpanel:ats_requests_list' %}" class="btn btn-sm btn-secondary">Show More</a>
+      </div>
+      {% endif %}
+    </div>
+
+
+
+  <!-- Visa Guide Purchases -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-info text-white">
+      🛂 Visa Guide Purchases
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Buyer</th>
+            <th>Visa Guide</th>
+            <th>Purchase Date</th>
+            <th>Credits Used</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for purchase in visa_purchases %}
+          <tr>
+            <td>{{ purchase.seeker.username }}</td>
+            <td>{{ purchase.visa_guide.country }}</td>
+            <td>{{ purchase.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ purchase.credits_used }}</td>
+            <td>
+              {% if purchase.completed %}
+                <span class="badge bg-success">Completed</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No visa guide purchases found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- Pending Event Tickets -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      🎟️ Pending Event Ticket Orders
+    </div>
+    <div class="card-body p-0">
+      {% if pending_tickets %}
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>Seeker</th>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ticket in pending_tickets %}
+              <tr>
+                <td>{{ ticket.seeker.username }}</td>
+                <td>{{ ticket.event.title }}</td>
+                <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  <form action="{% url 'adminpanel:mark_ticket_delivered' ticket.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-primary">✅ Mark Delivered</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-muted text-center p-3">No pending tickets found.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

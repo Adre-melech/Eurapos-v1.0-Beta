@@ -1,0 +1,52 @@
+{% extends "adminpanel/adminbase.html" %}
+
+{% block content %}
+<h2 class="text-center mt-3">Edit Visa Guide</h2>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Visa Guide Edit Form -->
+<div class="card p-4 mx-auto" style="max-width: 600px;">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Country</label>
+            <input type="text" name="country" class="form-control" value="{{ visa_guide.country }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Current Visa Guide Image</label><br>
+            <img src="{{ visa_guide.image.url }}" class="img-fluid mb-2" width="200" alt="Visa Guide Image">
+            <input type="file" name="image" class="form-control">
+            <small class="text-muted">Upload a new image to replace the existing one.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Current Visa Guide PDF</label><br>
+            <a href="{{ visa_guide.pdf_file.url }}" class="btn btn-info btn-sm">View Current PDF</a>
+            <input type="file" name="pdf_file" class="form-control mt-2">
+            <small class="text-muted">Upload a new PDF to replace the existing one.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Credits Required</label>
+            <input type="number" name="credits_required" class="form-control" min="1" value="{{ visa_guide.credits_required }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-warning w-100">Update Visa Guide</button>
+    </form>
+</div>
+
+<p class="text-center mt-3">
+    <a href="{% url 'adminpanel:manage_visa_guides' %}" class="text-secondary">Back to Visa Guides</a>
+</p>
+
+{% endblock %}

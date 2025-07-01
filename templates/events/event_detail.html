@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <img src="{{ event.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ event.title }}">
+    </div>
+    <div class="col-lg-6">
+      <h2 class="mb-3">{{ event.title }}</h2>
+      <span class="badge bg-primary mb-2">{{ event.credits_required }} Credits</span>
+      <p class="text-muted"><strong>Available Until:</strong> {{ event.available_until }}</p>
+
+      <p class="mt-4">{{ event.description|linebreaks }}</p>
+
+      {% if user.is_authenticated %}
+        {% if purchased %}
+          <div class="alert alert-success mt-4">
+            ✅ You’ve already purchased a ticket for this event.
+          </div>
+        {% else %}
+          <form method="post" action="{% url 'events:purchase_ticket' event.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success mt-4">
+              🎟 Buy Ticket Now
+            </button>
+          </form>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-info mt-4">
+          Please <a href="{% url 'login' %}">log in</a> to purchase a ticket.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}All Applications | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h3 class="mb-4">📝 All Applications</h3>
+
+  {% if applications %}
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>Applications List</span>
+        <span class="badge bg-light text-primary">{{ applications.count }}</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Seeker</th>
+                <th>Job ID</th>
+                <th>Job</th>
+                <th>Applied At</th>
+                <th>Status</th>
+                <th>Update Status</th>
+                <th>CV</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app in applications %}
+              <tr>
+                <td>{{ app.seeker.seeker_id }}</td>
+                <td>{{ app.seeker.username }}</td>
+                <td>{{ app.job.job_id }}</td>
+                <td>{{ app.job.title }}</td>
+                <td>{{ app.applied_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  {% if app.status == "Submitted" %}
+                    <span class="badge bg-secondary">{{ app.status }}</span>
+                  {% elif app.status == "Under Review" %}
+                    <span class="badge bg-warning text-dark">{{ app.status }}</span>
+                  {% elif app.status == "Selected" %}
+                    <span class="badge bg-success">{{ app.status }}</span>
+                  {% elif app.status == "Rejected" %}
+                    <span class="badge bg-danger">{{ app.status }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="post" action="{% url 'adminpanel:update_application_status' app.id %}" class="d-flex gap-2 align-items-center">
+                    {% csrf_token %}
+                    <select name="status" class="form-select form-select-sm">
+                      {% for value, label in app.STATUS_CHOICES %}
+                        <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-outline-primary">Update</button>
+                  </form>
+                </td>
+                <td>
+                  {% if app.cv %}
+                    <a href="{{ app.cv.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">📄 View</a>
+                  {% else %}
+                    <span class="text-muted">No CV</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center">
+      No applications have been submitted yet.
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

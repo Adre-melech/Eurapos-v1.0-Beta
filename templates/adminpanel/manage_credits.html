@@ -1,0 +1,15 @@
+{% extends "adminpanel/adminbase.html" %}
+
+{% block content %}
+<h2>Manage Credits for {{ seeker.username }}</h2>
+<p><strong>Current Credits:</strong> {{ seeker.credits }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="credits">Add or Remove Credits:</label>
+        <input type="number" name="credits" id="credits" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Update Credits</button>
+</form>
+{% endblock %}

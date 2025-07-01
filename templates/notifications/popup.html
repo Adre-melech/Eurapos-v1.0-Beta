@@ -1,0 +1,7 @@
+{% if notifications %}
+<div class="notification-popup">
+    {% for notification in notifications %}
+        <p>{{ notification.message }}</p>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Eurapos - Job Portal{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Font Awesome icons -->
+  <script src="https://kit.fontawesome.com/66b54d8688.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="{% url 'home:home' %}">Eurapos</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'jobs:job_list' %}">Browse Jobs</a>
+          </li>
+
+          {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'seeker:dashboard' %}">Dashboard</a>
+            </li>
+
+            {% if unlocked_jobs %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'jobs:exclusive_jobs' %}">Exclusive Jobs</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link text-warning" href="{% url 'jobs:unlock_exclusive_jobs' %}">
+                  🚀 Unlock Exclusive Jobs!
+                </a>
+              </li>
+            {% endif %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home:visa_guides' %}">Visa Guides</a>
+            </li>
+
+            <!-- Credits display -->
+            <li class="nav-item d-flex align-items-center px-3 border rounded bg-light me-lg-2" style="font-weight:600; font-size:0.9rem;">
+              <i class="fa-solid fa-wallet me-2" style="color: #1800d1;"></i>
+              {{ request.user.credits|default:"0" }}
+            </li>
+
+            <!-- Notifications -->
+            <li class="nav-item dropdown">
+              <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-regular fa-bell fa-xl"></i>
+                {% with count=unread_notifications.count %}
+                  {% if count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {{ count|default:"0" }}{% if count > 99 %}+{% endif %}
+                    </span>
+                  {% endif %}
+                {% endwith %}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm p-0" style="min-width: 350px; max-height: 400px; overflow-y: auto;">
+                <li class="dropdown-header bg-light fw-bold px-3 py-2">🔔 Notifications</li>
+                {% for note in recent_notifications %}
+                  <li class="dropdown-item small text-wrap {% if not note.read %}fw-bold{% endif %}"
+                      data-note-id="{{ note.id }}" onclick="markAsRead(this)">
+                    {{ note.message }}<br>
+                    <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+                  </li>
+                {% empty %}
+                  <li class="dropdown-item text-muted text-center">No notifications yet.</li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-center" href="{% url 'seeker:notifications_page' %}">🔍 See all notifications</a></li>
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <a class="btn btn-outline-danger btn-sm ms-lg-2" href="{% url 'seeker:seeker_logout' %}">Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'seeker:seeker_register' %}">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary btn-sm" href="{% url 'seeker:seeker_login' %}">Login</a>
+            </li>
+          {% endif %}
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+  {% if request.user.is_authenticated %}
+    <!-- Flash Alerts -->
+    <div class="container mt-3">
+      {% if not request.user.receive_whatsapp_jobs %}
+        <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+          🚀 Unlock Personalized WhatsApp Job Recommendations for 10 Days!
+          <a href="{% url 'seeker:buy_whatsapp_recommendations' %}" class="btn btn-sm btn-primary ms-2">Activate Now</a>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+
+      {% if not request.user.visa_discount_redeemed %}
+        <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+          🚀 Get 10% Off Visa Consultancy with Credits!
+          <a href="{% url 'seeker:buy_visa_discount' %}" class="btn btn-sm btn-primary ms-2">Redeem Now</a>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+
+      {% for guide in visa_guides %}
+        {% if guide.id %}
+          <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+            🚀 Unlock Visa Guidelines for Your Destination!
+            <a href="{% url 'seeker:unlock_visa_guide' guide.id %}" class="btn btn-sm btn-primary ms-2">Unlock Now</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            Visa Guide ID missing! Please contact support.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+<!-- Main Content -->
+<div class="container my-4">
+  {% block content %}
+  {% endblock %}
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="row text-center text-md-start">
+      <div class="col-md-3 mb-4">
+        <h5>Contact</h5>
+        <p>Email: support@eurapos.com</p>
+        <p>Phone: +65 1234 5678</p>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="{% url 'jobs:job_list' %}">Browse Jobs</a></li>
+          <li><a href="{% url 'home:visa_guides' %}">Visa Guides</a></li>
+          <li><a href="{% url 'seeker:seeker_register' %}">Register</a></li>
+          <li><a href="{% url 'seeker:seeker_login' %}">Login</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h5>Rewards</h5>
+        <ul class="list-unstyled">
+          <li><a href="#">Refer & Earn</a></li>
+          <li><a href="#">Exclusive Access</a></li>
+          <li><a href="#">Discount Coupons</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h5>Follow Us</h5>
+        <div class="social-icons">
+          <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
+          <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
+          <a href="#" target="_blank"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" target="_blank"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <p class="mb-0">&copy; 2025 Eurapos. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery & Custom JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/home.js' %}"></script>
+
+<!-- Bootstrap Icons (for social links) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</body>
+</html>

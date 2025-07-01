@@ -1,0 +1,41 @@
+{% extends "adminpanel/adminbase.html" %}
+
+{% block content %}
+<h2>Edit Job Post</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label>Job Title</label>
+        <input type="text" name="title" class="form-control" value="{{ job.title }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Company Name</label>
+        <input type="text" name="company_name" class="form-control" value="{{ job.company_name }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Salary</label>
+        <input type="text" name="salary" class="form-control" value="{{ job.salary }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Application Deadline</label>
+        <input type="date" name="deadline" class="form-control" value="{{ job.deadline|date:'Y-m-d' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Job Description</label>
+        <textarea name="description" class="form-control" rows="5" required>{{ job.description }}</textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Required Skills</label>
+        <textarea name="required_skills" class="form-control" rows="4" required>{{ job.required_skills }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Update Job</button>
+    <p class="text-center mt-3"><a href="{% url 'adminpanel:manage_jobs' %}" class="text-secondary">Back to Job Management</a></p>
+</form>
+{% endblock %}

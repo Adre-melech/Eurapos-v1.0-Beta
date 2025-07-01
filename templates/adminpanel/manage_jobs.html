@@ -1,0 +1,40 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block content %}
+<h2 class="mb-4">Manage Job Posts</h2>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Salary</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td>{{ job.company_name }}</td>
+            <td>{{ job.salary }}</td>
+            <td>{{ job.deadline|date:"F j, Y" }}</td>
+            <td>
+                <a href="{% url 'adminpanel:edit_job' job.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <form method="POST" action="{% url 'adminpanel:delete_job' job.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No job postings found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p class="text-center mt-4">
+    <a href="{% url 'adminpanel:add_job' %}" class="btn btn-primary">Post a New Job</a>
+    <a href="{% url 'adminpanel:admin_dashboard' %}" class="btn btn-secondary">Dashboard</a>
+</p>
+{% endblock %}

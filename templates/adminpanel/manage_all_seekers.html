@@ -1,0 +1,45 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}Dashboard | Admin Panel{% endblock %}
+{% block content %}
+
+<h3 class="mb-4">👥 Manage All Seekers</h3>
+
+<table class="table table-bordered table-hover">
+  <thead class="table-light">
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Referral ID</th>
+      <th>Email</th>
+      <th>Credits</th>
+      <th>Add Credits</th>
+      <th>Manage</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for seeker in seekers %}
+      <tr>
+        <td>{{ seeker.seeker_id|default:"—" }}</td>
+        <td>{{ seeker.username }}</td>
+        <td>{{ seeker.referral_id|default:"—" }}</td>
+        <td>{{ seeker.email }}</td>
+        <td>{{ seeker.credits }}</td>
+        <td>
+          <form method="POST" class="d-flex align-items-center">
+            {% csrf_token %}
+            <input type="hidden" name="seeker_id" value="{{ seeker.id }}">
+            <input type="number" name="credits" class="form-control form-control-sm me-2" placeholder="Amount" min="1" required>
+            <button type="submit" class="btn btn-sm btn-success">Add</button>
+          </form>
+        </td>
+        <td>
+          <a href="{% url 'adminpanel:edit_seeker' seeker.id %}" class="btn btn-sm btn-outline-primary">
+            Manage
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

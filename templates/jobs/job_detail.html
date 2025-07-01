@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row g-4">
+    <!-- Job Overview -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h2 class="card-title text-primary">{{ job.title }}</h2>
+          <p class="mb-2"><i class="bi bi-building"></i> <strong>Company:</strong> {{ job.company_name }}</p>
+          <p class="mb-2"><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ job.country.name }}</p>
+          <p class="mb-2"><i class="bi bi-tags"></i> <strong>Category:</strong> {{ job.category.name }}</p>
+          <p class="mb-2"><i class="bi bi-cash-stack"></i> <strong>Salary:</strong> {{ job.salary }}</p>
+          <p class="mb-3"><i class="bi bi-calendar-event"></i> <strong>Deadline:</strong> <span class="text-danger">{{ job.deadline|date:"F j, Y" }}</span></p>
+
+          <hr>
+          <h5>Description</h5>
+          <p class="mt-2">{{ job.description|default:"[NO DESCRIPTION]"|linebreaks }}</p>
+
+          {% if job.required_skills %}
+            <h5 class="mt-4">Required Skills</h5>
+            <ul class="list-group list-group-flush">
+              {% for skill in job.required_skills.splitlines %}
+                <li class="list-group-item">{{ skill }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Apply Section -->
+      <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+          {% if user.is_authenticated %}
+            {% if application_status %}
+              <div class="alert alert-info mb-0">✅ You have already applied for this job.</div>
+            {% else %}
+              <h5 class="mb-3">Apply for This Job</h5>
+              <form method="POST" action="{% url 'jobs:apply_job' job.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label class="form-label">Upload CV (PDF, DOC):</label>
+                <input type="file" name="cv" class="form-control" accept=".pdf, .doc, .docx">
+                <button type="submit" class="btn btn-primary mt-3">Apply Now</button>
+              </form>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-warning">
+              🔒 Please <a href="{% url 'seeker:seeker_login' %}" class="text-primary">log in</a> or
+              <a href="{% url 'seeker:seeker_register' %}" class="text-primary">register</a> to apply.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- HR Contact Section -->
+      <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-dark text-white">
+          🏢 HR Contact Information
+        </div>
+        <div class="card-body">
+          {% if user.is_authenticated %}
+            {% if application %}
+              {% if application.hr_unlocked %}
+              <p><strong>Name:</strong> {{ job.hr_name }}</p>
+              <p><strong>Email:</strong> <a href="mailto:{{ job.hr_email }}">{{ job.hr_email }}</a></p>
+              <p><strong>Phone:</strong> {{ job.hr_phone }}</p>
+              {% else %}
+                <p class="text-muted">🔒 HR contact details are locked.</p>
+                <form method="POST" action="{% url 'jobs:unlock_hr_info' job.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning mt-2">Unlock for 10 Credits</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <p class="text-muted">🔒 You need to <a href="{% url 'jobs:apply_job' job.id %}" class="text-primary">apply for this job</a> before unlocking HR contact details.</p>
+            {% endif %}
+          {% else %}
+            <p class="text-muted">
+              🔒 Please <a href="{% url 'seeker:seeker_login' %}" class="text-primary">log in</a> or
+              <a href="{% url 'seeker:seeker_register' %}" class="text-primary">register</a> to see HR contact information.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+
+
+    </div>
+
+    <!-- Sidebar with Stats -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center">
+          <h6 class="text-muted mb-2">👁️ Views</h6>
+          <h3 class="text-primary">{{ job.views }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rating Modal -->
+{% if application and application.status != "Rejected" %}
+<div class="modal fade" id="ratingModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content shadow">
+      <div class="modal-header">
+        <h5 class="modal-title">⭐ Rate Your Application Experience</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-success">💰 Earn 5 credits by submitting your rating!</p>
+        <form method="POST" action="{% url 'jobs:rate_application' application.id %}">
+          {% csrf_token %}
+          <label class="form-label">Select Rating:</label>
+          <select name="rating" class="form-select">
+            <option value="good">🙂 Good</option>
+            <option value="okay">😐 Okay</option>
+            <option value="bad">☹️ Bad</option>
+          </select>
+          <button type="submit" class="btn btn-success mt-3">Submit Rating</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    {% if application and not application.rating %}
+      var ratingModal = new bootstrap.Modal(document.getElementById("ratingModal"));
+      ratingModal.show();
+    {% endif %}
+  });
+</script>
+
+{% endblock %}

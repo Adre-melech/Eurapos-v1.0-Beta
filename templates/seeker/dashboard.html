@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="mb-5 text-center text-primary fw-bold">My Dashboard</h2>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Credits & Referral -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="card shadow rounded-4 border-primary border-2">
+        <div class="card-body text-center">
+          <h5 class="card-title text-primary">💰 Available Credits</h5>
+          <p class="display-5 fw-bold">{{ seeker.credits }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow rounded-4 border-success border-2">
+        <div class="card-body text-center">
+          <h5 class="card-title text-success">🎯 Referral Program</h5>
+          <p class="mb-2">Share your referral ID and earn <strong>50 Credits</strong> per friend:</p>
+
+          <div class="d-flex justify-content-center align-items-center bg-light border rounded p-2">
+            <span id="referralId" class="fw-bold me-2">{{ seeker.referral_id }}</span>
+            <button id="copyReferralBtn" class="btn btn-sm btn-outline-primary" title="Copy to clipboard">
+              📋 Copy
+            </button>
+          </div>
+
+          <small id="copyMsg" class="text-success mt-2" style="display:none;">Copied!</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Unlock Exclusive Jobs Section -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm rounded-4 p-4 h-100 text-center">
+        <h5 class="mb-3">🔓 Unlock Exclusive Jobs</h5>
+
+        {% if unlocked_jobs %}
+          <p class="text-success fw-semibold">
+            ✅ Access valid until <strong>{{ unlocked_jobs.0.expires_at|date:"F j, Y" }}</strong>
+          </p>
+        {% elif can_unlock %}
+          <p>Exclusive jobs are hidden. Unlock access for 3 days!</p>
+          <form method="POST" action="{% url 'jobs:unlock_exclusive_jobs' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary w-100">Unlock for 10 Credits</button>
+          </form>
+        {% else %}
+          <p class="text-warning fw-semibold mb-2">
+            ⏳ Available again on <strong>{{ cooldown_expires|date:"F j, Y, g:i A" }}</strong>
+          </p>
+
+          <div class="progress mb-2" style="height: 22px;" title="{{ cooldown_remaining|floatformat:0 }} seconds remaining">
+            <div class="progress-bar progress-bar-striped bg-warning"
+                 role="progressbar"
+                 style="width: {{ cooldown_progress|floatformat:2 }}%;"
+                 aria-valuenow="{{ cooldown_elapsed|floatformat:0 }}"
+                 aria-valuemin="0" aria-valuemax="259200">
+              {{ cooldown_remaining|floatformat:0|divisibleby:3600|yesno:"~1,~0" }} hrs left
+            </div>
+          </div>
+
+          <button class="btn btn-secondary w-100" disabled>Unavailable</button>
+        {% endif %}
+      </div>
+    </div>
+
+
+    <!-- ATS CV Purchase -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm rounded-4 p-4 h-100 text-center">
+        <h5 class="mb-3">📄 Buy ATS-friendly CV</h5>
+        <p>Get a professionally optimized ATS CV.</p>
+
+        {% with ats_status=seeker.ats_cv_order_available %}
+          {% if ats_status.0 %}
+            <form method="POST" action="{% url 'seeker:buy_ats_cv' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-100">Buy ATS CV (30 Credits)</button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary w-100" disabled>
+              Available in {{ ats_status.1 }} day{{ ats_status.1|pluralize }}
+            </button>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- WhatsApp Recommendations -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm rounded-4 p-4 h-100 text-center">
+        <h5 class="mb-3">📲 WhatsApp Job Recommendations</h5>
+        <p>Receive job alerts on WhatsApp for 10 days.</p>
+
+        {% with wa_status=seeker.whatsapp_recommendation_status %}
+          {% if wa_status.0 %}
+            <p class="text-muted mb-3">Active for {{ wa_status.1 }} more day{{ wa_status.1|pluralize }}.</p>
+            <button class="btn btn-secondary w-100" disabled>Active</button>
+          {% else %}
+            <form method="POST" action="{% url 'seeker:buy_whatsapp_recommendations' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success w-100">Activate (20 Credits)</button>
+            </form>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Visa Discount -->
+  <div class="card shadow-sm rounded-4 p-4 mb-5">
+    <h4 class="text-primary fw-bold">🎫 Visa Consultancy Discount</h4>
+    <p>Redeem credits for 10% off visa processing at selected consultancies. Each discount is valid for 30 days.</p>
+
+    {% if visa_discount %}
+      <p class="text-success fw-semibold">✅ Your Visa Discount is confirmed!</p>
+      <p>Order ID: <strong>{{ visa_discount.order_id }}</strong></p>
+      <p>Coupon Code: <strong>{{ visa_discount.coupon_code }}</strong></p>
+      <p class="text-muted">Valid Until: {{ visa_discount.valid_until|date:"F j, Y" }}</p>
+      <a href="{{ visa_discount.pdf_file.url }}" class="btn btn-info">📥 Download Confirmation PDF</a>
+    {% else %}
+      <form method="POST" action="{% url 'seeker:buy_visa_discount' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Purchase (40 Credits)</button>
+      </form>
+    {% endif %}
+  </div>
+
+
+
+  <!-- Job Applications -->
+  <h3 class="mb-4 text-primary fw-bold">📋 My Job Applications</h3>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Applied On</th>
+          <th>Status</th>
+          <th>Priority Review</th>
+          <th>Rating</th>
+          <th>CV</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in applications %}
+        <tr>
+          <td>{{ application.job.title }}</td>
+          <td>{{ application.job.company_name }}</td>
+          <td>{{ application.applied_at|date:"F j, Y" }}</td>
+          <td><span class="badge bg-primary text-uppercase">{{ application.status }}</span></td>
+
+          <td>
+            {% if application.status == "Under Review" %}
+              {% if application.priority_review %}
+                <span class="badge bg-success">✅ Enabled ({{ application.purchased_priority_at|date:"F j, Y" }})</span>
+              {% else %}
+                <form method="POST" action="{% url 'jobs:buy_priority_review' application.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning btn-sm">Buy Priority Review (15 Credits)</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">❌ Not Available</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if application.rating %}
+              <span class="badge bg-info text-dark">{{ application.get_rating_display }}</span>
+            {% else %}
+              <form method="POST" action="{% url 'jobs:rate_application' application.id %}">
+                {% csrf_token %}
+                <select name="rating" class="form-select form-select-sm mb-1" aria-label="Rate Application">
+                  <option value="good">🙂 Good</option>
+                  <option value="okay">😐 Okay</option>
+                  <option value="bad">☹️ Bad</option>
+                </select>
+                <button type="submit" class="btn btn-secondary btn-sm">Rate</button>
+              </form>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if application.cv %}
+              <a href="{{ application.cv.url }}" target="_blank" class="text-decoration-none">📄 View CV</a>
+            {% else %}
+              <span class="text-danger">⚠ No CV uploaded</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">No applications found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Event Ticket Purchases -->
+  <h4 class="mb-4 text-primary fw-bold">🎫 My Event Ticket Purchases</h4>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Event Title</th>
+          <th>Confirmation Code</th>
+          <th>Purchased On</th>
+          <th>Status</th>
+          <th>Download Ticket</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in ticket_purchases %}
+        <tr>
+          <td>{{ ticket.order_id }}</td>
+          <td>{{ ticket.event.title }}</td>
+          <td>{{ ticket.confirmation_code }}</td>
+          <td>{{ ticket.purchased_at|date:"F j, Y, g:i A" }}</td>
+          <td>
+            {% if ticket.confirmed %}
+              <span class="badge bg-success">Delivered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ticket.confirmed %}
+              <a href="{% url 'events:download_ticket' ticket.id %}" class="btn btn-sm btn-outline-primary">
+                📥 Download
+              </a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-muted">No tickets purchased.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<h4 class="mb-4 text-success fw-bold">📄 My Visa Guide Downloads</h4>
+<div class="table-responsive mb-5">
+  <table class="table table-hover table-bordered rounded shadow-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>Country</th>
+        <th>Credits Used</th>
+        <th>Unlocked On</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for unlocked in unlocked_guides %}
+      <tr>
+        <td>{{ unlocked.guide.country }}</td>
+        <td>{{ unlocked.guide.credits_required }}</td>
+        <td>{{ unlocked.unlocked_at|date:"F j, Y, g:i A" }}</td>
+        <td>
+          {% if unlocked.guide.pdf_file %}
+            <a href="{{ unlocked.guide.pdf_file.url }}" class="btn btn-sm btn-outline-success" download>
+              📥 Download PDF
+            </a>
+          {% else %}
+            <span class="text-muted">Not available</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-center text-muted">No visa guides unlocked.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+  <!-- ATS CV Orders -->
+  <h4 class="mb-4 text-primary fw-bold">📑 My ATS CV Orders</h4>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Requested On</th>
+          <th>Status</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in ats_requests %}
+        <tr>
+          <td>{{ request.order_id }}</td>
+          <td>{{ request.requested_at|date:"F j, Y, g:i A" }}</td>
+          <td>
+            {% if request.processed %}
+              <span class="badge bg-success">✅ Delivered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">🚀 Processing</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if request.cv_file %}
+              <a href="{{ request.cv_file.url }}" class="btn btn-sm btn-outline-primary">📥 Download</a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center text-muted">No ATS CV requests made.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<script>
+  document.getElementById('copyReferralBtn').addEventListener('click', function() {
+    const referralText = document.getElementById('referralId').textContent.trim();
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(referralText).then(() => {
+        const msg = document.getElementById('copyMsg');
+        msg.style.display = 'block';
+
+        // Hide "Copied!" message after 2 seconds
+        setTimeout(() => {
+          msg.style.display = 'none';
+        }, 5000);
+      }).catch(() => {
+        alert('Failed to copy referral ID. Please copy manually.');
+      });
+    } else {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = referralText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const msg = document.getElementById('copyMsg');
+        msg.style.display = 'block';
+        setTimeout(() => {
+          msg.style.display = 'none';
+        }, 5000);
+      } catch (err) {
+        alert('Failed to copy referral ID. Please copy manually.');
+      }
+      document.body.removeChild(textarea);
+    }
+  });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}All ATS CV Requests | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h4 class="mb-4">📄 All ATS CV Requests</h4>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+      <span>ATS CV Requests</span>
+      <span class="badge bg-light text-dark">{{ ats_requests.count }}</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Seeker ID</th>
+            <th>Seeker Name</th>
+            <th>Requested At</th>
+            <th>Status</th>
+            <th>Download CV</th>
+            <th>Upload ATS CV</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ats in ats_requests %}
+          <tr>
+            <td>ats-{{ ats.id }}</td>
+            <td>{{ ats.seeker.seeker_id }}</td>
+            <td>{{ ats.seeker.username }}</td>
+            <td>{{ ats.requested_at|date:"M d, Y H:i" }}</td>
+            <td>
+              {% if ats.is_processed %}
+                <span class="badge bg-success">Processed</span>
+              {% else %}
+                <span class="badge bg-secondary">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if ats.cv_file %}
+                <a href="{{ ats.cv_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 Download</a>
+              {% else %}
+                <span class="text-muted">No File</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if not ats.is_processed %}
+              <form method="post" enctype="multipart/form-data" action="{% url 'adminpanel:upload_ats_cv' ats.id %}" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="file" name="cv_file" accept="application/pdf" class="form-control form-control-sm" required>
+                <button type="submit" class="btn btn-sm btn-outline-success">Upload</button>
+              </form>
+              {% else %}
+              <span class="text-muted">Already uploaded</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted">No ATS CV requests found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

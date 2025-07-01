@@ -1,0 +1,99 @@
+{% extends "adminpanel/adminbase.html" %}
+
+{% block content %}
+<h2 class="text-center mt-3">Add a New Job Posting</h2>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Job Post Form -->
+<div class="card p-4 mx-auto" style="max-width: 600px;">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Job Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Company Name</label>
+            <input type="text" name="company_name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Salary</label>
+            <input type="text" name="salary" class="form-control" placeholder="e.g., $50,000/year" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Application Deadline</label>
+            <input type="date" name="deadline" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Job Description</label>
+            <textarea name="description" class="form-control" rows="5" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Required Skills</label>
+            <textarea name="required_skills" class="form-control" rows="4" placeholder="List key skills, separated by commas" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Country</label>
+            <select name="country" class="form-select" required>
+                {% for country in countries %}
+                    <option value="{{ country.id }}">{{ country.name|default:"Unknown Country" }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select" required>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name|default:"Uncategorized" }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Exclusive Job Toggle -->
+        <div class="mb-3">
+            <label class="form-label">Exclusive Job?</label>
+            <input type="checkbox" name="exclusive_job"> Mark this job as exclusive
+        </div>
+
+        <!-- HR Contact Information -->
+        <h4 class="mt-4">HR Contact Details</h4>
+        <div class="mb-3">
+            <label class="form-label">HR Name</label>
+            <input type="text" name="hr_name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">HR Phone</label>
+            <input type="text" name="hr_phone" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">HR Email</label>
+            <input type="email" name="hr_email" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Submit Job Posting</button>
+    </form>
+</div>
+
+<p class="text-center mt-3">
+    <a href="{% url 'adminpanel:admin_dashboard' %}" class="text-secondary">Back to Admin Dashboard</a>
+</p>
+
+{% endblock %}

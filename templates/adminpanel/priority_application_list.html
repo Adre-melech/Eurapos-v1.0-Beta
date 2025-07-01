@@ -1,0 +1,41 @@
+{% extends "adminpanel/adminbase.html" %}
+{% block title %}Priority Applications | Admin Panel{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <h3 class="mb-4">🔥 All Priority Applications</h3>
+
+  {% if priority_applications %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Seeker</th>
+            <th>Job</th>
+            <th>Priority Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in priority_applications %}
+            <tr>
+              <td>{{ app.seeker.username }}</td>
+              <td>{{ app.job.title }}</td>
+              <td>{{ app.purchased_priority_at|date:"M d, Y H:i" }}</td>
+              <td>
+                <form method="post" action="{% url 'adminpanel:mark_priority_done' app.id %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger">✅ Done</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted text-center p-3">No priority applications found.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
