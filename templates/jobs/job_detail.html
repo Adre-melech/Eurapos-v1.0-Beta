@@ -1,28 +1,77 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+  .job-info-panel {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #333;
+  }
+  .job-info-panel div {
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .job-info-panel i {
+    font-size: 1.4rem;
+    color: #0d6efd;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+  }
+  @media (min-width: 992px) {
+    /* Sticky only on lg+ */
+    .job-info-panel {
+      position: sticky;
+      top: 100px;
+    }
+  }
+  /* Adjust margin on small screens */
+  @media (max-width: 991.98px) {
+    .job-info-panel {
+      margin-bottom: 2rem;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+    }
+  }
+  /* Skill list styling */
+  .skills-list li {
+    background: #e9ecef;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+</style>
+
 <div class="container my-5">
-  <div class="row g-4">
-    <!-- Job Overview -->
-    <div class="col-lg-8">
-      <div class="card shadow-sm border-0">
+  <div class="row g-5">
+    <!-- Left content -->
+    <div class="col-lg-8 order-2 order-lg-1">
+      <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
-          <h2 class="card-title text-primary">{{ job.title }}</h2>
-          <p class="mb-2"><i class="bi bi-building"></i> <strong>Company:</strong> {{ job.company_name }}</p>
-          <p class="mb-2"><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ job.country.name }}</p>
-          <p class="mb-2"><i class="bi bi-tags"></i> <strong>Category:</strong> {{ job.category.name }}</p>
-          <p class="mb-2"><i class="bi bi-cash-stack"></i> <strong>Salary:</strong> {{ job.salary }}</p>
-          <p class="mb-3"><i class="bi bi-calendar-event"></i> <strong>Deadline:</strong> <span class="text-danger">{{ job.deadline|date:"F j, Y" }}</span></p>
+          <h2 class="card-title text-primary fw-bold">{{ job.title }}</h2>
+
+          <!-- Responsive job info panel for small screens (shown only below title) -->
+          <div class="job-info-panel d-lg-none mt-3 mb-4">
+            <div><i class="bi bi-building"></i> Company: <strong>{{ job.company_name }}</strong></div>
+            <div><i class="bi bi-geo-alt"></i> Location: <strong>{{ job.country.name }}</strong></div>
+            <div><i class="bi bi-tags"></i> Category: <strong>{{ job.category.name }}</strong></div>
+            <div><i class="bi bi-cash-stack"></i> Salary: <strong>{{ job.salary }}</strong></div>
+            <div><i class="bi bi-calendar-event"></i> Deadline: <strong class="text-danger">{{ job.deadline|date:"F j, Y" }}</strong></div>
+          </div>
 
           <hr>
+
           <h5>Description</h5>
-          <p class="mt-2">{{ job.description|default:"[NO DESCRIPTION]"|linebreaks }}</p>
+          <p class="mt-3 lh-lg">{{ job.description|default:"[NO DESCRIPTION]"|linebreaks }}</p>
 
           {% if job.required_skills %}
             <h5 class="mt-4">Required Skills</h5>
-            <ul class="list-group list-group-flush">
+            <ul class="list-unstyled skills-list ms-3">
               {% for skill in job.required_skills.splitlines %}
-                <li class="list-group-item">{{ skill }}</li>
+                <li>{{ skill }}</li>
               {% endfor %}
             </ul>
           {% endif %}
@@ -30,96 +79,114 @@
       </div>
 
       <!-- Apply Section -->
-      <div class="card shadow-sm border-0 mt-4">
+      <div class="card shadow-sm border-0 rounded-4 mt-4">
         <div class="card-body">
           {% if user.is_authenticated %}
             {% if application_status %}
-              <div class="alert alert-info mb-0">✅ You have already applied for this job.</div>
+              <div class="alert alert-info d-flex align-items-center gap-2 mb-0">
+                <i class="bi bi-check-circle-fill"></i>
+                ✅ You have already applied for this job.
+              </div>
             {% else %}
-              <h5 class="mb-3">Apply for This Job</h5>
-              <form method="POST" action="{% url 'jobs:apply_job' job.id %}" enctype="multipart/form-data">
+              <h5 class="mb-3 fw-semibold">Apply for This Job</h5>
+              <form method="POST" action="{% url 'jobs:apply_job' job.id %}" enctype="multipart/form-data" class="needs-validation" novalidate>
                 {% csrf_token %}
-                <label class="form-label">Upload CV (PDF, DOC):</label>
-                <input type="file" name="cv" class="form-control" accept=".pdf, .doc, .docx">
-                <button type="submit" class="btn btn-primary mt-3">Apply Now</button>
+                <label for="cvUpload" class="form-label">Upload CV (PDF, DOC):</label>
+                <input
+                  type="file"
+                  id="cvUpload"
+                  name="cv"
+                  class="form-control"
+                  accept=".pdf, .doc, .docx"
+                  required
+                >
+                <div class="invalid-feedback">
+                  Please upload your CV.
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill mt-3 px-4 shadow-sm">
+                  Apply Now
+                </button>
               </form>
             {% endif %}
           {% else %}
-            <div class="alert alert-warning">
-              🔒 Please <a href="{% url 'seeker:seeker_login' %}" class="text-primary">log in</a> or
-              <a href="{% url 'seeker:seeker_register' %}" class="text-primary">register</a> to apply.
+            <div class="alert alert-warning mb-0">
+              🔒 Please
+              <a href="{% url 'seeker:seeker_login' %}" class="text-primary text-decoration-underline">log in</a> or
+              <a href="{% url 'seeker:seeker_register' %}" class="text-primary text-decoration-underline">register</a> to apply.
             </div>
           {% endif %}
         </div>
       </div>
 
       <!-- HR Contact Section -->
-      <div class="card shadow-sm border-0 mt-4">
-        <div class="card-header bg-dark text-white">
+      <div class="card shadow-sm border-0 rounded-4 mt-4">
+        <div class="card-header bg-dark text-white fw-semibold">
           🏢 HR Contact Information
         </div>
         <div class="card-body">
           {% if user.is_authenticated %}
             {% if application %}
               {% if application.hr_unlocked %}
-              <p><strong>Name:</strong> {{ job.hr_name }}</p>
-              <p><strong>Email:</strong> <a href="mailto:{{ job.hr_email }}">{{ job.hr_email }}</a></p>
-              <p><strong>Phone:</strong> {{ job.hr_phone }}</p>
+                <p><strong>Name:</strong> {{ job.hr_name }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ job.hr_email }}" class="text-decoration-underline">{{ job.hr_email }}</a></p>
+                <p><strong>Phone:</strong> {{ job.hr_phone }}</p>
               {% else %}
                 <p class="text-muted">🔒 HR contact details are locked.</p>
                 <form method="POST" action="{% url 'jobs:unlock_hr_info' job.id %}">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-warning mt-2">Unlock for 10 Credits</button>
+                  <button type="submit" class="btn btn-warning rounded-pill mt-2 px-4 shadow-sm">
+                    Unlock for 10 Credits
+                  </button>
                 </form>
               {% endif %}
             {% else %}
-              <p class="text-muted">🔒 You need to <a href="{% url 'jobs:apply_job' job.id %}" class="text-primary">apply for this job</a> before unlocking HR contact details.</p>
+              <p class="text-muted">🔒 You need to <a href="{% url 'jobs:apply_job' job.id %}" class="text-primary text-decoration-underline">apply for this job</a> before unlocking HR contact details.</p>
             {% endif %}
           {% else %}
             <p class="text-muted">
-              🔒 Please <a href="{% url 'seeker:seeker_login' %}" class="text-primary">log in</a> or
-              <a href="{% url 'seeker:seeker_register' %}" class="text-primary">register</a> to see HR contact information.
+              🔒 Please
+              <a href="{% url 'seeker:seeker_login' %}" class="text-primary text-decoration-underline">log in</a> or
+              <a href="{% url 'seeker:seeker_register' %}" class="text-primary text-decoration-underline">register</a> to see HR contact information.
             </p>
           {% endif %}
         </div>
       </div>
-
-
-
     </div>
 
-    <!-- Sidebar with Stats -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body text-center">
-          <h6 class="text-muted mb-2">👁️ Views</h6>
-          <h3 class="text-primary">{{ job.views }}</h3>
-        </div>
+    <!-- Right content: visible only on lg+ -->
+    <aside class="col-lg-4 order-1 order-lg-2 d-none d-lg-block">
+      <div class="job-info-panel">
+        <div><i class="bi bi-building"></i> Company: <strong>{{ job.company_name }}</strong></div>
+        <div><i class="bi bi-geo-alt"></i> Location: <strong>{{ job.country.name }}</strong></div>
+        <div><i class="bi bi-tags"></i> Category: <strong>{{ job.category.name }}</strong></div>
+        <div><i class="bi bi-cash-stack"></i> Salary: <strong>{{ job.salary }}</strong></div>
+        <div><i class="bi bi-calendar-event"></i> Deadline: <strong class="text-danger">{{ job.deadline|date:"F j, Y" }}</strong></div>
       </div>
-    </div>
+    </aside>
   </div>
 </div>
 
 <!-- Rating Modal -->
 {% if application and application.status != "Rejected" %}
-<div class="modal fade" id="ratingModal" tabindex="-1">
+<div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content shadow">
+    <div class="modal-content shadow rounded-3">
       <div class="modal-header">
-        <h5 class="modal-title">⭐ Rate Your Application Experience</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="ratingModalLabel">⭐ Rate Your Application Experience</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="text-success">💰 Earn 5 credits by submitting your rating!</p>
+        <p class="text-success fw-semibold">💰 Earn 5 credits by submitting your rating!</p>
         <form method="POST" action="{% url 'jobs:rate_application' application.id %}">
           {% csrf_token %}
-          <label class="form-label">Select Rating:</label>
-          <select name="rating" class="form-select">
+          <label for="ratingSelect" class="form-label fw-semibold">Select Rating:</label>
+          <select id="ratingSelect" name="rating" class="form-select" required>
+            <option value="" disabled selected>Choose an option</option>
             <option value="good">🙂 Good</option>
             <option value="okay">😐 Okay</option>
             <option value="bad">☹️ Bad</option>
           </select>
-          <button type="submit" class="btn btn-success mt-3">Submit Rating</button>
+          <button type="submit" class="btn btn-success rounded-pill mt-3 px-4 shadow-sm">Submit Rating</button>
         </form>
       </div>
     </div>
@@ -128,6 +195,21 @@
 {% endif %}
 
 <script>
+  // Bootstrap form validation for CV upload
+  (function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })();
+
   document.addEventListener("DOMContentLoaded", function () {
     {% if application and not application.rating %}
       var ratingModal = new bootstrap.Modal(document.getElementById("ratingModal"));
@@ -135,5 +217,6 @@
     {% endif %}
   });
 </script>
+
 
 {% endblock %}

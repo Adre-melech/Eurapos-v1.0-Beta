@@ -1,9 +1,11 @@
 import random
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.timezone import now
 from datetime import timedelta
 from jobs.models import JobPost, JobCountry, Category, UnlockedExclusiveJob
-from seeker.models import VisaGuide
+from seeker.models import VisaGuide, UnlockedVisaGuide
 from events.models import EventTicket
 
 
@@ -15,6 +17,13 @@ def homepage(request):
     event_tickets = EventTicket.objects.filter(available_until__gte=now().date()).order_by("available_until")[:4]
     total_events_count = EventTicket.objects.filter(available_until__gte=now().date()).count()
     visa_guides = VisaGuide.objects.order_by("country")[:6]
+
+    unlocked_visa_guides = []
+    unlocked_guide_ids = []
+
+    if request.user.is_authenticated:
+        unlocked_visa_guides = UnlockedVisaGuide.objects.filter(seeker=request.user)
+        unlocked_guide_ids = unlocked_visa_guides.values_list("guide_id", flat=True)
 
     near_deadline_jobs = JobPost.objects.filter(
         deadline__gte=now(),
@@ -66,6 +75,8 @@ def homepage(request):
         "categories": categories,
         "countries": countries,
         "visa_guides": visa_guides,
+        "unlocked_visa_guides": unlocked_visa_guides,
+        "unlocked_guide_ids": unlocked_guide_ids,
         "recommended_jobs": recommended_jobs,
         "near_deadline_jobs": near_deadline_jobs,
         "hot_jobs": hot_jobs,
@@ -79,7 +90,17 @@ def homepage(request):
 
 
 
+@login_required
 def visa_guides_page(request):
-    """Displays a dedicated page for Visa Guides."""
-    visa_guides = VisaGuide.objects.order_by("country")  # Fetch all visa guides
-    return render(request, "home/visa_guides.html", {"visa_guides": visa_guides})
+    """Displays all visa guides and highlights which ones the seeker has unlocked."""
+    seeker = request.user
+
+    visa_guides = VisaGuide.objects.order_by("country")
+    unlocked_guide_ids = UnlockedVisaGuide.objects.filter(
+        seeker=seeker
+    ).values_list("guide_id", flat=True)
+
+    return render(request, "home/visa_guides.html", {
+        "visa_guides": visa_guides,
+        "unlocked_guide_ids": unlocked_guide_ids,
+    })

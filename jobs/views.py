@@ -578,5 +578,21 @@ def unlock_exclusive_jobs(request):
     return redirect("seeker:dashboard")
 
 
+@login_required
+def recommended_jobs(request):
+    """Displays jobs recommended to the seeker based on their job title category."""
+    seeker = request.user
+    recommended = []
 
+    if seeker.job_title and seeker.job_title.category:
+        recommended = list(
+            JobPost.objects.filter(
+                category=seeker.job_title.category,
+                exclusive_job=False
+            ).distinct().order_by("-created_at")  # You can sort by any field you like
+        )
+
+    return render(request, "jobs/recommended_jobs.html", {
+        "recommended_jobs": recommended
+    })
 

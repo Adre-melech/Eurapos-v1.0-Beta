@@ -2,22 +2,25 @@ import os
 from django.conf import settings
 import random, string
 import logging
-
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import PasswordResetView
 from django.core.mail import send_mail, BadHeaderError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.http import urlsafe_base64_encode
 from django.utils.timezone import now, timedelta
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.contrib import messages
 from datetime import date
-
+from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
 from events.models import TicketPurchase
-from .forms import SeekerRegistrationForm
+from .forms import SeekerRegistrationForm, SeekerPasswordResetForm
 from jobs.models import Application, UnlockedExclusiveJob
 from notifications.models import Notification
 from .utils import generate_visa_discount_pdf
@@ -83,6 +86,45 @@ def seeker_login(request):
 
     return render(request, "seeker/login.html", {"form": form})
 
+
+@csrf_exempt
+def custom_password_reset_view(request):
+    if request.method == "POST":
+        form = SeekerPasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            users = form.get_users(email)
+
+            for user in users:
+                context = {
+                    "email": user.email,
+                    "domain": request.get_host(),
+                    "site_name": "Eurapos",
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "user": user,
+                    "token": default_token_generator.make_token(user),
+                    "protocol": "https" if request.is_secure() else "http",
+                }
+
+                subject = render_to_string("seeker/registration/password_reset_subject.txt", context).strip()
+                email_body = render_to_string("seeker/registration/password_reset_email.html", context)
+
+                send_mail(
+                    subject,
+                    email_body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
+
+            return render(request, "seeker/password_reset_ajax.html")
+
+        else:
+            return HttpResponse("This email address doesn't exist", status=200)
+
+    else:
+        form = SeekerPasswordResetForm()
+    return render(request, "seeker/password_reset_form.html", {"form": form})
 
 def seeker_logout(request):
     """Handles seeker logout"""

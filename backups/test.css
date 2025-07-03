@@ -1,0 +1,108 @@
+.hover-shadow:hover {
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+#viewMoreBtn:hover {
+  background-color: #004aad;
+  color: white;
+  border-color: #004aad;
+}
+
+
+.hover-shadow:hover {
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 1rem 2rem rgba(220, 53, 69, 0.25);
+  transition: all 0.3s ease-in-out;
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+.hot-job-card {
+  border-left: 4px solid #198754; /* Bootstrap success green */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.hot-job-card:hover {
+  box-shadow: 0 0.75rem 1.5rem rgba(25, 135, 84, 0.3);
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+
+/* animated effect */
+.hot-badge {
+  background: linear-gradient(45deg, #edcb1c, #ff6a00);
+  color: #4b2e00;
+  text-shadow:
+    0 0 5px #ff8c00,
+    0 0 10px #ff4500,
+    0 0 20px #ff6a00,
+    0 0 30px #edcb1c,
+    0 0 40px #edcb1c;
+  box-shadow:
+    0 0 10px #ff8c00,
+    0 0 20px #ff4500,
+    0 0 30px #ff6a00;
+
+  animation: flickerFire 1.5s infinite alternate;
+}
+
+@keyframes flickerFire {
+  0% {
+    text-shadow:
+      0 0 5px #ff8c00,
+      0 0 10px #ff4500,
+      0 0 20px #ff6a00,
+      0 0 30px #edcb1c,
+      0 0 40px #edcb1c;
+    box-shadow:
+      0 0 10px #ff8c00,
+      0 0 20px #ff4500,
+      0 0 30px #ff6a00;
+  }
+  100% {
+    text-shadow:
+      0 0 3px #ffae00,
+      0 0 7px #ff5c00,
+      0 0 15px #ff4500,
+      0 0 20px #edcb1c,
+      0 0 30px #edcb1c;
+    box-shadow:
+      0 0 8px #ffae00,
+      0 0 15px #ff5c00,
+      0 0 20px #ff4500;
+  }
+}
+
+/* Still effect */
+.hot-badge {
+  background: linear-gradient(45deg, #edcb1c, #ff6a00);
+  color: #4b2e00;
+  text-shadow:
+    0 0 5px #ff8c00,
+    0 0 10px #ff4500,
+    0 0 20px #ff6a00,
+    0 0 30px #edcb1c,
+    0 0 40px #edcb1c;
+  box-shadow:
+    0 0 10px #ff8c00,
+    0 0 20px #ff4500,
+    0 0 30px #ff6a00;
+}

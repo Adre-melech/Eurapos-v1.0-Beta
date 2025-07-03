@@ -1,0 +1,45 @@
+{% extends 'adminpanel/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="mb-4">🌍 Manage Seeker Countries</h3>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% if seeker_countries %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Country Name</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for country in seeker_countries %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ country.name }}</td>
+            <td class="text-end">
+              <a href="{% url 'adminpanel:edit_seeker_country' country.id %}" class="btn btn-sm btn-primary">Edit</a>
+              <form action="{% url 'adminpanel:delete_seeker_country' country.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this country?');">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No seeker countries added yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

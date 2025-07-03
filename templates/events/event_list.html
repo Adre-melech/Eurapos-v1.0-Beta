@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h3 class="mb-4 fw-bold text-primary">📅 Upcoming Events</h3>
+
+{% if events %}
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for event in events %}
+      <div class="col">
+        <div class="card h-100 shadow rounded-4 border-0 hover-shadow transition">
+          {% if event.image %}
+            <img
+              src="{{ event.image.url }}"
+              class="card-img-top rounded-top"
+              alt="{{ event.title }}"
+              style="object-fit: cover; height: 180px;"
+            >
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-semibold">{{ event.title }}</h5>
+            <p class="text-muted mb-2 small">
+              <i class="bi bi-calendar-check me-1"></i>
+              Available until: <strong>{{ event.available_until|date:"M d, Y" }}</strong>
+            </p>
+            <p class="card-text text-secondary flex-grow-1">
+              {{ event.description|truncatewords:25 }}
+            </p>
+            <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <span class="badge bg-primary px-3 py-2 fs-6 fw-semibold">
+                🎟 {{ event.credits_required }} credits
+              </span>
+              <a href="{% url 'events:event_detail' event.id %}" class="btn btn-outline-primary btn-sm px-4 shadow-sm">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info text-center py-4 fs-5">
+    📭 No upcoming events at the moment. Please check back soon!
+  </div>
+{% endif %}
+
+{% endblock %}

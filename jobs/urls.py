@@ -3,7 +3,8 @@ from .views import (
     job_list, job_detail, rate_application, apply_job, ajax_search,
     unlock_hr_info, unlock_exclusive_jobs, near_deadline_jobs, hot_jobs,
     all_jobs, load_more_jobs, load_more_near_deadline_jobs, ajax_near_deadline_search,
-    ajax_all_jobs_search, load_more_hot_jobs, ajax_hot_jobs_search, buy_priority_review, exclusive_jobs
+    ajax_all_jobs_search, load_more_hot_jobs, ajax_hot_jobs_search, buy_priority_review, exclusive_jobs,
+    recommended_jobs
 )
 
 app_name = "jobs"
@@ -33,6 +34,9 @@ urlpatterns = [
     path("unlock_hr_info/<int:job_id>/", unlock_hr_info, name="unlock_hr_info"),
     path("unlock_exclusive_jobs/", unlock_exclusive_jobs, name="unlock_exclusive_jobs"),
     path("exclusive-jobs/", exclusive_jobs, name="exclusive_jobs"),
+
+    path("recommended/", recommended_jobs, name="recommended_jobs"),
+
 
 
     path("buy_priority_review/<int:application_id>/", buy_priority_review, name="buy_priority_review"),

@@ -1,0 +1,47 @@
+{% extends 'adminpanel/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="mb-4">🧑‍💼 Manage Job Titles</h3>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% if job_titles %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Job Title</th>
+            <th>Category</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for title in job_titles %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ title.name }}</td>
+            <td>{{ title.category.name }}</td>
+            <td class="text-end">
+              <a href="{% url 'adminpanel:edit_job_title' title.id %}" class="btn btn-sm btn-primary">Edit</a>
+              <form action="{% url 'adminpanel:delete_job_title' title.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this job title?');">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No job titles available.</p>
+  {% endif %}
+</div>
+{% endblock %}

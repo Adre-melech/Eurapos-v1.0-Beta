@@ -1,79 +1,124 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2 class="mt-4 text-primary">🌎 Explore All Jobs</h2>
+<!-- 🌎 Explore All Jobs -->
+<section class="mt-5">
+  <h2 class="fw-bold text-primary mb-4" style="font-size: 1.75rem;">
+    🌎 Explore All Jobs
+  </h2>
 
-{% if messages %}
-  <div class="mb-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <!-- Flash Messages -->
+  {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm rounded-3 px-4 py-3" role="alert"
+             style="border-left: 5px solid {% if message.tags == 'success' %}#28a745{% elif message.tags == 'error' or message.tags == 'danger' %}#dc3545{% elif message.tags == 'warning' %}#edcb1c{% else %}#004aad{% endif %};">
+          <strong class="me-2">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill text-success{% elif message.tags == 'error' or message.tags == 'danger' %}bi-x-circle-fill text-danger{% elif message.tags == 'warning' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %}"></i>
+          </strong>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Filters Section -->
+  <div class="row g-4 align-items-end mb-4">
+    <!-- Search -->
+    <div class="col-md-6">
+      <label for="searchInput" class="form-label fw-semibold">
+        🔍 Search Jobs
+      </label>
+      <div class="input-group shadow-sm rounded-3">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="bi bi-search text-muted"></i>
+        </span>
+        <input
+          type="text"
+          id="searchInput"
+          class="form-control form-control-lg border-start-0"
+          placeholder="Search by title, role, or company..."
+          oninput="fetchAllJobsDebounced()"
+        >
       </div>
-    {% endfor %}
-  </div>
-{% endif %}
+    </div>
 
-<!-- Filters -->
-<div class="row g-3 mb-4 align-items-end">
-  <div class="col-md-6">
-    <label for="searchInput" class="form-label">🔍 Search Jobs</label>
-    <input
-      type="text"
-      id="searchInput"
-      class="form-control form-control-lg shadow-sm"
-      placeholder="Search jobs..."
-      oninput="fetchAllJobsDebounced()"
-    >
-  </div>
-  <div class="col-md-3">
-    <label for="categoryFilter" class="form-label">📂 Category</label>
-    <select id="categoryFilter" class="form-select" onchange="fetchAllJobs()">
-      <option value="">All Categories</option>
-      {% for category in categories %}
-        <option value="{{ category.id }}">{{ category.name }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label for="countryFilter" class="form-label">🌍 Country</label>
-    <select id="countryFilter" class="form-select" onchange="fetchAllJobs()">
-      <option value="">All Countries</option>
-      {% for country in countries %}
-        <option value="{{ country.id }}">{{ country.name }}</option>
-      {% endfor %}
-    </select>
-  </div>
-</div>
+    <!-- Category Filter -->
+    <div class="col-md-3">
+      <label for="categoryFilter" class="form-label fw-semibold">
+        📂 Category
+      </label>
+      <select id="categoryFilter" class="form-select shadow-sm rounded-3" onchange="fetchAllJobs()">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-<!-- Spinner -->
-<div id="loadingSpinner" class="text-center my-5 d-none">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+    <!-- Country Filter -->
+    <div class="col-md-3">
+      <label for="countryFilter" class="form-label fw-semibold">
+        🌍 Country
+      </label>
+      <select id="countryFilter" class="form-select shadow-sm rounded-3" onchange="fetchAllJobs()">
+        <option value="">All Countries</option>
+        {% for country in countries %}
+          <option value="{{ country.id }}">{{ country.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
   </div>
-</div>
+
+  <!-- Spinner Loader -->
+  <div id="loadingSpinner" class="text-center my-5 d-none">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</section>
+
 
 <!-- Job Cards -->
 <div id="jobResults" class="row g-4 fade-in">
   {% include "jobs/partials/all_jobs_result.html" %}
 </div>
 
-<!-- Load More Section -->
-<div id="loadMoreSection" class="text-center mt-4">
+<!-- 🔻 Load More Section -->
+<div id="loadMoreSection" class="text-center mt-5">
   {% if has_more_jobs %}
-    <button id="loadMoreBtn" class="btn btn-danger">Load More Jobs</button>
-    <div id="noMoreJobsMsg" class="text-success fw-semibold mt-3 d-none">
-      ✅ This is all jobs.
+    <button id="loadMoreBtn"
+            class="btn btn-outline-danger rounded-pill px-5 py-2 fw-semibold shadow-sm transition"
+            style="font-size: 1rem;">
+      <i class="bi bi-arrow-down-circle me-2"></i> Load More Jobs
+    </button>
+
+    <div id="noMoreJobsMsg"
+         class="text-success fw-semibold mt-4 d-none"
+         style="font-size: 1rem;">
+      ✅ You've reached the end of the job list.
     </div>
+
   {% elif near_deadline_jobs %}
-    <button id="loadMoreBtn" class="btn btn-danger d-none">Load More Jobs</button>
-    <div id="noMoreJobsMsg" class="text-success fw-semibold mt-3">
-      ✅ This is all jobs.
+    <button id="loadMoreBtn"
+            class="btn btn-outline-danger rounded-pill px-5 py-2 fw-semibold shadow-sm d-none">
+      Load More Jobs
+    </button>
+
+    <div id="noMoreJobsMsg"
+         class="text-success fw-semibold mt-4"
+         style="font-size: 1rem;">
+      ✅ You've reached the end of the job list.
     </div>
+
   {% else %}
-    <p class="text-muted">No jobs found near deadline.</p>
+    <p class="text-muted mt-4 fw-medium" style="font-size: 1rem;">
+      ✅ You've reached the end of the job list.
+    </p>
   {% endif %}
 </div>
+
 
 <script>
   const loadingSpinner = document.getElementById("loadingSpinner");

@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container py-4">
-  <h2 class="mb-4">🔎 Browse Jobs</h2>
+<div class="container py-4" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <h2 class="mb-4" style="font-weight: 700; color: #004aad;">🔎 Browse Jobs</h2>
 
   <!-- Flash Messages -->
   {% if messages %}
     <div class="mb-3">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-          {{ message }}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center gap-3 shadow-sm rounded-3 px-4 py-3" role="alert"
+             style="border-left: 5px solid {% if message.tags == 'success' %}#28a745{% elif message.tags in 'error danger' %}#dc3545{% elif message.tags == 'warning' %}#edcb1c{% else %}#004aad{% endif %};">
+          <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill text-success{% elif message.tags in 'error danger' %}bi-x-circle-fill text-danger{% elif message.tags == 'warning' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %} fs-5"></i>
+          <div class="flex-grow-1 small text-dark">{{ message }}</div>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% endfor %}
@@ -17,35 +19,41 @@
   {% endif %}
 
   <!-- Search & Filters -->
-  <div class="row g-3 mb-4 align-items-end">
+  <form id="jobFilterForm" class="row g-3 mb-5 align-items-end" style="max-width: 900px;">
     <div class="col-md-6">
-      <label for="searchInput" class="form-label">Search</label>
-      <input type="text" id="searchInput" class="form-control form-control-lg shadow-sm" placeholder="Search jobs...">
+      <label for="searchInput" class="form-label fw-semibold" style="color: #004aad;">Search Jobs</label>
+      <input type="search" id="searchInput" class="form-control form-control-lg shadow-sm rounded-3 border-0" placeholder="Type job title, skills or company..." style="background-color: #f9f9f9;" />
     </div>
+
     <div class="col-md-3">
-      <label for="categoryFilter" class="form-label">Category</label>
-      <select id="categoryFilter" class="form-select">
+      <label for="categoryFilter" class="form-label fw-semibold" style="color: #004aad;">Category</label>
+      <select id="categoryFilter" class="form-select shadow-sm rounded-3 border-0" style="background-color: #f9f9f9;">
         <option value="">All Categories</option>
         {% for category in categories %}
           <option value="{{ category.id }}">{{ category.name }}</option>
         {% endfor %}
       </select>
     </div>
+
     <div class="col-md-3">
-      <label for="countryFilter" class="form-label">Country</label>
-      <select id="countryFilter" class="form-select">
+      <label for="countryFilter" class="form-label fw-semibold" style="color: #004aad;">Country</label>
+      <select id="countryFilter" class="form-select shadow-sm rounded-3 border-0" style="background-color: #f9f9f9;">
         <option value="">All Countries</option>
         {% for country in countries %}
           <option value="{{ country.id }}">{{ country.name }}</option>
         {% endfor %}
       </select>
     </div>
-  </div>
+  </form>
 
   <!-- Spinner -->
   <div id="loadingSpinner" class="text-center my-5 d-none">
-    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
+</div>
+
 
   <!-- Job Results (AJAX injected here or rendered initially) -->
   <div id="jobResults" class="row g-4 fade-in">
@@ -53,155 +61,320 @@
   </div>
 
   <!-- View More Button -->
-  <div id="viewMoreSection" class="text-end mt-2">
-    <a href="{% url 'jobs:all_jobs' %}" class="btn btn-primary" id="viewMoreBtn">View More</a>
+  <div id="viewMoreSection" class="text-center mt-4">
+    <a href="{% url 'jobs:all_jobs' %}"
+       id="viewMoreBtn"
+       class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold shadow-sm transition"
+       style="border-width: 2px;">
+      🔍 View More Jobs
+    </a>
   </div>
 
   <!-- Main Job Sections -->
   <div id="mainJobSections">
 
     <!-- 🔒 Exclusive Jobs -->
-    <div class="mt-5" id="exclusiveJobs">
+    <section class="mt-5" id="exclusiveJobs">
       {% if request.user.is_authenticated %}
         {% if exclusive_jobs %}
-          <h3 class="text-success">🌟 Exclusive Job Listings</h3>
+          <h3 class="fw-bold text-success mb-4">🌟 Exclusive Job Listings</h3>
           <div class="row g-4">
             {% for job in exclusive_jobs %}
               <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border-success border-start border-3">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ job.title }}</h5>
-                    <p class="text-muted">{{ job.company_name }}</p>
-                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success mt-auto">View Job</a>
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                  <div class="card-body d-flex flex-column p-4 position-relative">
+
+                    <!-- Exclusive Badge -->
+                    <span class="position-absolute top-0 end-0 badge bg-success-subtle text-success fw-semibold mt-2 me-2" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 1rem;">
+                      EXCLUSIVE
+                    </span>
+
+                    <!-- Job Title -->
+                    <h5 class="card-title text-success fw-semibold mb-1">
+                      {{ job.title }}
+                    </h5>
+
+                    <!-- Company Name -->
+                    <p class="text-muted mb-2">{{ job.company_name }}</p>
+
+                    <!-- Location & Deadline -->
+                    <p class="mb-2 small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ job.country.name }}<br>
+                      <i class="bi bi-calendar-event text-warning me-1"></i> Deadline: {{ job.deadline|date:"F j, Y" }}
+                    </p>
+
+                    <!-- Credits Required Label (if you store that per job) -->
+                    {% if job.credits_required %}
+                      <span class="badge bg-light text-dark border mb-3" style="font-size: 0.8rem;">
+                        💳 {{ job.credits_required }} Credits Required
+                      </span>
+                    {% endif %}
+
+                    <!-- View Job Button -->
+                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success btn-sm rounded-pill mt-auto px-4 shadow-sm">
+                      View Job
+                    </a>
                   </div>
                 </div>
               </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="alert alert-warning text-center">
+          <div class="alert alert-warning text-center fw-semibold rounded-3 shadow-sm mt-4" style="border-left: 5px solid #edcb1c;">
             🚀 Unlock Exclusive Jobs with Credits!<br>
-            <strong>Available Credits:</strong> {{ request.user.credits }}
+            <span class="d-block mt-2">💳 Available Credits: <strong>{{ request.user.credits }}</strong></span>
             <div class="mt-3">
-              <a href="{% url 'jobs:unlock_exclusive_jobs' %}" class="btn btn-success">Unlock Now</a>
+              <a href="{% url 'jobs:unlock_exclusive_jobs' %}" class="btn btn-success rounded-pill px-4 shadow-sm">
+                Unlock Now
+              </a>
             </div>
           </div>
         {% endif %}
       {% else %}
-        <div class="alert alert-info text-center">
+        <div class="alert alert-info text-center fw-semibold rounded-3 shadow-sm mt-4" style="border-left: 5px solid #004aad;">
           🚀 Register or Login to Access Exclusive Jobs!
-          <div class="mt-2">
-            <a href="{% url 'seeker:seeker_register' %}" class="btn btn-primary btn-sm me-2">Register</a>
-            <a href="{% url 'seeker:seeker_login' %}" class="btn btn-outline-secondary btn-sm">Login</a>
+          <div class="mt-3">
+            <a href="{% url 'seeker:seeker_register' %}" class="btn btn-primary btn-sm me-2 px-4 rounded-pill shadow-sm">Register</a>
+            <a href="{% url 'seeker:seeker_login' %}" class="btn btn-outline-secondary btn-sm px-4 rounded-pill shadow-sm">Login</a>
           </div>
         </div>
       {% endif %}
-    </div>
+    </section>
+
 
     <!-- ✅ Recommended Jobs -->
     {% if user.is_authenticated %}
-      <h3 class="mt-5">🔍 Recommended Jobs for You</h3>
+      <section class="mt-5">
+        <h3 class="fw-bold text-primary mb-4">🔍 Recommended Jobs for You</h3>
 
-      {% if recommended_jobs %}
-        <div class="row g-4">
-          {% for job in recommended_jobs %}
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm border-0">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">{{ job.title }}</h5>
-                  <p class="text-muted mb-2">{{ job.company_name }}</p>
-                  <span class="badge bg-light text-dark mb-2">
-                    {{ job.category.name }} • {{ job.country.name }}
-                  </span>
-                  <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary mt-auto">View Job</a>
+        {% if recommended_jobs %}
+          <div class="row g-4">
+            {% for job in recommended_jobs %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                  <div class="card-body d-flex flex-column p-4">
+
+                    <!-- Job Title -->
+                    <h5 class="card-title fw-semibold text-primary mb-1">
+                      {{ job.title }}
+                    </h5>
+
+                    <!-- Company Name -->
+                    <p class="text-muted mb-2">{{ job.company_name }}</p>
+
+                    <!-- Category + Country Badge -->
+                    <span class="badge bg-light text-dark border mb-3" style="font-size: 0.8rem;">
+                      {{ job.category.name }} • {{ job.country.name }}
+                    </span>
+
+                    <!-- View Job Button -->
+                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary btn-sm rounded-pill mt-auto px-4 shadow-sm">
+                      View Job
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          {% endfor %}
-        </div>
+            {% endfor %}
+          </div>
 
-        {% if recommended_jobs|length >= 3 %}
-          <div class="text-end mt-2">
-            <a href="{% url 'jobs:recommended_jobs' %}" class="btn btn-primary">View More</a>
+          {% if recommended_jobs|length >= 3 %}
+            <div class="text-center mt-4">
+              <a href="{% url 'jobs:recommended_jobs' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm transition">
+                View More
+              </a>
+            </div>
+          {% endif %}
+
+        {% else %}
+          <div class="alert alert-warning text-center mt-4 fw-semibold rounded-3 shadow-sm" style="border-left: 5px solid #edcb1c;">
+            ⚠️ No recommended jobs available. <br>
+            <span class="d-block mt-1">Make sure you've selected preferred categories in your profile.</span>
           </div>
         {% endif %}
-
-      {% else %}
-        <div class="alert alert-warning mt-3">
-          ⚠️ No recommended jobs available. Make sure you've selected preferred categories in your profile.
-        </div>
-      {% endif %}
+      </section>
     {% endif %}
 
 
     <!-- ⏰ Near Deadline Jobs -->
     {% if near_deadline_jobs %}
-    <div class="mt-5" id="nearDeadlineJobs">
-      <h4 class="mb-3 text-danger">⏳ Jobs Near Deadline</h4>
+    <section class="mt-5" id="nearDeadlineJobs">
+      <h3 class="fw-bold text-danger mb-4">⏳ Jobs Near Deadline</h3>
+
       <div class="row g-4">
         {% for job in near_deadline_jobs %}
           <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-danger">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ job.title }}</h5>
-                <p class="text-muted">{{ job.company_name }}</p>
-                <p class="text-muted">Deadline: {{ job.deadline|date:"F j, Y" }}</p>
-                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-danger mt-auto">View Job</a>
+            <div class="card h-100 border-0 rounded-4 shadow-sm position-relative">
+              <div class="card-body d-flex flex-column p-4">
+
+                <!-- Closing Soon Badge -->
+                <span class="position-absolute top-0 end-0 badge bg-danger-subtle text-danger fw-semibold mt-2 me-2" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 1rem;">
+                  ⏳ Closing Soon
+                </span>
+
+                <!-- Job Title -->
+                <h5 class="card-title text-danger fw-semibold mb-1">
+                  {{ job.title }}
+                </h5>
+
+                <!-- Company Name -->
+                <p class="text-muted mb-2">{{ job.company_name }}</p>
+
+                <!-- Deadline -->
+                <p class="small text-danger fw-semibold mb-3">
+                  <i class="bi bi-clock-fill me-1"></i> Deadline: {{ job.deadline|date:"F j, Y" }}
+                </p>
+
+                <!-- View Job Button -->
+                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-danger btn-sm rounded-pill mt-auto px-4 shadow-sm">
+                  View Job
+                </a>
               </div>
             </div>
           </div>
         {% endfor %}
       </div>
-      <div class="text-center mt-3">
-        <a href="{% url 'jobs:near_deadline_jobs' %}" class="btn btn-sm btn-outline-danger">View More</a>
+
+      <!-- View More Button -->
+      <div class="text-center mt-4">
+        <a href="{% url 'jobs:near_deadline_jobs' %}" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-semibold shadow-sm transition">
+          View More
+        </a>
       </div>
-    </div>
+    </section>
     {% endif %}
+
 
     <!-- 🔥 Hot Jobs -->
     {% if hot_jobs %}
-    <div class="mt-5" id="hotJobs">
-      <h4 class="mb-3 text-success">🔥 Hot Jobs</h4>
+    <section class="mt-5" id="hotJobs">
+      <h3 class="fw-bold text-success mb-4">🔥 Hot Jobs</h3>
+
+      <style>
+        .flame-badge {
+          position: absolute;
+          top: 0.75rem;
+          right: 0.75rem;
+          background: #fff4e6;
+          color: #ff4500;
+          font-weight: 600;
+          font-size: 0.75rem;
+          padding: 4px 10px;
+          border-radius: 1rem;
+          animation: flicker 1.2s infinite alternate;
+          box-shadow: 0 0 6px rgba(255, 69, 0, 0.4);
+        }
+
+        @keyframes flicker {
+          0%   { opacity: 1; transform: scale(1); }
+          50%  { opacity: 0.8; transform: scale(1.03); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      </style>
+
       <div class="row g-4">
         {% for job in hot_jobs %}
           <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-success">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ job.title }}</h5>
-                <p class="text-muted">{{ job.company_name }}</p>
-                <p class="text-muted">Deadline: {{ job.deadline|date:"F j, Y" }}</p>
-                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success mt-auto">View Job</a>
+            <div class="card h-100 shadow-sm border-0 rounded-4 position-relative">
+              <div class="card-body d-flex flex-column p-4">
+
+                <!-- 🔥 Flickering Flame Badge -->
+                <span class="flame-badge">🔥 HOT</span>
+
+                <!-- Job Title -->
+                <h5 class="card-title text-success fw-semibold mb-2">
+                  {{ job.title }}
+                </h5>
+
+                <!-- Company Name -->
+                <p class="text-muted mb-2">{{ job.company_name }}</p>
+
+                <!-- Deadline -->
+                <p class="text-muted small mb-3">
+                  <i class="bi bi-calendar-event me-1"></i> {{ job.deadline|date:"F j, Y" }}
+                </p>
+
+                <!-- View Job Button -->
+                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success btn-sm rounded-pill mt-auto px-4 shadow-sm">
+                  View Job
+                </a>
               </div>
             </div>
           </div>
         {% endfor %}
       </div>
-      <div class="text-center mt-3">
-        <a href="{% url 'jobs:hot_jobs' %}" class="btn btn-sm btn-outline-success">View More</a>
+
+      <!-- View More Button -->
+      <div class="text-center mt-4">
+        <a href="{% url 'jobs:hot_jobs' %}" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold shadow-sm transition">
+          View More
+        </a>
       </div>
-    </div>
+    </section>
     {% endif %}
 
-    <!-- 🆕 Latest Jobs -->
+
+
+    <!-- 🆕 Newest Jobs -->
     {% if latest_jobs %}
-    <div class="mt-5" id="latestJobs">
-      <h4 class="mb-3">🆕 Newest Jobs</h4>
+    <section class="mt-5" id="latestJobs">
+      <h3 class="fw-bold text-primary mb-4">🆕 Newest Jobs</h3>
+
+      <style>
+        .newest-badge {
+          position: absolute;
+          top: 0.8rem;
+          right: 0.8rem;
+          background-color: #004aad;
+          color: #fff;
+          font-size: 0.65rem;
+          padding: 4px 10px;
+          font-weight: 600;
+          border-radius: 50rem;
+          letter-spacing: 0.5px;
+          box-shadow: 0 0 8px rgba(0, 74, 173, 0.2);
+          animation: flickerNew 1.8s infinite;
+        }
+
+        @keyframes flickerNew {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%      { opacity: 0.85; transform: scale(1.05); }
+        }
+      </style>
+
       <div class="row g-4">
         {% for job in latest_jobs %}
           <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-primary">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ job.title }}</h5>
-                <p class="text-muted">{{ job.company_name }}</p>
-                <p class="text-muted">Deadline: {{ job.deadline|date:"F j, Y" }}</p>
-                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary mt-auto">View Job</a>
+            <div class="card h-100 shadow-sm border-0 rounded-4 position-relative">
+              <!-- NEW Ribbon -->
+              <span class="newest-badge">NEW</span>
+
+              <div class="card-body d-flex flex-column p-4">
+                <!-- Job Title -->
+                <h5 class="fw-semibold text-primary mb-1">{{ job.title }}</h5>
+
+                <!-- Company -->
+                <p class="text-muted small mb-2">
+                  <i class="bi bi-building me-1"></i> {{ job.company_name }}
+                </p>
+
+                <!-- Deadline -->
+                <p class="text-muted small mb-4">
+                  <i class="bi bi-calendar-event me-1"></i> Deadline: {{ job.deadline|date:"F j, Y" }}
+                </p>
+
+                <!-- View Button -->
+                <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-primary btn-sm rounded-pill mt-auto px-4 shadow-sm">
+                  View Job
+                </a>
               </div>
             </div>
           </div>
         {% endfor %}
       </div>
-    </div>
+    </section>
     {% endif %}
+
+
   </div>
 </div>
 

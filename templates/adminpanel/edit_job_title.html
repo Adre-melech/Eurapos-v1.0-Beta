@@ -1,0 +1,29 @@
+{% extends 'adminpanel/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="mb-4">✏️ Edit Job Title</h3>
+
+  <form method="post" class="card p-4 shadow-sm">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="name" class="form-label">Job Title Name</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ job_title.name }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select name="category" id="category" class="form-select" disabled>
+        <option>{{ job_title.category.name }}</option>
+      </select>
+      <div class="form-text">To change the category, delete and re-add the job title.</div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <a href="{% url 'adminpanel:manage_job_titles' %}" class="btn btn-outline-secondary">Back</a>
+      <button type="submit" class="btn btn-success">Update Job Title</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

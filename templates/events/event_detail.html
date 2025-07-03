@@ -3,35 +3,52 @@
 
 {% block content %}
 <div class="container py-5">
-  <div class="row">
-    <div class="col-lg-6 mb-4">
-      <img src="{{ event.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ event.title }}">
-    </div>
-    <div class="col-lg-6">
-      <h2 class="mb-3">{{ event.title }}</h2>
-      <span class="badge bg-primary mb-2">{{ event.credits_required }} Credits</span>
-      <p class="text-muted"><strong>Available Until:</strong> {{ event.available_until }}</p>
+  <div class="card shadow-sm rounded-4 mx-auto" style="max-width: 900px;">
+    <!-- Image on top -->
+    <img
+      src="{{ event.image.url }}"
+      alt="{{ event.title }}"
+      class="card-img-top rounded-top-4"
+      style="object-fit: cover; max-height: 350px; width: 100%;"
+    >
 
-      <p class="mt-4">{{ event.description|linebreaks }}</p>
+    <div class="card-body px-4 py-5">
+      <h2 class="card-title fw-bold mb-3 text-center">{{ event.title }}</h2>
 
-      {% if user.is_authenticated %}
-        {% if purchased %}
-          <div class="alert alert-success mt-4">
-            ✅ You’ve already purchased a ticket for this event.
-          </div>
+      <div class="d-flex justify-content-center mb-4">
+        <span class="badge bg-primary fs-6 px-4 py-2 shadow">
+          🎟 {{ event.credits_required }} Credits
+        </span>
+      </div>
+
+      <p class="text-center text-secondary mb-4 fs-5">
+        <strong>Available Until:</strong> {{ event.available_until|date:"F j, Y" }}
+      </p>
+
+      <p class="text-muted fs-5" style="white-space: pre-line; line-height: 1.6;">
+        {{ event.description }}
+      </p>
+
+      <div class="mt-4 text-center">
+        {% if user.is_authenticated %}
+          {% if purchased %}
+            <div class="alert alert-success py-3 fs-5">
+              ✅ You’ve already purchased a ticket for this event.
+            </div>
+          {% else %}
+            <form method="post" action="{% url 'events:purchase_ticket' event.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                🎟 Buy Ticket Now
+              </button>
+            </form>
+          {% endif %}
         {% else %}
-          <form method="post" action="{% url 'events:purchase_ticket' event.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success mt-4">
-              🎟 Buy Ticket Now
-            </button>
-          </form>
+          <div class="alert alert-info fs-5 py-3">
+            Please <a href="{% url 'seeker:seeker_login' %}" class="text-decoration-underline fw-semibold">log in</a> to purchase a ticket.
+          </div>
         {% endif %}
-      {% else %}
-        <div class="alert alert-info mt-4">
-          Please <a href="{% url 'seeker:seeker_login' %}">log in</a> to purchase a ticket.
-        </div>
-      {% endif %}
+      </div>
     </div>
   </div>
 </div>

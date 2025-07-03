@@ -3,45 +3,136 @@
 
 {% load static %}
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body p-4">
-          <h3 class="text-center mb-4">🔐 Seeker Login</h3>
+<div class="container py-5" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+  <div class="card shadow-lg rounded-4 border-0" style="max-width: 420px; width: 100%;">
+    <div class="card-body p-5">
+      <h3 class="text-center mb-4 fw-bold text-primary">🔐 Seeker Login</h3>
 
-          <!-- Flash Messages -->
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
+      <!-- Flash Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Login Form -->
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+            {{ field|add_class:"form-control form-control-lg rounded-3 shadow-sm" }}
+            {% for error in field.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
             {% endfor %}
-          {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary w-100 btn-lg fw-semibold shadow-sm">Login</button>
+      </form>
 
-          <!-- Login Form -->
-          <form method="POST" novalidate>
-            {% csrf_token %}
-            {% for field in form %}
-              <div class="mb-3">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field|add_class:"form-control form-control-lg" }}
-                {% for error in field.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-            {% endfor %}
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Login</button>
-          </form>
+      <p class="mt-4 mb-0 text-center text-muted fs-6">
+        Don’t have an account?
+        <a href="{% url 'seeker:seeker_register' %}" class="text-primary text-decoration-underline fw-semibold">Register here</a>
+        <br>
+        <!-- Forgot Password Link -->
+        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
+      </p>
+    </div>
+  </div>
+</div>
 
-          <p class="mt-4 mb-0 text-center text-muted">
-            Don’t have an account?
-            <a href="{% url 'seeker:seeker_register' %}" class="text-decoration-none fw-semibold">Register here</a>
-          </p>
-        </div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="passwordResetForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="resetEmail" class="form-label">Enter your email</label>
+            <input type="email" class="form-control" id="resetEmail" name="email" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Send Reset Link</button>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Check your email</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>We've sent password reset instructions to your email.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Email Not Found</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>The email is not registered with Eurapos. Please check and try again.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script>
+  document.getElementById("passwordResetForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById("resetEmail").value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch("{% url 'seeker:password_reset' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({ email: email })
+    })
+    .then(response => response.text())
+    .then(html => {
+      // Check if the form returned the password reset done message
+      if (html.includes("We've emailed you instructions")) {
+        const forgotModal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+        forgotModal.hide();
+        new bootstrap.Modal(document.getElementById('successModal')).show();
+      } else if (html.includes("This email address doesn't exist")) {
+        new bootstrap.Modal(document.getElementById('errorModal')).show();
+      } else {
+        // fallback: check for email field errors
+        if (html.includes("Enter a valid email address") || html.includes("email")) {
+          new bootstrap.Modal(document.getElementById('errorModal')).show();
+        }
+      }
+    });
+  });
+</script>
+
 {% endblock %}
