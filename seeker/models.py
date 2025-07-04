@@ -1,6 +1,7 @@
 import random, string
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.apps import apps  # Prevents circular import issues
 
@@ -26,7 +27,6 @@ class Seeker(AbstractUser):
     whatsapp_optin_expires = models.DateTimeField(blank=True, null=True)
 
     # Visa Discount
-    visa_discount_redeemed = models.BooleanField(default=False)
     visa_discount_code = models.CharField(max_length=20, blank=True, null=True)
 
     # Referral
@@ -35,6 +35,8 @@ class Seeker(AbstractUser):
     # Group Permissions
     groups = models.ManyToManyField("auth.Group", related_name="seeker_users", blank=True)
     user_permissions = models.ManyToManyField("auth.Permission", related_name="seeker_permissions", blank=True)
+
+    last_credit_date = models.DateField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.is_superuser:
@@ -65,12 +67,23 @@ class Seeker(AbstractUser):
             return True
         return False
 
+    @property
+    def visa_discount_redeemed(self):
+        VisaDiscount = apps.get_model('seeker', 'VisaDiscount')
+        latest_discount = VisaDiscount.objects.filter(seeker=self).order_by('-purchased_at').first()
+        return latest_discount and latest_discount.valid_until >= timezone.now().date()
+
+
     def grant_daily_login_reward(self):
-        today = now().date()
-        if self.last_login_date != today:
-            self.add_credits(5)
-            self.last_login_date = today
-            self.save(update_fields=["last_login_date", "credits"])
+        today = timezone.localdate()
+        if not hasattr(self, '_last_credit_date') or self._last_credit_date != today:
+            # Assuming you store last reward date somewhere, e.g. in user profile:
+            if self.last_credit_date != today:
+                self.credits += 5
+                self.last_credit_date = today
+                self.save(update_fields=['credits', 'last_credit_date'])
+                return True  # Credits granted today
+        return False  # Already granted today
 
     def award_referral_bonus(self, referrer):
         if referrer:
@@ -132,6 +145,7 @@ class ATSResumeRequest(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
     processed = models.BooleanField(default=False)  # Admin marks as processed
     order_id = models.CharField(max_length=12, unique=True, blank=True)  # Order tracking ID
+    cv = models.FileField(upload_to="user_cvs/", blank=True, null=True)
     cv_file = models.FileField(upload_to="ats_cvs/", blank=True, null=True)  # Final CV uploaded by admin
     updated_at = models.DateTimeField(auto_now=True)
 

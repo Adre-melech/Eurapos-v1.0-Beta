@@ -1,0 +1,83 @@
+  <!-- Search & Filters -->
+  <form id="hotJobsFilterForm" class="row g-3 align-items-end mb-5" onsubmit="return false;">
+    <div class="col-md-6">
+      <label for="searchInput" class="form-label fw-semibold text-secondary">🔍 Search Hot Jobs</label>
+      <input
+        type="search"
+        id="searchInput"
+        class="form-control form-control-lg shadow-sm rounded-3"
+        placeholder="Search hot jobs by title, company or skill..."
+        oninput="fetchHotJobsDebounced()"
+        aria-label="Search Hot Jobs"
+        autocomplete="off"
+      >
+    </div>
+    <div class="col-md-3">
+      <label for="categoryFilter" class="form-label fw-semibold text-secondary">📂 Category</label>
+      <select
+        id="categoryFilter"
+        class="form-select shadow-sm rounded-3"
+        onchange="fetchHotJobs()"
+        aria-label="Filter by Category"
+      >
+        <option value="" selected>All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="countryFilter" class="form-label fw-semibold text-secondary">🌍 Country</label>
+      <select
+        id="countryFilter"
+        class="form-select shadow-sm rounded-3"
+        onchange="fetchHotJobs()"
+        aria-label="Filter by Country"
+      >
+        <option value="" selected>All Countries</option>
+        {% for country in countries %}
+          <option value="{{ country.id }}">{{ country.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="text-center my-5 d-none">
+    <div class="spinner-border text-warning" role="status" aria-live="polite" aria-busy="true">
+      <span class="visually-hidden">Loading hot jobs...</span>
+    </div>
+  </div>
+
+<!-- Search & Filters -->
+<div class="row g-3 mb-4 align-items-end">
+  <div class="col-md-6">
+    <label for="searchInput" class="form-label">🔍 Search for Jobs</label>
+    <input type="text" id="searchInput" class="form-control form-control-lg shadow-sm" placeholder="Search jobs..." oninput="fetchJobs()">
+  </div>
+  <div class="col-md-3">
+    <label for="categoryFilter" class="form-label">📂 Category</label>
+    <select id="categoryFilter" class="form-select" onchange="fetchJobs()">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label for="countryFilter" class="form-label">🌍 Country</label>
+    <select id="countryFilter" class="form-select" onchange="fetchJobs()">
+      <option value="">All Countries</option>
+      {% for country in countries %}
+        <option value="{{ country.id }}">{{ country.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- Spinner -->
+<div id="loadingSpinner" class="text-center my-5 d-none">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>

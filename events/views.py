@@ -71,7 +71,7 @@ def purchase_ticket(request, event_id):
 
         messages.success(
             request,
-            f"✅ Ticket purchased! Order ID: {purchase.order_id}. Confirmation Code: {purchase.confirmation_code}"
+            f"✅ Ticket purchased! Order ID: {purchase.order_id}. Confirmation Code: {purchase.confirmation_code} Will be receiving Ticket within 3 working days."
         )
     else:
         messages.error(request, "❌ Not enough credits to buy this ticket.")

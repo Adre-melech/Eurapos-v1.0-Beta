@@ -8,7 +8,7 @@ from django.contrib.auth.views import PasswordResetView
 from django.core.mail import send_mail, BadHeaderError
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_encode
@@ -17,10 +17,10 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.contrib import messages
 from datetime import date
 from django.utils.encoding import force_bytes
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 from events.models import TicketPurchase
-from .forms import SeekerRegistrationForm, SeekerPasswordResetForm
+from .forms import SeekerRegistrationForm, SeekerPasswordResetForm, ATSCVUploadForm
 from jobs.models import Application, UnlockedExclusiveJob
 from notifications.models import Notification
 from .utils import generate_visa_discount_pdf
@@ -38,32 +38,50 @@ def seeker_register(request):
             user = form.save()
             user.add_credits(5)  # Grant 5 bonus credits on registration
 
-            # Check if the user was referred by another seeker
-            referral_code = request.POST.get("referral_id")  # Get referral ID from input
-            referrer = Seeker.objects.filter(referral_id=referral_code).first()
+            # Handle referral logic
+            referral_code = request.POST.get("referral_id", "").strip()
+            if referral_code:
+                referrer = Seeker.objects.filter(referral_id=referral_code).first()
+                if referrer:
+                    user.referred_by = referrer
+                    user.save(update_fields=["referred_by"])
+                    referrer.award_referral_bonus(referrer)
 
-            if referrer:
-                user.referred_by = referrer  # Link referral
-                user.save(update_fields=["referred_by"])
-                referrer.award_referral_bonus(referrer)  # Award 50 credits to the referrer
+                    # Notify the referrer
+                    Notification.objects.create(
+                        seeker=referrer,
+                        message=f"🎉 You've earned 50 credits for referring {user.username}!"
+                    )
 
-            login(request, user)
-            Notification.objects.create(
-                seeker=user,
-                message="Welcome to Eurapos! Your account has been created successfully. You've received 5 bonus credits!"
-            )
-            messages.success(request, "Registration successful! You've earned 5 credits.")
-            return redirect('jobs:job_list')
+            # Authenticate and log the user in
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password1")
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+
+                # Notify the user
+                Notification.objects.create(
+                    seeker=user,
+                    message="🎉 Welcome to Eurapos! You've received 5 bonus credits for signing up and another 5 for today's login streak."
+                )
+
+                messages.success(request, "Registration successful! You've earned 5 credits.")
+                return redirect("seeker:dashboard")
+            else:
+                messages.error(request, "Authentication failed after registration. Please try logging in.")
         else:
             messages.error(request, "Registration failed. Please check your inputs.")
     else:
         form = SeekerRegistrationForm()
 
-    return render(request, 'seeker/register.html', {'form': form})
+    return render(request, "seeker/register.html", {"form": form})
 
 
 def seeker_login(request):
-    """Handles seeker login and grants 5 credits for daily logins."""
+    if request.user.is_authenticated:
+        return redirect("seeker:dashboard")  # ✅ Redirect if already logged in
+
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -72,15 +90,17 @@ def seeker_login(request):
                 messages.error(request, "Admin users cannot log in via the seeker portal. Please use the admin panel.")
                 return redirect("seeker:seeker_login")
 
-            # Grant 5 credits for daily login
-            user.grant_daily_login_reward()
+            # Grant 5 credits for daily login, returns True if granted
+            granted = user.grant_daily_login_reward()
+
             login(request, user)
 
-            messages.success(request, f"Welcome back, {user.username}! 🎉 You earned **5 credits** for logging in today!")
+            if granted:
+                messages.success(request, f"Welcome back, {user.username}! 🎉 You earned **5 credits** for logging in today!")
 
             return redirect("seeker:dashboard")
         else:
-            messages.error(request, "Invalid credentials. Please try again.")
+            messages.error(request, "Login failed. Please check your username/email and password.")
     else:
         form = AuthenticationForm()
 
@@ -145,6 +165,7 @@ def seeker_dashboard(request):
     ats_requests = ATSResumeRequest.objects.filter(seeker=seeker).order_by("-requested_at")
     unlocked_guides = UnlockedVisaGuide.objects.filter(seeker=seeker).select_related("guide")
     ticket_purchases = TicketPurchase.objects.filter(seeker=seeker).select_related("event").order_by("-purchased_at")
+    form = ATSCVUploadForm()
 
     visa_discount = (
         VisaDiscount.objects.filter(seeker=seeker, valid_until__gte=date.today())
@@ -171,6 +192,7 @@ def seeker_dashboard(request):
         "visa_discount": visa_discount,
         "unlocked_guides": unlocked_guides,
         "ticket_purchases": ticket_purchases,
+        "form": form,
         "whatsapp_active": whatsapp_active,
         "whatsapp_days_left": whatsapp_days_left,
         "can_unlock": can_unlock,
@@ -186,51 +208,67 @@ def seeker_dashboard(request):
 
 
 def buy_ats_cv(request):
-    """Handles ATS CV purchase using credits."""
     seeker = request.user
 
-    if seeker.credits >= 30:  # Cost of ATS CV
-        seeker.credits -= 30
-        seeker.save(update_fields=["credits"])
+    if request.method == "POST":
+        form = ATSCVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            if seeker.credits < 30:
+                messages.error(request, "❌ Not enough credits to request an ATS CV.")
+                return redirect("seeker:dashboard")
 
-        ats_request = ATSResumeRequest.objects.create(seeker=seeker)
-        ats_request.generate_order_id()
+            # Deduct credits
+            seeker.credits -= 30
+            seeker.save(update_fields=["credits"])
 
-        # Email Notification to Seeker (with safety checks)
-        if seeker.email:
-            try:
-                send_mail(
-                    subject="📄 ATS CV Order Confirmation",
-                    message=(
-                        f"Dear {seeker.get_full_name() or seeker.username},\n\n"
-                        f"Your ATS CV request has been received!\n"
-                        f"Order ID: {ats_request.order_id}\n\n"
-                        "Your optimized CV will be delivered within 3 working days.\n\n"
-                        "Thank you for using Eurapos!"
-                    ),
-                    from_email="noreply@eurapos.com",
-                    recipient_list=[seeker.email],
-                    fail_silently=False,
-                )
-            except BadHeaderError:
-                messages.warning(request, "⚠️ Order placed but email failed due to invalid header.")
-                logger.error("BadHeaderError while sending ATS CV confirmation to %s", seeker.email)
-            except Exception as e:
-                messages.warning(request, "⚠️ Order placed but email notification failed.")
-                logger.error("Error sending ATS CV confirmation email: %s", str(e))
+            # Create ATSResumeRequest with uploaded CV
+            ats_request = ATSResumeRequest.objects.create(
+                seeker=seeker,
+                cv=form.cleaned_data["cv_file"]  # Assuming your model has a FileField named 'cv'
+            )
+            ats_request.generate_order_id()
+            ats_request.save()
+
+            # Send confirmation email (same as before)
+            if seeker.email:
+                try:
+                    send_mail(
+                        subject="📄 ATS CV Order Confirmation",
+                        message=(
+                            f"Dear {seeker.get_full_name() or seeker.username},\n\n"
+                            f"Your ATS CV request has been received!\n"
+                            f"Order ID: {ats_request.order_id}\n\n"
+                            "Your optimized CV will be delivered within 3 working days.\n\n"
+                            "Thank you for using Eurapos!"
+                        ),
+                        from_email="noreply@eurapos.com",
+                        recipient_list=[seeker.email],
+                        fail_silently=False,
+                    )
+                except BadHeaderError:
+                    messages.warning(request, "⚠️ Order placed but email failed due to invalid header.")
+                    logger.error("BadHeaderError while sending ATS CV confirmation to %s", seeker.email)
+                except Exception as e:
+                    messages.warning(request, "⚠️ Order placed but email notification failed.")
+                    logger.error("Error sending ATS CV confirmation email: %s", str(e))
+            else:
+                messages.warning(request, "⚠️ Order placed but email not sent (missing email address).")
+
+            messages.success(
+                request,
+                f"✅ ATS CV request placed! Order ID: {ats_request.order_id}. "
+                "Your CV will be delivered within 3 working days."
+            )
+            return redirect("seeker:dashboard")
+
         else:
-            messages.warning(request, "⚠️ Order placed but email not sent (missing email address).")
-
-        messages.success(
-            request,
-            f"✅ ATS CV request placed! Order ID: {ats_request.order_id}. "
-            "Your CV will be delivered within 3 working days."
-        )
+            # Form invalid, will render again with errors below
+            pass
 
     else:
-        messages.error(request, "❌ Not enough credits to request an ATS CV.")
+        form = ATSCVUploadForm()
 
-    return redirect("seeker:dashboard")
+    return render(request, "seeker/buy_ats_cv.html", {"form": form, "credits_required": 30})
 
 
 @require_POST
@@ -363,8 +401,9 @@ def mark_notification_read(request, notification_id):
     return redirect("seeker:notifications_page")
 
 
-@csrf_exempt
+
 @require_POST
+@csrf_protect
 def ajax_mark_notification_read(request):
     note_id = request.POST.get("id")
     if not request.user.is_authenticated:

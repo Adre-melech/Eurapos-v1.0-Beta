@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.timezone import now
 from notifications.models import Notification
-from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide
+from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide, UnlockedVisaGuide
 
 
 class SeekerAdmin(admin.ModelAdmin):
@@ -57,7 +57,6 @@ class ATSResumeRequestAdmin(admin.ModelAdmin):
         return "—"
     cv_file_link.allow_tags = True
     cv_file_link.short_description = "CV File"
-
 
 class VisaDiscountAdmin(admin.ModelAdmin):
     list_display = ("seeker", "order_id", "coupon_code", "valid_until", "purchased_at")

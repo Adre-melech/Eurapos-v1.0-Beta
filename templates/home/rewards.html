@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">🏆 User Rewards & Incentives</h2>
+    <p class="lead text-muted">The more you engage, the more you unlock. Here's what awaits you 👇</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h4>💰 Credit Rewards</h4>
+        <ul class="mb-0">
+          <li>Earn credits for referrals and account verifications</li>
+          <li>Use credits to unlock exclusive jobs and events</li>
+          <li>Bonus credits during seasonal promotions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h4>🎟️ Event Participation Rewards</h4>
+        <ul class="mb-0">
+          <li>Free access to virtual or in-person events</li>
+          <li>Digital certificates or badges for completing challenges</li>
+          <li>Top performers earn spotlight features or exclusive merch</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h4>📢 Engagement Rewards</h4>
+        <ul class="mb-0">
+          <li>Daily login streak bonuses</li>
+          <li>Leave helpful feedback? Win credits or unlockables</li>
+          <li>Early access to new features for active users</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h4>👑 Exclusive Access</h4>
+        <ul class="mb-0">
+          <li>Unlock premium job listings for 3 days with credits</li>
+          <li>Priority notification for time-limited opportunities</li>
+          <li>Admin-picked users receive surprise upgrades</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 text-center">
+    <p class="text-muted">Stay active, stay curious — your next reward might be one click away 🚀</p>
+    <a href="{% url 'home:contact' %}" class="btn btn-outline-primary">🔍 Have questions? Contact Support</a>
+  </div>
+</div>
+{% endblock %}

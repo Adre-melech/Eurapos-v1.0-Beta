@@ -17,61 +17,86 @@
     </div>
   {% endif %}
 
-  <!-- Search & Filters -->
-  <form id="hotJobsFilterForm" class="row g-3 align-items-end mb-5" onsubmit="return false;">
-    <div class="col-md-6">
-      <label for="searchInput" class="form-label fw-semibold text-secondary">🔍 Search Hot Jobs</label>
-      <input
-        type="search"
-        id="searchInput"
-        class="form-control form-control-lg shadow-sm rounded-3"
-        placeholder="Search hot jobs by title, company or skill..."
-        oninput="fetchHotJobsDebounced()"
-        aria-label="Search Hot Jobs"
-        autocomplete="off"
-      >
-    </div>
-    <div class="col-md-3">
-      <label for="categoryFilter" class="form-label fw-semibold text-secondary">📂 Category</label>
-      <select
-        id="categoryFilter"
-        class="form-select shadow-sm rounded-3"
-        onchange="fetchHotJobs()"
-        aria-label="Filter by Category"
-      >
-        <option value="" selected>All Categories</option>
-        {% for category in categories %}
-          <option value="{{ category.id }}">{{ category.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label for="countryFilter" class="form-label fw-semibold text-secondary">🌍 Country</label>
-      <select
-        id="countryFilter"
-        class="form-select shadow-sm rounded-3"
-        onchange="fetchHotJobs()"
-        aria-label="Filter by Country"
-      >
-        <option value="" selected>All Countries</option>
-        {% for country in countries %}
-          <option value="{{ country.id }}">{{ country.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </form>
-
-  <!-- Loading Spinner -->
-  <div id="loadingSpinner" class="text-center my-5 d-none">
-    <div class="spinner-border text-warning" role="status" aria-live="polite" aria-busy="true">
-      <span class="visually-hidden">Loading hot jobs...</span>
-    </div>
-  </div>
 </section>
 
 <!-- Job Results (AJAX injected here) -->
 <div id="jobResults" class="row g-4 fade-in">
-  {% include "jobs/partials/hot_jobs_result.html" %}
+  <style>
+    .flame-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: #fff4e6;
+      color: #ff4500;
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 1rem;
+      animation: flicker 1.2s infinite alternate;
+      box-shadow: 0 0 6px rgba(255, 69, 0, 0.4);
+    }
+
+    @keyframes flicker {
+      0%   { opacity: 1; transform: scale(1); }
+      50%  { opacity: 0.8; transform: scale(1.03); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style
+
+  {% if hot_jobs %}
+    <div class="row g-4">
+      {% for job in hot_jobs %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-warning job-card rounded-4">
+            <div class="card-body d-flex flex-column position-relative p-4">
+              <!-- HOT badge -->
+              <span class="flame-badge">🔥 HOT</span>
+
+              <!-- Job Title -->
+              <h5 class="card-title text-warning fw-semibold mb-2">
+                <a href="{% url 'jobs:job_detail' job.id %}" class="text-decoration-none text-warning">
+                  {{ job.title }}
+                </a>
+              </h5>
+
+              <!-- Company -->
+              <p class="mb-1 text-muted">
+                <i class="bi bi-building me-1"></i>
+                <strong>Company:</strong> {{ job.company_name }}
+              </p>
+
+              <!-- Salary -->
+              <p class="mb-1 text-muted">
+                <i class="bi bi-cash me-1"></i>
+                <strong>Salary:</strong> {{ job.salary }}
+              </p>
+
+              <!-- Views -->
+              <p class="mb-1 text-muted">
+                <i class="bi bi-eye me-1"></i>
+                <strong>Views:</strong> {{ job.views }}
+              </p>
+
+              <!-- Location -->
+              <p class="mb-3 text-muted">
+                <i class="bi bi-geo-alt me-1"></i>
+                <strong>Location:</strong> {{ job.country.name }}
+              </p>
+
+              <!-- View Job Button -->
+              <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-warning rounded-pill mt-auto px-4 fw-semibold shadow-sm">
+                View Job
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning text-center mt-4 fw-semibold shadow-sm rounded-3">
+      ❌ No Hot Jobs Found! Try refining your search or filters.
+    </div>
+  {% endif %}
 </div>
 
 <!-- Load More Button -->

@@ -20,7 +20,7 @@ from .views import (
     # ATS Management
     mark_ats_processed, upload_event_ticket, confirm_event_ticket, mark_priority_done, all_applications,
     priority_applications_list, whatsapp_subscribers_list, ats_requests_list, delivered_ats_resumes_list,
-    all_pending_event_tickets, delivered_event_tickets, unlocked_access_users
+    all_pending_event_tickets, delivered_event_tickets, unlocked_access_users, manage_exclusive_access
 )
 
 app_name = "adminpanel"
@@ -65,6 +65,8 @@ urlpatterns = [
     path("manage-job-countries/", manage_job_countries, name="manage_job_countries"),
     path("edit-job-country/<int:country_id>/", edit_job_country, name="edit_job_country"),
     path("delete-job-country/<int:country_id>/", delete_job_country, name="delete_job_country"),
+
+path("exclusive-access/", manage_exclusive_access, name="manage_exclusive_access"),
 
     # Seeker Management
     path("update-application-status/<int:application_id>/", update_application_status, name="update_application_status"),

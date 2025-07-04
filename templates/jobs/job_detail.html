@@ -43,6 +43,30 @@
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
   }
+  /* Rating jobs */
+  .rating-option {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 80px;
+    text-align: center;
+  }
+
+  .rating-option:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.05);
+  }
+
+  .rating-option.bg-light.border-primary {
+    border: 2px solid #0d6efd !important;
+    background-color: #e7f1ff;
+  }
+
+  @media (max-width: 576px) {
+    .rating-option {
+      width: 70px;
+      font-size: 1.75rem;
+    }
+  }
 </style>
 
 <div class="container my-5">
@@ -52,6 +76,20 @@
       <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
           <h2 class="card-title text-primary fw-bold">{{ job.title }}</h2>
+
+          <!-- Flash Messages -->
+          {% if messages %}
+            <div class="mb-3">
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center gap-3 shadow-sm rounded-3 px-4 py-3" role="alert"
+                     style="border-left: 5px solid {% if message.tags == 'success' %}#28a745{% elif message.tags in 'error danger' %}#dc3545{% elif message.tags == 'warning' %}#edcb1c{% else %}#004aad{% endif %};">
+                  <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill text-success{% elif message.tags in 'error danger' %}bi-x-circle-fill text-danger{% elif message.tags == 'warning' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %} fs-5"></i>
+                  <div class="flex-grow-1 small text-dark">{{ message }}</div>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
 
           <!-- Responsive job info panel for small screens (shown only below title) -->
           <div class="job-info-panel d-lg-none mt-3 mb-4">
@@ -167,26 +205,38 @@
 </div>
 
 <!-- Rating Modal -->
+<!-- Rating Modal -->
 {% if application and application.status != "Rejected" %}
+<!-- Rating Modal -->
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content shadow rounded-3">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ratingModalLabel">⭐ Rate Your Application Experience</h5>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow rounded-4 border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="ratingModalLabel">⭐ Rate Your Application</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p class="text-success fw-semibold">💰 Earn 5 credits by submitting your rating!</p>
-        <form method="POST" action="{% url 'jobs:rate_application' application.id %}">
+
+      <div class="modal-body text-center">
+        <p class="text-success fw-semibold mb-4">💰 Earn 5 credits by submitting your rating!</p>
+
+        <form method="POST" action="{% url 'jobs:rate_application' application.id %}" class="needs-validation" novalidate>
           {% csrf_token %}
-          <label for="ratingSelect" class="form-label fw-semibold">Select Rating:</label>
-          <select id="ratingSelect" name="rating" class="form-select" required>
-            <option value="" disabled selected>Choose an option</option>
-            <option value="good">🙂 Good</option>
-            <option value="okay">😐 Okay</option>
-            <option value="bad">☹️ Bad</option>
-          </select>
-          <button type="submit" class="btn btn-success rounded-pill mt-3 px-4 shadow-sm">Submit Rating</button>
+          <input type="hidden" name="rating" id="selectedRating" required>
+
+          <!-- Emoji Options with Labels -->
+          <div class="d-flex justify-content-center gap-4 mb-3 flex-wrap text-center">
+            <div class="rating-option border rounded-3 p-3 fs-1 cursor-pointer" data-value="good" role="button" aria-label="Good">🙂</div>
+            <div class="rating-option border rounded-3 p-3 fs-1 cursor-pointer" data-value="okay" role="button" aria-label="Okay">😐</div>
+            <div class="rating-option border rounded-3 p-3 fs-1 cursor-pointer" data-value="bad" role="button" aria-label="Bad">☹️</div>
+          </div>
+
+          <div class="invalid-feedback d-block text-danger mb-2" id="ratingError" style="display: none;">
+            Please select a rating before submitting.
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 rounded-pill px-4 fw-semibold shadow-sm">
+            Submit Rating
+          </button>
         </form>
       </div>
     </div>
@@ -195,28 +245,57 @@
 {% endif %}
 
 <script>
-  // Bootstrap form validation for CV upload
-  (function () {
-    'use strict'
-    var forms = document.querySelectorAll('.needs-validation')
-    Array.prototype.slice.call(forms).forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-        form.classList.add('was-validated')
-      }, false)
-    })
-  })();
-
   document.addEventListener("DOMContentLoaded", function () {
+    // Auto show rating modal if no rating exists
     {% if application and not application.rating %}
-      var ratingModal = new bootstrap.Modal(document.getElementById("ratingModal"));
+      const ratingModal = new bootstrap.Modal(document.getElementById("ratingModal"));
       ratingModal.show();
     {% endif %}
+
+    // Rating emoji selection
+    const ratingOptions = document.querySelectorAll('.rating-option');
+    const selectedRatingInput = document.getElementById('selectedRating');
+    const ratingError = document.getElementById('ratingError');
+
+    if (ratingOptions.length && selectedRatingInput) {
+      ratingOptions.forEach(option => {
+        option.addEventListener('click', function () {
+          const value = this.getAttribute('data-value');
+          selectedRatingInput.value = value;
+
+          ratingOptions.forEach(opt => opt.classList.remove('selected', 'bg-light', 'border-primary'));
+          this.classList.add('selected', 'bg-light', 'border-primary');
+
+          if (ratingError) ratingError.style.display = 'none';
+          selectedRatingInput.classList.remove('is-invalid');
+        });
+      });
+    }
+
+    // Handle Bootstrap validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        // If there's a rating input, validate it
+        if (selectedRatingInput && !selectedRatingInput.value) {
+          event.preventDefault();
+          selectedRatingInput.classList.add('is-invalid');
+          if (ratingError) ratingError.style.display = 'block';
+        }
+
+        // Regular Bootstrap form validation
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
   });
 </script>
+
+
 
 
 {% endblock %}

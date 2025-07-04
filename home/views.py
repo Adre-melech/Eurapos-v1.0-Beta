@@ -1,9 +1,14 @@
 import random
-
+from django.contrib import messages
+from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.timezone import now
 from datetime import timedelta
+
+from django.views.decorators.http import require_GET, require_http_methods
+
+from home.models import ContactMessage
 from jobs.models import JobPost, JobCountry, Category, UnlockedExclusiveJob
 from seeker.models import VisaGuide, UnlockedVisaGuide
 from events.models import EventTicket
@@ -104,3 +109,54 @@ def visa_guides_page(request):
         "visa_guides": visa_guides,
         "unlocked_guide_ids": unlocked_guide_ids,
     })
+
+def about_us(request):
+    return render(request, "home/about.html")
+
+def contact_us(request):
+    return render(request, "home/contact.html")
+
+def rewards(request):
+    return render(request, "home/rewards.html")
+
+@require_http_methods(["GET", "POST"])
+def send_contact(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        # Basic validation
+        if not name or not email or not message:
+            messages.error(request, "⚠️ Please fill out all fields.")
+            return redirect("home:send_contact")
+
+        # Save to DB (optional)
+        ContactMessage.objects.create(name=name, email=email, message=message)
+
+        # Optional email to admin
+        send_mail(
+            subject=f"New Contact from {name}",
+            message=message,
+            from_email=email,
+            recipient_list=["support@example.com"],  # update this
+            fail_silently=True
+        )
+
+        messages.success(request, "✅ Thank you! Your message has been sent.")
+        return redirect("home:send_contact")
+
+    return render(request, "home/contact.html")
+
+
+
+def faq(request):
+    return render(request, "home/faq.html")
+
+@require_GET
+def terms_view(request):
+    return render(request, "home/terms.html")
+
+@require_GET
+def privacy_view(request):
+    return render(request, "home/privacy.html")

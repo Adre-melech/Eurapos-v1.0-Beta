@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
+
 {% block content %}
 <div class="container py-4">
 
@@ -82,7 +84,7 @@
     </div>
 
 
-    <!-- ATS CV Purchase -->
+    <!-- ATS CV Purchase Card -->
     <div class="col-md-4 mb-4">
       <div class="card shadow-sm rounded-4 p-4 h-100 text-center">
         <h5 class="mb-3">📄 Buy ATS-friendly CV</h5>
@@ -90,10 +92,10 @@
 
         {% with ats_status=seeker.ats_cv_order_available %}
           {% if ats_status.0 %}
-            <form method="POST" action="{% url 'seeker:buy_ats_cv' %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-primary w-100">Buy ATS CV (30 Credits)</button>
-            </form>
+            <!-- Button triggers modal -->
+            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#buyAtsCvModal">
+              Buy ATS CV (30 Credits)
+            </button>
           {% else %}
             <button class="btn btn-secondary w-100" disabled>
               Available in {{ ats_status.1 }} day{{ ats_status.1|pluralize }}
@@ -162,7 +164,11 @@
       <tbody>
         {% for application in applications %}
         <tr>
-          <td>{{ application.job.title }}</td>
+          <td>
+            <a href="{% url 'jobs:job_detail' application.job.id %}" class="text-decoration-none text-primary fw-semibold">
+              {{ application.job.title }}
+            </a>
+          </td>
           <td>{{ application.job.company_name }}</td>
           <td>{{ application.applied_at|date:"F j, Y" }}</td>
           <td><span class="badge bg-primary text-uppercase">{{ application.status }}</span></td>
@@ -214,6 +220,49 @@
       </tbody>
     </table>
   </div>
+
+
+  <!-- ATS CV Orders -->
+  <h4 class="mb-4 text-primary fw-bold">📑 My ATS CV Orders</h4>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Requested On</th>
+          <th>Status</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in ats_requests %}
+        <tr>
+          <td>{{ request.order_id }}</td>
+          <td>{{ request.requested_at|date:"F j, Y, g:i A" }}</td>
+          <td>
+            {% if request.processed %}
+              <span class="badge bg-success">✅ Delivered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">🚀 Processing</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if request.cv_file %}
+              <a href="{{ request.cv_file.url }}" class="btn btn-sm btn-outline-primary">📥 Download</a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center text-muted">No ATS CV requests made.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
 
   <!-- Event Ticket Purchases -->
   <h4 class="mb-4 text-primary fw-bold">🎫 My Event Ticket Purchases</h4>
@@ -298,85 +347,88 @@
   </table>
 </div>
 
-  <!-- ATS CV Orders -->
-  <h4 class="mb-4 text-primary fw-bold">📑 My ATS CV Orders</h4>
-  <div class="table-responsive mb-5">
-    <table class="table table-hover table-bordered rounded shadow-sm">
-      <thead class="table-dark">
-        <tr>
-          <th>Order ID</th>
-          <th>Requested On</th>
-          <th>Status</th>
-          <th>Download</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for request in ats_requests %}
-        <tr>
-          <td>{{ request.order_id }}</td>
-          <td>{{ request.requested_at|date:"F j, Y, g:i A" }}</td>
-          <td>
-            {% if request.processed %}
-              <span class="badge bg-success">✅ Delivered</span>
-            {% else %}
-              <span class="badge bg-warning text-dark">🚀 Processing</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if request.cv_file %}
-              <a href="{{ request.cv_file.url }}" class="btn btn-sm btn-outline-primary">📥 Download</a>
-            {% else %}
-              <span class="text-muted">—</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3" class="text-center text-muted">No ATS CV requests made.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+</div>
 
+
+
+<!-- Modal -->
+<div class="modal fade" id="buyAtsCvModal" tabindex="-1" aria-labelledby="buyAtsCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title" id="buyAtsCvModalLabel">📄 Upload your current CV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'seeker:buy_ats_cv' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="modal-body">
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="mb-3">
+            {{ form.cv_file.label_tag }}
+            {{ form.cv_file|add_class:"form-control" }}
+            {% for error in form.cv_file.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <p>You need 30 credits to order an ATS CV.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Purchase and Upload CV (30 Credits)</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-  document.getElementById('copyReferralBtn').addEventListener('click', function() {
-    const referralText = document.getElementById('referralId').textContent.trim();
+  document.addEventListener("DOMContentLoaded", function() {
+    // Show ATS CV modal if form has errors
+    {% if form.errors %}
+      var atsModal = new bootstrap.Modal(document.getElementById('buyAtsCvModal'));
+      atsModal.show();
+    {% endif %}
 
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(referralText).then(() => {
-        const msg = document.getElementById('copyMsg');
-        msg.style.display = 'block';
+    // Referral copy button logic
+    document.getElementById('copyReferralBtn').addEventListener('click', function() {
+      const referralText = document.getElementById('referralId').textContent.trim();
 
-        // Hide "Copied!" message after 2 seconds
-        setTimeout(() => {
-          msg.style.display = 'none';
-        }, 5000);
-      }).catch(() => {
-        alert('Failed to copy referral ID. Please copy manually.');
-      });
-    } else {
-      // Fallback for older browsers
-      const textarea = document.createElement('textarea');
-      textarea.value = referralText;
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand('copy');
-        const msg = document.getElementById('copyMsg');
-        msg.style.display = 'block';
-        setTimeout(() => {
-          msg.style.display = 'none';
-        }, 5000);
-      } catch (err) {
-        alert('Failed to copy referral ID. Please copy manually.');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(referralText).then(() => {
+          const msg = document.getElementById('copyMsg');
+          msg.style.display = 'block';
+
+          // Hide "Copied!" message after 5 seconds
+          setTimeout(() => {
+            msg.style.display = 'none';
+          }, 5000);
+        }).catch(() => {
+          alert('Failed to copy referral ID. Please copy manually.');
+        });
+      } else {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = referralText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          const msg = document.getElementById('copyMsg');
+          msg.style.display = 'block';
+          setTimeout(() => {
+            msg.style.display = 'none';
+          }, 5000);
+        } catch (err) {
+          alert('Failed to copy referral ID. Please copy manually.');
+        }
+        document.body.removeChild(textarea);
       }
-      document.body.removeChild(textarea);
-    }
+    });
   });
 </script>
 

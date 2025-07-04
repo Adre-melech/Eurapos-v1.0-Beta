@@ -95,7 +95,7 @@ def upload_ats_cv(request, request_id):
         from notifications.models import Notification
         Notification.objects.create(
             seeker=ats_request.seeker,
-            message=f"📄 Your ATS-optimized CV for order {ats_request.order_id} has been uploaded!"
+            message=f"📄 Your ATS-optimized CV for order {ats_request.order_id} has been uploaded! Download it from your dashboard."
         )
 
         messages.success(request, f"ATS CV uploaded for {ats_request.seeker.username}.")
@@ -414,13 +414,68 @@ def add_job_country(request):
             for seeker in Seeker.objects.filter(is_staff=False):
                 Notification.objects.create(
                     seeker=seeker,
-                    message=f"🌍 We've added a new job country: {name}. Explore opportunities abroad!"
+                    message=f"🌍 We've added a new country: {name}. Explore opportunities abroad!"
                 )
 
             messages.success(request, "Job Country added successfully!")
             return redirect("adminpanel:admin_dashboard")
 
     return render(request, "adminpanel/add_job_country.html")
+
+
+@staff_member_required
+def manage_exclusive_access(request):
+    seekers = Seeker.objects.all().order_by("username")
+
+    if request.method == "POST":
+        seeker_id = request.POST.get("seeker_id")
+        action = request.POST.get("action")
+        seeker = get_object_or_404(Seeker, id=seeker_id)
+
+        if action == "grant":
+            expires = now() + timedelta(days=3)
+            exclusive_jobs = JobPost.objects.filter(exclusive_job=True)
+
+            for job in exclusive_jobs:
+                UnlockedExclusiveJob.objects.update_or_create(
+                    seeker=seeker,
+                    job=job,
+                    defaults={"expires_at": expires, "active": True}
+                )
+
+            # ✅ Notify seeker
+            Notification.objects.create(
+                seeker=seeker,
+                message="🎉 Eurapos has granted you access to exclusive job listings for 3 days!"
+            )
+
+            messages.success(request, f"✅ Exclusive job access granted to {seeker.username} for 3 days.")
+
+        elif action == "revoke":
+            UnlockedExclusiveJob.objects.filter(seeker=seeker).update(active=False)
+
+            # ✅ Notify seeker
+            Notification.objects.create(
+                seeker=seeker,
+                message="🚫 Your access to exclusive job listings has been revoked by Eurapos."
+            )
+
+            messages.warning(request, f"🚫 Exclusive job access revoked for {seeker.username}.")
+
+        return redirect("adminpanel:manage_exclusive_access")
+
+    # Map of seeker.id → True/False based on active access
+    seekers_with_access = {
+        seeker.id: UnlockedExclusiveJob.objects.filter(
+            seeker=seeker, expires_at__gt=now(), active=True
+        ).exists()
+        for seeker in seekers
+    }
+
+    return render(request, "adminpanel/manage_exclusive_access.html", {
+        "seekers": seekers,
+        "seekers_with_access": seekers_with_access,
+    })
 
 
 @staff_member_required
@@ -501,7 +556,7 @@ def manage_all_seekers(request):
             from notifications.models import Notification
             Notification.objects.create(
                 seeker=seeker,
-                message=f"💰 {credits} credits were added to your account by the admin team!"
+                message=f"💰 {credits} credits were added to your account by Eurapos!"
             )
 
             messages.success(request, f"{credits} credits added to {seeker.username}.")
@@ -539,7 +594,7 @@ def manage_credits(request, seeker_id):
             from notifications.models import Notification
             Notification.objects.create(
                 seeker=seeker,
-                message=f"💰 {credit_amount} credits were added to your account by the admin team!"
+                message=f"💰 {credit_amount} credits were added to your account by Eurapos!"
             )
 
             messages.success(request, f"{credit_amount} credits added to {seeker.username}.")

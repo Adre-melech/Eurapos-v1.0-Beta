@@ -12,3 +12,18 @@
     </div>
   {% endif %}
 {% endfor %}
+
+
+
+
+<!-- Floating Notification Bell (Mobile Only) -->
+<div class="d-block d-lg-none">
+  <!-- Bell icon -->
+  <div id="notification-bell" aria-label="Notifications" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+    <i class="fa-regular fa-bell"></i>{% with count=unread_notifications.count %}{% if count > 0 %}
+    <span class="badge rounded-pill bg-danger pulse-badge">{{ count }}{% if count > 99 %}+{% endif %}</span>
+    {% endif %}
+    {% endwith %}
+  </div>
+<!-- Notification Chatbox -->
+<div id="notification-chatbox" role="region" aria-live="polite" aria-label="Notifications List"><div id="notification-chatbox-header">🔔 Notifications</div><ul>{% for note in recent_notifications %}<li class="{% if not note.read %}fw-bold{% endif %}" data-note-id="{{ note.id }}" onclick="markAsRead(this)" tabindex="0" role="button">{{ note.message }}<br><small>{{ note.created_at|timesince }} ago</small></li>{% empty %}<li class="text-center text-muted">No notifications yet.</li>{% endfor %}</ul><div id="notification-chatbox-footer"><a href="{% url 'seeker:notifications_page' %}">🔍 See all notifications</a></div></div></div>

@@ -1,0 +1,100 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm fixed-top py-2">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-decoration-none" href="{% url 'home:home' %}">
+      <img src="{% static 'img/logo.png' %}" alt="Eurapos" style="height: 40px;">
+    </a>
+
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+
+        <li class="nav-item">
+          <a class="nav-link text-dark fw-medium" href="{% url 'jobs:job_list' %}">Browse Jobs</a>
+        </li>
+
+        {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link text-dark fw-medium" href="{% url 'seeker:dashboard' %}">Dashboard</a>
+          </li>
+
+          {% if unlocked_jobs %}
+            <li class="nav-item">
+              <a class="nav-link text-dark fw-medium" href="{% url 'jobs:exclusive_jobs' %}">Exclusive Jobs</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" href="{% url 'jobs:unlock_exclusive_jobs' %}" style="color: #edcb1c;">
+                🚀 Unlock Exclusive Jobs!
+              </a>
+            </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link text-dark fw-medium" href="{% url 'home:visa_guides' %}">Visa Guides</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link text-dark fw-medium" href="https://news.eurapos.com">News</a>
+          </li>
+
+          <!-- Credits Wallet -->
+          <li class="nav-item d-flex align-items-center px-3 py-1 bg-light rounded-3 shadow-sm" style="font-weight: 600; font-size: 0.95rem;">
+            <i class="bi bi-wallet2 me-2 fs-5 text-primary"></i>
+            <span class="d-none d-sm-inline">Credits:</span>
+            <span class="ms-1">{{ request.user.credits|default:"0" }}</span>
+          </li>
+
+          <!-- Notifications -->
+          <li class="nav-item dropdown">
+            <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-regular fa-bell fa-lg text-dark"></i>
+              {% with count=unread_notifications.count %}
+                {% if count > 0 %}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ count }}{% if count > 99 %}+{% endif %}
+                  </span>
+                {% endif %}
+              {% endwith %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm p-0" style="min-width: 350px; max-height: 400px; overflow-y: auto;">
+              <li class="dropdown-header bg-light fw-bold px-3 py-2">🔔 Notifications</li>
+              {% for note in recent_notifications %}
+                <li class="dropdown-item small text-wrap {% if not note.read %}fw-bold{% endif %}"
+                    data-note-id="{{ note.id }}" onclick="markAsRead(this)">
+                  {{ note.message }}<br>
+                  <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+                </li>
+              {% empty %}
+                <li class="dropdown-item text-muted text-center">No notifications yet.</li>
+              {% endfor %}
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-center" href="{% url 'seeker:notifications_page' %}">
+                  🔍 See all notifications
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="btn btn-outline-danger btn-sm ms-lg-2" href="{% url 'seeker:seeker_logout' %}">Logout</a>
+          </li>
+
+        {% else %}
+          <li class="nav-item">
+            <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'seeker:seeker_register' %}">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary btn-sm" href="{% url 'seeker:seeker_login' %}">Login</a>
+          </li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </div>
+</nav>
