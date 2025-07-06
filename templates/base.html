@@ -50,8 +50,8 @@
                 <a class="nav-link text-dark fw-medium" href="{% url 'jobs:exclusive_jobs' %}">Exclusive Jobs</a>
               </li>
             {% endif %}
-
           {% endif %}
+
 
           <li class="nav-item">
             <a class="nav-link text-dark fw-medium" href="{% url 'jobs:job_list' %}">Browse Jobs</a>
@@ -229,11 +229,12 @@
       </div>
 
       <div class="col-md-3 mb-4">
-        <h5 class="text-dark">Rewards</h5>
+        <h5 class="text-dark">For Employers</h5>
         <ul class="list-unstyled small">
-          <li><a href="#" class="text-decoration-none text-secondary">Refer & Earn</a></li>
-          <li><a href="#" class="text-decoration-none text-secondary">Exclusive Access</a></li>
-          <li><a href="#" class="text-decoration-none text-secondary">Discount Coupons</a></li>
+          <li><a href="{% url 'recruiter:why_partner' %}" class="text-decoration-none text-secondary">Why Partner With Us?</a></li>
+          <li><a href="{% url 'recruiter:resume_access' %}" class="text-decoration-none text-secondary">Resume Access Plans</a></li>
+          <li><a href="{% url 'recruiter:workforce_solutions' %}" class="text-decoration-none text-secondary">Workforce Placement Solutions</a></li>
+          <li><a href="{% url 'recruiter:post_jobs' %}" class="text-decoration-none text-secondary">Post Jobs</a></li>
         </ul>
       </div>
 
@@ -467,6 +468,41 @@
         <button type="submit" class="btn w-100 text-white d-flex justify-content-center align-items-center gap-2" style="background-color: #004aad;">
           <i class="bi bi-whatsapp fs-5"></i> Confirm Purchase (20 Credits)
         </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<button class="btn btn-warning position-fixed bottom-0 end-0 m-4 shadow-lg"
+        data-bs-toggle="modal" data-bs-target="#partnerModal"
+        style="z-index: 1050;">
+  🤝 Become a Partner
+</button>
+
+
+
+<!-- Become a Partner Modal -->
+<div class="modal fade" id="partnerModal" tabindex="-1" aria-labelledby="partnerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{% url 'recruiter:partner_register' %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="partnerModalLabel">🤝 Become a Partner</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="company" class="form-label">Company Name</label>
+          <input type="text" class="form-control" id="company" name="company" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Official Email</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success w-100">📩 Register Interest</button>
       </div>
     </form>
   </div>

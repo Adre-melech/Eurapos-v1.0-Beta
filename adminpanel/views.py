@@ -443,7 +443,12 @@ def manage_exclusive_access(request):
                     defaults={"expires_at": expires, "active": True}
                 )
 
-            # ✅ Notify seeker
+            # (Re)create or update HiddenJobAccess (for cooldown tracking)
+            HiddenJobAccess.objects.update_or_create(
+                seeker=seeker,
+                defaults={"expires_at": expires, "active": True}
+            )
+
             Notification.objects.create(
                 seeker=seeker,
                 message="🎉 Eurapos has granted you access to exclusive job listings for 3 days!"
@@ -452,9 +457,13 @@ def manage_exclusive_access(request):
             messages.success(request, f"✅ Exclusive job access granted to {seeker.username} for 3 days.")
 
         elif action == "revoke":
+            # Revoke all current exclusive jobs
             UnlockedExclusiveJob.objects.filter(seeker=seeker).update(active=False)
 
-            # ✅ Notify seeker
+            # ❌ Clear cooldown logic so user can buy again
+            HiddenJobAccess.objects.filter(seeker=seeker).delete()
+            UnlockedExclusiveJob.objects.filter(seeker=seeker).delete()
+
             Notification.objects.create(
                 seeker=seeker,
                 message="🚫 Your access to exclusive job listings has been revoked by Eurapos."
@@ -464,7 +473,6 @@ def manage_exclusive_access(request):
 
         return redirect("adminpanel:manage_exclusive_access")
 
-    # Map of seeker.id → True/False based on active access
     seekers_with_access = {
         seeker.id: UnlockedExclusiveJob.objects.filter(
             seeker=seeker, expires_at__gt=now(), active=True

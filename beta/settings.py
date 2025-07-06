@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'jobs',
     'home',
     'seeker',
+    'recruiter',
     'adminpanel',
     'notifications',
     'events',
@@ -79,6 +80,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'jobs.context_processors.unlocked_jobs_status',
                 'seeker.context_processors.seeker_notifications',
+                'seeker.context_processors.unlocked_jobs_processor',
             ],
         },
     },
@@ -155,6 +157,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "seeker.Seeker"
 
 # SMTP Configuration
+ADMINS = [("Eurapos Team", "eurapos.main@gmail.com")]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mailtrap.io'
 EMAIL_HOST_USER = 'b4f2e9ed6053b4'

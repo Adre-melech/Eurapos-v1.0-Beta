@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Eurapos | Workforce Placement Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">🧩 Workforce Placement Solutions</h2>
+    <p class="lead text-muted">Deploy skilled talent at speed and scale — without compromising on quality.</p>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🛠️ Pre-Vetted Talent Pools</h5>
+        <p class="mb-0">Access curated candidates based on role-specific skills, verified experience, and active job-seeking signals.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">📆 On-Demand Hiring</h5>
+        <p class="mb-0">Whether it’s short-term staff or long-term onboarding, our team can match you with candidates in hours — not weeks.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🔍 High-Intent Matching</h5>
+        <p class="mb-0">Our smart matching engine factors in candidate readiness, profile performance, and platform engagement to reduce drop-offs.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🤝 Collaborative Placements</h5>
+        <p class="mb-0">Need help managing onboarding, contracts, or compliance? Our placement team works alongside yours to simplify hiring.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mt-5 text-center">
+    <a href="{% url 'recruiter:post_jobs' %}" class="btn btn-primary px-4">
+      📩 Post Jobs with Us
+    </a>
+  </div>
+</div>
+{% endblock %}

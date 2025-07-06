@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">📝 Purchase ATS-Optimized CV</h2>
+    <p class="lead text-muted">Get a professionally designed CV that passes recruiter filters and makes an impact.</p>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h4 class="card-title">What You’ll Get</h4>
+          <ul class="mb-4">
+            <li>✅ ATS-compliant formatting (designed to pass filtering bots)</li>
+            <li>✅ Professionally written and personalized content</li>
+            <li>✅ Delivered within 48 hours via your dashboard</li>
+            <li>✅ 1 free revision within 7 days of delivery</li>
+          </ul>
+
+          <h5 class="fw-bold">💳 Cost: <span class="text-success">20 credits</span></h5>
+
+          {% if user.credits >= 20 %}
+            <form method="POST" action="{% url 'seeker:buy_ats_cv' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="job_role" class="form-label">Target Job Role (Optional)</label>
+                <input type="text" name="job_role" id="job_role" class="form-control" placeholder="e.g. Frontend Developer, HR Executive">
+              </div>
+              <div class="mb-3">
+                <label for="notes" class="form-label">Additional Notes</label>
+                <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Tell us about your experience or goals…"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">🚀 Purchase CV for 20 Credits</button>
+            </form>
+          {% else %}
+            <div class="alert alert-warning mt-4" role="alert">
+              ❌ You don’t have enough credits to purchase this CV. <a href="{% url 'seeker:rewards' %}" class="alert-link">Earn more here</a>.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 text-center">
+    <a href="{% url 'home:faq' %}" class="text-decoration-none">📚 How does this work?</a>
+  </div>
+</div>
+{% endblock %}

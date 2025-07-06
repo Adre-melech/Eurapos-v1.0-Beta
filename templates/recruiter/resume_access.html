@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Eurapos | Resume Access Plans{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">📂 Resume Access Plans</h2>
+    <p class="lead text-muted">Browse and connect with verified, actively seeking candidates — smarter, faster, and with full transparency.</p>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <div class="card h-100 border-primary">
+        <div class="card-header bg-primary text-white fw-bold text-center">
+          Basic
+        </div>
+        <div class="card-body">
+          <ul class="mb-4">
+            <li>🔎 Search 100 resumes/month</li>
+            <li>🟢 View contact info on profile</li>
+            <li>📁 Save up to 20 candidates</li>
+            <li>✅ Email support</li>
+          </ul>
+          <div class="text-center fw-bold">BDT 1,000/month</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 border-success">
+        <div class="card-header bg-success text-white fw-bold text-center">
+          Standard
+        </div>
+        <div class="card-body">
+          <ul class="mb-4">
+            <li>🔎 Search 500 resumes/month</li>
+            <li>📞 Full contact access + resume download</li>
+            <li>📁 Save up to 100 candidates</li>
+            <li>📊 Basic hiring insights</li>
+            <li>⚡ Priority email support</li>
+          </ul>
+          <div class="text-center fw-bold">BDT 3,500/month</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 border-dark">
+        <div class="card-header bg-dark text-white fw-bold text-center">
+          Premium
+        </div>
+        <div class="card-body">
+          <ul class="mb-4">
+            <li>🔎 Unlimited resume access</li>
+            <li>📞 Contact + download CVs instantly</li>
+            <li>📁 Unlimited shortlist folders</li>
+            <li>📊 Advanced analytics + filters</li>
+            <li>🎧 Dedicated account manager</li>
+          </ul>
+          <div class="text-center fw-bold">Custom pricing</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mt-5 text-center">
+    <a href="{% url 'recruiter:post_jobs' %}" class="btn btn-outline-primary px-4">
+      🚀 Start Posting Jobs
+    </a>
+  </div>
+</div>
+{% endblock %}

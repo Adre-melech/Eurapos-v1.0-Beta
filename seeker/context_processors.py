@@ -1,4 +1,5 @@
 from notifications.models import Notification
+from jobs.models import UnlockedExclusiveJob
 
 def seeker_notifications(request):
     if request.user.is_authenticated:
@@ -9,3 +10,11 @@ def seeker_notifications(request):
             "unread_notifications": notifications.filter(read=False)
         }
     return {}
+
+
+def unlocked_jobs_processor(request):
+    if request.user.is_authenticated:
+        return {
+            'unlocked_jobs': UnlockedExclusiveJob.objects.filter(seeker=request.user).exists()
+        }
+    return {'unlocked_jobs': False}

@@ -416,3 +416,7 @@ def ajax_mark_notification_read(request):
         return JsonResponse({"success": True})
     except Notification.DoesNotExist:
         return JsonResponse({"error": "Notification not found"}, status=404)
+
+@login_required
+def rewards_view(request):
+    return render(request, "seeker/rewards.html")

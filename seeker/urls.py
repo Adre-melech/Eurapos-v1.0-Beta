@@ -1,7 +1,7 @@
 from django.urls import path, reverse_lazy
 from .views import seeker_register, seeker_login, seeker_logout, seeker_dashboard, buy_whatsapp_recommendations, \
     buy_visa_discount, unlock_visa_guide, buy_ats_cv, notifications_page, ajax_mark_notification_read, \
-    custom_password_reset_view
+    custom_password_reset_view, rewards_view
 from notifications.views import mark_notification_read
 from django.contrib.auth import views as auth_views
 
@@ -39,4 +39,5 @@ urlpatterns = [
     path("all/", notifications_page, name="notifications_page"),
     path("notification/read/<int:notification_id>/", mark_notification_read, name="mark_notification_read"),
     path("ajax/notification/read/", ajax_mark_notification_read, name="ajax_mark_notification_read"),
+    path("rewards/", rewards_view, name="rewards"),
 ]

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Eurapos | Why Partner With Us{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">🤝 Why Partner With Eurapos?</h2>
+    <p class="lead text-muted">We help recruiters move faster, smarter, and at scale.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🎯 Precision Targeting</h5>
+        <p class="mb-0">Get matched with active, vetted candidates based on real-time job interest, skill tags, and referral-based credibility.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">📊 Data-Driven Insights</h5>
+        <p class="mb-0">Access detailed engagement metrics and candidate intent scores to make smarter hiring decisions — no guessing required.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🚀 Instant Visibility</h5>
+        <p class="mb-0">Highlight your jobs in exclusive talent feeds and gain visibility among top-tier seekers — with zero wasted ad spend.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="border rounded p-4 h-100">
+        <h5 class="fw-bold">🔐 Secure & Verified Talent</h5>
+        <p class="mb-0">Eurapos verifies candidate authenticity through activity signals, referrals, and platform interactions. You hire with confidence.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 text-center">
+    <a href="{% url 'recruiter:resume_access' %}" class="btn btn-primary px-4">📂 Explore Resume Access Plans</a>
+  </div>
+</div>
+{% endblock %}
