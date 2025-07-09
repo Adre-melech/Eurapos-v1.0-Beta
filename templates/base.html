@@ -223,7 +223,7 @@
         <ul class="list-unstyled small">
           <li><a href="{% url 'home:about' %}" class="text-decoration-none text-secondary">About Eurapos</a></li>
           <li><a href="{% url 'home:contact' %}" class="text-decoration-none text-secondary">Contact Us</a></li>
-          <li><a href="{% url 'home:rewards' %}" class="text-decoration-none text-secondary">Rewards</a></li>
+          <li><a href="{% url 'home:rewards' %}" class="text-decoration-none text-secondary">Earn Credits & Rewards</a></li>
           <li><a href="{% url 'home:faq' %}" class="text-decoration-none text-secondary">FAQ's</a></li>
         </ul>
       </div>
@@ -264,215 +264,8 @@
 </footer>
 
 
-<!-- Notification -->
-<style>
-  /* Pulsing badge animation */
-  .pulse-badge {
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.2);
-      opacity: 0.8;
-    }
-  }
-
-  /* Floating notification container */
-  #notification-chatbox {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 320px;
-    max-height: 450px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    overflow-y: auto;
-    display: none;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
-    z-index: 1050;
-  }
-
-  /* Header */
-  #notification-chatbox-header {
-    background: #f8f9fa;
-    padding: 12px 16px;
-    font-weight: 700;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    user-select: none;
-  }
-
-  /* Notification items */
-  #notification-chatbox ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  #notification-chatbox li {
-    padding: 10px 16px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-  }
-  #notification-chatbox li:hover {
-    background-color: #f0f0f0;
-  }
-  #notification-chatbox li.fw-bold {
-    font-weight: 700;
-  }
-  #notification-chatbox li small {
-    display: block;
-    color: #888;
-    margin-top: 4px;
-  }
-
-  /* Footer link */
-  #notification-chatbox-footer {
-    padding: 10px 16px;
-    text-align: center;
-    border-top: 1px solid #eee;
-  }
-  #notification-chatbox-footer a {
-    text-decoration: none;
-    color: #004aad;
-    font-weight: 600;
-  }
-  #notification-chatbox-footer a:hover {
-    text-decoration: underline;
-  }
-
-  /* Bell icon - bigger */
-  #notification-bell {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: #004aad; /* Off-white background behind bell */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    color: #333;
-    cursor: pointer;
-    z-index: 1100;
-  }
-  /* Smaller badge */
-  #notification-bell .badge {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    font-size: 12px;
-    line-height: 1.2;
-    height: 20px;
-    min-width: 20px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-</style>
-
-<!-- Mobile Floating Bell -->
-{% if user.is_authenticated %}
-  <div class="d-block d-lg-none position-fixed bottom-0 end-0 p-3 z-3">
-    <div id="notification-bell"
-         class="bg shadow-sm rounded-circle p-3 position-relative"
-         style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;"
-         role="button"
-         tabindex="0"
-         aria-expanded="false">
-      <i class="fa-regular fa-bell fa-xl text-white"></i>
-      {% if unread_notifications.count > 0 %}
-        <span id="notification-count-mobile"
-              class="badge bg-danger pulse-badge position-absolute top-0 start-100 translate-middle"
-              style="font-size: 12px; padding: 3px 6px;">
-          {{ unread_notifications.count }}{% if unread_notifications.count > 99 %}+{% endif %}
-        </span>
-      {% endif %}
-    </div>
-
-    <div id="notification-chatbox"
-         class="card shadow-sm position-absolute"
-         style="bottom: 72px; right: 0; width: 18rem; display: none;">
-      <div id="notification-chatbox-header" class="card-header fw-bold">🔔 Notifications</div>
-      <ul class="list-group list-group-flush">
-        {% for note in recent_notifications %}
-          <li class="list-group-item {% if not note.read %}fw-bold{% endif %}"
-              data-note-id="{{ note.id }}"
-              tabindex="0"
-              role="button">
-            {{ note.message }}<br>
-            <small class="text-muted">{{ note.created_at|timesince }} ago</small>
-            {% if not note.read %}
-              <button class="btn btn-sm btn-outline-primary mt-2" onclick="markAsRead(this.parentElement, 'mobile')">
-                Mark as Read
-              </button>
-            {% endif %}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-center text-muted">No notifications yet.</li>
-        {% endfor %}
-      </ul>
-      <div id="notification-chatbox-footer" class="card-footer text-center">
-        <a href="{% url 'seeker:notifications_page' %}" class="text-decoration-none">🔍 See all notifications</a>
-      </div>
-    </div>
-  </div>
-{% endif %}
-
-
-
-
-
-
-<!-- WhatsApp Number Modal -->
-<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form method="POST" action="{% url 'seeker:buy_whatsapp_recommendations' %}" class="modal-content border-0 shadow rounded-3">
-      {% csrf_token %}
-
-      <div class="modal-header bg-white border-bottom-0">
-        <h5 class="modal-title text-dark d-flex align-items-center gap-2" id="whatsappModalLabel">
-          <i class="bi bi-whatsapp text-success fs-4"></i> Enter Your WhatsApp Number
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="whatsapp_number" class="form-label fw-semibold">WhatsApp Number</label>
-          <input type="text"
-                 name="whatsapp_number"
-                 id="whatsapp_number"
-                 class="form-control"
-                 placeholder="+8801XXXXXXXXX"
-                 required
-                 style="border-color: #dddcdc;">
-        </div>
-        <div class="alert alert-info small d-flex align-items-center gap-2" style="background-color: #f1fbfc; color: #004aad;">
-          <i class="bi bi-info-circle"></i>
-          Make sure this number is active on WhatsApp.
-        </div>
-      </div>
-
-      <div class="modal-footer bg-white border-top-0">
-        <button type="submit" class="btn w-100 text-white d-flex justify-content-center align-items-center gap-2" style="background-color: #004aad;">
-          <i class="bi bi-whatsapp fs-5"></i> Confirm Purchase (20 Credits)
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+<!-- Include Modal and Script at Bottom -->
+{% include 'partials/notification.html' %}
 
 <button class="btn btn-warning position-fixed bottom-0 end-0 m-4 shadow-lg"
         data-bs-toggle="modal" data-bs-target="#partnerModal"
@@ -480,33 +273,63 @@
   🤝 Become a Partner
 </button>
 
+{% include 'partials/modals.html' %}
 
 
-<!-- Become a Partner Modal -->
-<div class="modal fade" id="partnerModal" tabindex="-1" aria-labelledby="partnerModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="POST" action="{% url 'recruiter:partner_register' %}" class="modal-content">
-      {% csrf_token %}
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="partnerModalLabel">🤝 Become a Partner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="company" class="form-label">Company Name</label>
-          <input type="text" class="form-control" id="company" name="company" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Official Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success w-100">📩 Register Interest</button>
-      </div>
-    </form>
+<style>
+  #cookie-consent {
+    opacity: 1;
+    transition: opacity 0.4s ease;
+  }
+
+  #cookie-consent.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+{% if not request.user.is_authenticated %}
+  <div id="cookie-consent" class="cookie-banner position-fixed bottom-0 w-100 bg-light p-3 shadow" style="display: none; z-index: 1050;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span>
+        🍪 By using this site, you agree to our
+        <a href="{% url 'home:terms' %}" target="_blank">Terms</a>,
+        <a href="{% url 'home:privacy' %}" target="_blank">Privacy Policy</a>,
+        and accept cookies.
+      </span>
+      <button class="btn btn-sm btn-primary ms-3" onclick="acceptConsent()">Accept</button>
+    </div>
   </div>
-</div>
+{% endif %}
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const banner = document.getElementById("cookie-consent");
+    if (!localStorage.getItem("consentGiven") && banner) {
+      banner.style.display = "block";
+    }
+
+    window.acceptConsent = function () {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      fetch("{% url 'home:accept_consent' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ timezone: timezone })
+      })
+      .then(response => {
+        if (response.ok) {
+          localStorage.setItem("consentGiven", "yes");
+          banner.style.display = "none";
+        }
+      });
+    };
+  });
+</script>
 
 
 <!-- Bootstrap JS -->

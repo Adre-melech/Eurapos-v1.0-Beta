@@ -428,8 +428,8 @@ def unlock_hr_info(request, job_id):
     application, created = Application.objects.get_or_create(seeker=seeker, job=job)
 
     if not application.hr_unlocked:
-        if seeker.credits >= 10:
-            seeker.credits -= 10  # Deduct credits
+        if seeker.credits >= 30:
+            seeker.credits -= 30  # Deduct credits
             seeker.save(update_fields=["credits"])
             application.hr_unlocked = True
             application.save(update_fields=["hr_unlocked"])
@@ -450,8 +450,8 @@ def buy_priority_review(request, application_id):
 
     if application.priority_review:
         messages.info(request, "You have already purchased priority HR review.")
-    elif seeker.credits >= 15:
-        seeker.credits -= 15
+    elif seeker.credits >= 75:
+        seeker.credits -= 75
         seeker.save(update_fields=["credits"])
         application.priority_review = True
         application.save(update_fields=["priority_review"])
@@ -475,8 +475,8 @@ def unlock_exclusive_jobs(request):
         return redirect("seeker:dashboard")
 
     # ✅ Check credits
-    if seeker.credits >= 10:
-        seeker.credits -= 10
+    if seeker.credits >= 50:
+        seeker.credits -= 50
         seeker.save(update_fields=["credits"])
 
         # Unlock each exclusive job

@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 import random, string
+from django.utils.timezone import localtime
 import logging
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
@@ -31,14 +32,20 @@ logger = logging.getLogger(__name__)
 
 
 def seeker_register(request):
-    """Handles seeker registration, grants bonus credits, tracks referrals, and sends a welcome notification."""
+    """Handles seeker registration, consent, referrals, login, and welcome credits."""
     if request.method == "POST":
         form = SeekerRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.add_credits(5)  # Grant 5 bonus credits on registration
+            user.add_credits(5)
 
-            # Handle referral logic
+            # ✅ Auto-accept Terms, Privacy, and Cookies on signup
+            user.consent_accepted = True
+            user.consent_accepted_at = now()
+            user.timezone = request.POST.get("timezone") or "UTC"
+            user.save(update_fields=["consent_accepted", "consent_accepted_at", "timezone"])
+
+            # ✅ Referral bonus logic
             referral_code = request.POST.get("referral_id", "").strip()
             if referral_code:
                 referrer = Seeker.objects.filter(referral_id=referral_code).first()
@@ -47,20 +54,18 @@ def seeker_register(request):
                     user.save(update_fields=["referred_by"])
                     referrer.award_referral_bonus(referrer)
 
-                    # Notify the referrer
                     Notification.objects.create(
                         seeker=referrer,
                         message=f"🎉 You've earned 50 credits for referring {user.username}!"
                     )
 
-            # Authenticate and log the user in
+            # ✅ Log the user in
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password1")
             user = authenticate(request, username=username, password=password)
-            if user is not None:
+            if user:
                 login(request, user)
 
-                # Notify the user
                 Notification.objects.create(
                     seeker=user,
                     message="🎉 Welcome to Eurapos! You've received 5 bonus credits for signing up and another 5 for today's login streak."
@@ -160,6 +165,29 @@ def seeker_dashboard(request):
         return redirect("seeker:seeker_login")
 
     seeker = request.user
+    hour = localtime().hour
+
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 18:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+
+        if first_name and last_name:
+            seeker.first_name = first_name
+            seeker.last_name = last_name
+            seeker.save(update_fields=["first_name", "last_name"])
+            messages.success(request, "✅ Profile updated successfully.")
+        else:
+            messages.error(request, "❌ Please fill out both first and last name.")
+
+        return redirect("seeker:dashboard")
 
     applications = Application.objects.filter(seeker=seeker).order_by("-applied_at")
     ats_requests = ATSResumeRequest.objects.filter(seeker=seeker).order_by("-requested_at")
@@ -187,6 +215,7 @@ def seeker_dashboard(request):
 
     context = {
         "seeker": seeker,
+        "greeting": greeting,
         "applications": applications,
         "ats_requests": ats_requests,
         "visa_discount": visa_discount,
@@ -213,12 +242,12 @@ def buy_ats_cv(request):
     if request.method == "POST":
         form = ATSCVUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            if seeker.credits < 30:
+            if seeker.credits < 300:
                 messages.error(request, "❌ Not enough credits to request an ATS CV.")
                 return redirect("seeker:dashboard")
 
             # Deduct credits
-            seeker.credits -= 30
+            seeker.credits -= 300
             seeker.save(update_fields=["credits"])
 
             # Create ATSResumeRequest with uploaded CV
@@ -281,8 +310,8 @@ def buy_whatsapp_recommendations(request):
         messages.error(request, "Please enter your WhatsApp number.")
         return redirect("seeker:dashboard")
 
-    if seeker.credits >= 20:
-        seeker.credits -= 20
+    if seeker.credits >= 125:
+        seeker.credits -= 125
         seeker.receive_whatsapp_jobs = True
         seeker.whatsapp_number = whatsapp_number
         seeker.whatsapp_optin_started = now()
@@ -310,12 +339,12 @@ def buy_visa_discount(request):
     """Handles purchasing visa consultancy discount with credits."""
     seeker = request.user
 
-    if seeker.credits < 40:
+    if seeker.credits < 500:
         messages.error(request, "Not enough credits to purchase the Visa Consultancy Discount.")
         return redirect("seeker:dashboard")
 
     # Deduct credits and create discount record
-    seeker.credits -= 40
+    seeker.credits -= 500
     seeker.save(update_fields=["credits"])
 
     visa_discount = VisaDiscount.objects.create(seeker=seeker)

@@ -1,46 +1,140 @@
 {% extends "base.html" %}
-{% block title %}Eurapos | Post Jobs{% endblock %}
+{% block title %}Coming Soon! | Eurapos | Post Jobs{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="fw-bold">📨 Post Jobs on Eurapos</h2>
-    <p class="lead text-muted">Reach engaged, high-intent talent that’s ready to act.</p>
-  </div>
 
-  <div class="row g-4 justify-content-center">
+  <style>
+    body {
+      background: #fff;
+      color: #004aad;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 3.5rem;
+    }
+    .highlight {
+      color: #edcb1c;
+      font-weight: 700;
+    }
+    .btn-primary {
+      background-color: #004aad;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #003580;
+    }
+    .section-header {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .feature-icon {
+      font-size: 2rem;
+      color: #edcb1c;
+      margin-right: 0.75rem;
+    }
+    .feature-item {
+      display: flex;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    .btn-group-lg > .btn {
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+    }
+    @media (max-width: 576px) {
+      .section-header {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 
-    <div class="col-md-10">
-      <div class="border rounded p-4">
-        <h5 class="fw-bold">🔍 Why Post with Us?</h5>
-        <ul>
-          <li>🎯 Target seekers by role, industry, and experience level</li>
-          <li>⚡ Highlight urgent jobs to active, logged-in seekers</li>
-          <li>📈 Get performance insights on job listing views & clicks</li>
-          <li>💬 Enable notifications and alerts to boost engagement</li>
-          <li>🔐 Optional exclusive job access for curated visibility</li>
-        </ul>
+  <header class="text-center mb-5">
+    <h1 class="section-header">Post Jobs</h1>
+    <p class="lead text-secondary">Coming Soon — <span class="highlight">Exclusive Early Access for Employers</span></p>
+  </header>
+
+  <section class="mb-4">
+    <p>At Eurapos Job, we’re building a powerful <strong>Recruiter Dashboard</strong> designed to simplify your hiring process and put the right candidates within your reach.</p>
+    <p>Although job posting features are currently in Beta, you can register now to become one of the first employers to experience our full platform as soon as it launches.</p>
+  </section>
+
+  <section class="mb-5">
+    <h2 class="section-header">What to Expect from Our Recruiter Dashboard</h2>
+    <div class="feature-item">
+      <span class="feature-icon">📝</span>
+      <div>
+        <strong>Post and Manage Job Listings</strong><br />
+        Easily create, edit, and track your open positions across multiple categories and locations.
       </div>
     </div>
-
-    <div class="col-md-10">
-      <div class="border rounded p-4 bg-light">
-        <h5 class="fw-bold">📅 How It Works</h5>
-        <ol class="mb-0">
-          <li>Submit your job using our upcoming recruiter dashboard or via email</li>
-          <li>Our team vets the listing for accuracy and visibility strategy</li>
-          <li>Approved jobs go live within 24 hours — faster on urgent posts</li>
-        </ol>
-        <p class="mt-3 text-muted">Need white-glove support for bulk listings or hiring drives? We’re happy to help.</p>
+    <div class="feature-item">
+      <span class="feature-icon">👤</span>
+      <div>
+        <strong>Access Candidate Profiles</strong><br />
+        Browse through detailed seeker profiles, complete with verified experience, skills, and relocation readiness.
       </div>
     </div>
+    <div class="feature-item">
+      <span class="feature-icon">📄</span>
+      <div>
+        <strong>Review and Download CVs</strong><br />
+        Download candidate CVs directly for offline review or sharing with your hiring teams.
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📊</span>
+      <div>
+        <strong>Application Tracking</strong><br />
+        Monitor applications in real-time, update statuses, and communicate directly with candidates.
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🔔</span>
+      <div>
+        <strong>Customizable Job Alerts</strong><br />
+        Set criteria to get notified instantly when new candidates match your job requirements.
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">💡</span>
+      <div>
+        <strong>Priority Support</strong><br />
+        Get dedicated assistance from our team during your recruitment campaigns.
+      </div>
+    </div>
+  </section>
 
-  </div>
+  <section class="mb-5">
+    <h2 class="section-header">Why Register for Early Access?</h2>
+    <div class="feature-item">
+      <span class="feature-icon">🚀</span>
+      <div>
+        <strong>Be the First to Hire</strong><br />
+        Gain priority access before the official launch and get ahead in the competition for top talent.
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🛠️</span>
+      <div>
+        <strong>Shape Our Platform</strong><br />
+        Provide feedback to help us tailor the dashboard features to your hiring needs.
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🎁</span>
+      <div>
+        <strong>Exclusive Beta Benefits</strong><br />
+        Enjoy special offers and support packages reserved only for early adopters.
+      </div>
+    </div>
+  </section>
 
-  <div class="text-center mt-5">
-    <a href="{% url 'home:contact' %}" class="btn btn-primary px-4">
-      ✉️ Contact Our Placement Team
-    </a>
-  </div>
-</div>
+  <section class="text-center">
+    <h2 class="section-header">How to Get Started</h2>
+    <p>Simply register your interest with us today, and our team will reach out with all the details to onboard you as an early access employer.</p>
+    <p>Your recruitment future is about to get a whole lot easier.<br />Partner with Eurapos Job and hire smarter, faster, and better.</p>
+    <div class="btn-group btn-group-lg mt-4" role="group" aria-label="Call to Action Buttons">
+      <a href="{% url 'home:contact' %}" class="btn btn-outline-primary">Contact Us</a>
+      <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#partnerModal">Register for Early Access</a>
+    </div>
+  </section>
 {% endblock %}

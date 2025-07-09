@@ -11,6 +11,10 @@ class Seeker(AbstractUser):
     referral_id = models.CharField(max_length=8, unique=True, blank=True)
     phone = models.CharField(max_length=15)
 
+    consent_accepted = models.BooleanField(default=False)
+    consent_accepted_at = models.DateTimeField(null=True, blank=True)
+    timezone = models.CharField(max_length=100, blank=True, null=True)
+
     country = models.ForeignKey("jobs.SeekerCountry", on_delete=models.SET_NULL, null=True)
     job_title = models.ForeignKey("jobs.JobTitle", on_delete=models.SET_NULL, null=True)
 
@@ -137,6 +141,15 @@ class Seeker(AbstractUser):
 
     def __str__(self):
         return f"{self.seeker_id} - {self.username} ({self.credits} Credits)"
+
+
+class ConsentLog(models.Model):
+    ip_address = models.GenericIPAddressField()
+    timezone = models.CharField(max_length=100)
+    accepted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.ip_address} – {self.timezone} @ {self.accepted_at}"
 
 
 class ATSResumeRequest(models.Model):

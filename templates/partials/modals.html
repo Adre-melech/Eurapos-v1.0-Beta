@@ -1,0 +1,72 @@
+<!-- WhatsApp Number Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <form method="POST" action="{% url 'seeker:buy_whatsapp_recommendations' %}" class="modal-content rounded-4 shadow border-2 border-primary p-4">
+      {% csrf_token %}
+
+      <div class="modal-header border-0 pb-3">
+        <h5 class="modal-title text-primary d-flex align-items-center gap-2" id="whatsappModalLabel">
+          <i class="bi bi-whatsapp text-success fs-3"></i> Enter Your WhatsApp Number
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <label for="whatsapp_number" class="form-label fw-semibold mb-2">WhatsApp Number</label>
+        <input
+          type="tel"
+          name="whatsapp_number"
+          id="whatsapp_number"
+          class="form-control form-control-lg rounded-pill border-primary"
+          placeholder="+8801XXXXXXXXX"
+          required
+          pattern="^\+?\d{10,15}$"
+          title="Enter a valid WhatsApp number including country code"
+          autocomplete="tel"
+        />
+        <div class="alert alert-info d-flex align-items-center gap-2 mt-3" style="background-color: #f1fbfc; color: #004aad;">
+          <i class="bi bi-info-circle fs-5"></i>
+          <small class="m-0">Make sure this number is active on WhatsApp.</small>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 pt-3">
+        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 d-flex justify-content-center align-items-center gap-2">
+          <i class="bi bi-whatsapp fs-4"></i> Confirm Purchase (20 Credits)
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- Become a Partner Modal -->
+<div class="modal fade" id="partnerModal" tabindex="-1" aria-labelledby="partnerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <form method="POST" action="{% url 'recruiter:partner_register' %}" class="modal-content rounded-4 shadow-sm border-success border-2 p-4">
+      {% csrf_token %}
+      <div class="modal-header border-0 pb-3">
+        <h5 class="modal-title text-success fw-bold" id="partnerModalLabel">🤝 Become a Partner</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-4">
+          <label for="company" class="form-label fw-semibold">Company Name</label>
+          <input type="text" class="form-control form-control-lg rounded-pill border-success" id="company" name="company" required placeholder="Enter your company name">
+        </div>
+        <div>
+          <label for="email" class="form-label fw-semibold">Official Email</label>
+          <input type="email" class="form-control form-control-lg rounded-pill border-success" id="email" name="email" required placeholder="Enter your official email">
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 pt-3">
+        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fs-5">
+          📩 Register Interest
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

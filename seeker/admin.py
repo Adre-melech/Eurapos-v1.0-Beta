@@ -1,22 +1,26 @@
 from django.contrib import admin
 from django.utils.timezone import now
+from import_export.admin import ExportMixin
 from notifications.models import Notification
-from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide, UnlockedVisaGuide
+from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide, UnlockedVisaGuide, ConsentLog
 
 
-class SeekerAdmin(admin.ModelAdmin):
+# === Seeker Admin ===
+class SeekerAdmin(ExportMixin, admin.ModelAdmin):
     list_display = (
-        'seeker_id', 'username', 'email', 'phone', 'country',
-        'job_title', 'date_joined', 'credits',
-        'receive_whatsapp_jobs', 'whatsapp_optin_started', 'whatsapp_optin_expires'
+        "seeker_id", "username", "email", "phone", "country",
+        "job_title", "date_joined", "credits",
+        "receive_whatsapp_jobs", "whatsapp_optin_started", "whatsapp_optin_expires",
+        "consent_accepted", "consent_accepted_at", "timezone"
     )
-    search_fields = ('username', 'email', 'seeker_id')
-    list_filter = ('country', 'job_title', 'date_joined', 'receive_whatsapp_jobs')
-
+    search_fields = ("username", "email", "seeker_id")
+    list_filter = (
+        "country", "job_title", "date_joined", "receive_whatsapp_jobs",
+        "consent_accepted", "timezone"
+    )
     actions = ["disable_expired_whatsapp_optins"]
 
     def disable_expired_whatsapp_optins(self, request, queryset):
-        """Bulk action to disable expired WhatsApp notifications."""
         updated = 0
         for seeker in queryset:
             if seeker.whatsapp_optin_expires and seeker.whatsapp_optin_expires < now().date():
@@ -27,7 +31,6 @@ class SeekerAdmin(admin.ModelAdmin):
         self.message_user(request, f"✅ Disabled expired WhatsApp opt-ins for {updated} seeker(s).")
 
     def save_model(self, request, obj, form, change):
-        """Send a notification if admin increased seeker's credits."""
         if change:
             old_obj = Seeker.objects.get(pk=obj.pk)
             if obj.credits > old_obj.credits:
@@ -37,6 +40,13 @@ class SeekerAdmin(admin.ModelAdmin):
                     message=f"🎁 You've been rewarded with {added} bonus credit(s) by EURAPOS!"
                 )
         super().save_model(request, obj, form, change)
+
+# === ConsentLog Admin ===
+class ConsentLogAdmin(ExportMixin, admin.ModelAdmin):
+    list_display = ("ip_address", "timezone", "accepted_at")
+    list_filter = ("timezone", "accepted_at")
+    search_fields = ("ip_address", "timezone")
+    ordering = ("-accepted_at",)
 
 
 class ATSResumeRequestAdmin(admin.ModelAdmin):
@@ -73,3 +83,4 @@ admin.site.register(VisaGuide, VisaGuideAdmin)
 admin.site.register(VisaDiscount, VisaDiscountAdmin)
 admin.site.register(ATSResumeRequest, ATSResumeRequestAdmin)
 admin.site.register(Seeker, SeekerAdmin)
+admin.site.register(ConsentLog, ConsentLogAdmin)

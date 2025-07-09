@@ -1,0 +1,42 @@
+{% load widget_tweaks %}
+<!-- Buy ATS CV Modal -->
+<div class="modal fade" id="buyAtsCvModal" tabindex="-1" aria-labelledby="buyAtsCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content rounded-4 shadow-sm border-primary border-2">
+
+      <div class="modal-header border-0 pb-3">
+        <h5 class="modal-title text-primary fw-bold" id="buyAtsCvModalLabel">
+          📄 Upload Your Current CV
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'seeker:buy_ats_cv' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="modal-body pt-0">
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger small mb-3">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <div class="mb-4">
+            {{ form.cv_file.label_tag }}
+            {{ form.cv_file|add_class:"form-control form-control-lg rounded-pill border-primary" }}
+            {% for error in form.cv_file.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <p class="small text-muted mb-0">
+            You need <strong>30 credits</strong> to order an ATS CV.
+          </p>
+        </div>
+
+        <div class="modal-footer border-0 pt-3">
+          <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fs-6">
+            Purchase and Upload CV (30 Credits)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

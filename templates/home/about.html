@@ -3,34 +3,51 @@
 
 {% block content %}
 <div class="container py-5">
-  <div class="text-center mb-4">
-    <h2 class="fw-bold">👋 About Us</h2>
-    <p class="lead text-muted">Empowering seekers and streamlining opportunities.</p>
+  <div class="text-center mb-5">
+    <h2 class="fw-bold display-5">👋 About Us</h2>
+    <p class="lead text-secondary fst-italic">Empowering seekers and streamlining opportunities.</p>
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <p>
-        Our platform is designed to connect motivated seekers with meaningful job opportunities, events, and exclusive access systems — all powered by smart credits, seamless notifications, and intuitive interactions.
+    <div class="col-lg-8 col-md-10">
+
+      <p class="fs-5 mb-4">
+        Our platform connects motivated job seekers with meaningful opportunities, events, and exclusive access systems — all powered by smart credits, seamless notifications, and intuitive interactions.
       </p>
 
-      <h4 class="mt-4">🌟 What We Stand For</h4>
-      <ul>
-        <li><strong>Transparency:</strong> Every interaction is trackable, visible, and fair.</li>
-        <li><strong>Efficiency:</strong> Modal forms, AJAX updates, and smart filters make navigation effortless.</li>
-        <li><strong>Engagement:</strong> Unlockable job listings, referral credits, and event ticketing keep seekers motivated.</li>
-        <li><strong>User-first design:</strong> From password resets to dashboard UX, every detail is built with empathy.</li>
-      </ul>
+      <section class="mb-5">
+        <h3 class="text-primary fw-bold mb-3">🌟 What We Stand For</h3>
+        <ul class="list-group list-group-flush fs-5">
+          <li class="list-group-item px-0 border-0">
+            <strong>Transparency:</strong> Every interaction is trackable, visible, and fair.
+          </li>
+          <li class="list-group-item px-0 border-0">
+            <strong>Efficiency:</strong> Modal forms, AJAX updates, and smart filters make navigation effortless.
+          </li>
+          <li class="list-group-item px-0 border-0">
+            <strong>Engagement:</strong> Unlockable job listings, referral credits, and event ticketing keep seekers motivated.
+          </li>
+          <li class="list-group-item px-0 border-0">
+            <strong>User-first design:</strong> From password resets to dashboard UX, every detail is built with empathy.
+          </li>
+        </ul>
+      </section>
 
-      <h4 class="mt-4">🚀 Built By Builders</h4>
-      <p>
-        This platform is constantly evolving. Whether it's refining the admin dashboard, introducing dynamic credit systems, or enhancing notification flows — we believe in iterative progress and practical innovation.
+      <section class="mb-4">
+        <h3 class="text-primary fw-bold mb-3">🚀 Built By Builders</h3>
+        <p class="fs-5">
+          This platform is constantly evolving. Whether refining the admin dashboard, introducing dynamic credit systems, or enhancing notification flows — we believe in iterative progress and practical innovation.
+        </p>
+      </section>
+
+      <p class="fs-6 text-muted text-center mt-5">
+        For feedback, collaboration, or just to say hi —
+        <a href="{% url 'home:contact' %}" class="text-decoration-none fw-semibold" style="color:#004aad;">reach out here</a>.
+        We’d love to hear from you.
       </p>
 
-      <p class="mt-4 text-muted">
-        For feedback, collaboration, or just to say hi — <a href="#">reach out here</a>. We’d love to hear from you.
-      </p>
     </div>
   </div>
 </div>
+
 {% endblock %}

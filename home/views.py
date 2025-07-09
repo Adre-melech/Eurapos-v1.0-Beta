@@ -1,17 +1,42 @@
 import random
+import json
+from django.http import JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.timezone import now
 from datetime import timedelta
-
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods
-
 from home.models import ContactMessage
 from jobs.models import JobPost, JobCountry, Category, UnlockedExclusiveJob
-from seeker.models import VisaGuide, UnlockedVisaGuide
+from seeker.models import VisaGuide, UnlockedVisaGuide, ConsentLog
 from events.models import EventTicket
+
+
+@csrf_exempt
+def accept_consent(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        tz = data.get("timezone") or "UTC"
+        ip = request.META.get("REMOTE_ADDR")
+
+        if request.user.is_authenticated:
+            seeker = request.user
+            seeker.timezone = tz
+            seeker.consent_accepted = True
+            seeker.consent_accepted_at = now()
+            seeker.save(update_fields=["timezone", "consent_accepted", "consent_accepted_at"])
+
+        ConsentLog.objects.create(
+            ip_address=ip,
+            timezone=tz
+        )
+
+        return JsonResponse({"status": "ok"})
+
+
 
 
 def homepage(request):

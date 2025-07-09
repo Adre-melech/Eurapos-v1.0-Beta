@@ -4,59 +4,70 @@
 {% block content %}
 <div class="container py-5">
   <div class="text-center mb-5">
-    <h2 class="fw-bold">🏆 User Rewards & Incentives</h2>
-    <p class="lead text-muted">The more you engage, the more you unlock. Here's what awaits you 👇</p>
+    <h2 class="fw-bold display-5">🏅 How You Can Earn Credits</h2>
+    <p class="lead text-muted">Boost your job search with credits earned through your activity and engagement on Eurapos Job.</p>
   </div>
 
-  <div class="row g-4">
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h4>💰 Credit Rewards</h4>
-        <ul class="mb-0">
-          <li>Earn credits for referrals and account verifications</li>
-          <li>Use credits to unlock exclusive jobs and events</li>
-          <li>Bonus credits during seasonal promotions</li>
-        </ul>
+  <!-- Credit Earning Table -->
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="table-responsive rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0 bg-white">
+          <thead class="table-primary text-center">
+            <tr>
+              <th scope="col" class="py-3">🪙 Action</th>
+              <th scope="col" class="py-3">🎯 Credits Earned</th>
+            </tr>
+          </thead>
+          <tbody class="text-center">
+            <tr>
+              <td>🎉 First Time Registration</td>
+              <td><span class="badge bg-success fs-6 px-3 py-2">+5</span></td>
+            </tr>
+            <tr>
+              <td>🔁 Daily Login (once per day)</td>
+              <td><span class="badge bg-success fs-6 px-3 py-2">+5</span></td>
+            </tr>
+            <tr>
+              <td>📄 Apply for a Job</td>
+              <td><span class="badge bg-success fs-6 px-3 py-2">+5</span></td>
+            </tr>
+            <tr>
+              <td>⭐ Rate a Job</td>
+              <td><span class="badge bg-success fs-6 px-3 py-2">+5</span></td>
+            </tr>
+            <tr>
+              <td>👥 Refer a Friend (via Referral Code)</td>
+              <td>
+                <span class="badge bg-success fs-6 px-3 py-2">+50</span><br>
+                <small class="text-muted">Per successful signup</small>
+              </td>
+            </tr>
+            <tr>
+              <td>🎁 Admin Bonus for Active Users</td>
+              <td>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Varies</span><br>
+                <small class="text-muted">Typically 10–1000+ credits</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h4>🎟️ Event Participation Rewards</h4>
-        <ul class="mb-0">
-          <li>Free access to virtual or in-person events</li>
-          <li>Digital certificates or badges for completing challenges</li>
-          <li>Top performers earn spotlight features or exclusive merch</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h4>📢 Engagement Rewards</h4>
-        <ul class="mb-0">
-          <li>Daily login streak bonuses</li>
-          <li>Leave helpful feedback? Win credits or unlockables</li>
-          <li>Early access to new features for active users</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h4>👑 Exclusive Access</h4>
-        <ul class="mb-0">
-          <li>Unlock premium job listings for 3 days with credits</li>
-          <li>Priority notification for time-limited opportunities</li>
-          <li>Admin-picked users receive surprise upgrades</li>
-        </ul>
+      <div class="mt-4 text-center">
+        <p class="text-muted"><em>💡 Tip: Be consistent, invite friends, and stay active — credits add up fast!</em></p>
       </div>
     </div>
   </div>
 
-  <div class="mt-5 text-center">
-    <p class="text-muted">Stay active, stay curious — your next reward might be one click away 🚀</p>
-    <a href="{% url 'home:contact' %}" class="btn btn-outline-primary">🔍 Have questions? Contact Support</a>
+  <!-- CTA -->
+  <div class="text-center mt-5">
+    <p class="text-muted mb-3">Ready to earn and unlock more? Let’s get you rewarded 🚀</p>
+    <a href="{% url 'home:contact' %}" class="btn btn-outline-primary rounded-pill px-4">
+      💬 Have Questions? Contact Support
+    </a>
   </div>
 </div>
+
+
 {% endblock %}

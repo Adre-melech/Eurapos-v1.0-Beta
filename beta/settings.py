@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # ThirdPartyApps
     'widget_tweaks',
     'django_q',
+    'import_export',
 ]
 
 MIDDLEWARE = [

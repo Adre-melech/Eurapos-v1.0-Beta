@@ -69,6 +69,13 @@
         <button type="submit" class="btn btn-primary w-100 btn-lg fw-semibold shadow-sm">Register</button>
       </form>
 
+      <p class="text-muted small mt-2">
+        By creating an account, you agree to our
+        <a href="{% url 'home:terms' %}" target="_blank">Terms of Service</a>,
+        <a href="{% url 'home:privacy' %}" target="_blank">Privacy Policy</a>,
+        and use of cookies.
+      </p>
+
       <p class="mt-4 mb-0 text-center text-muted fs-6">
         Already have an account?
         <a href="{% url 'seeker:seeker_login' %}" class="text-primary text-decoration-underline fw-semibold">Login here</a>

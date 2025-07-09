@@ -2,44 +2,123 @@
 {% block title %}Eurapos | Why Partner With Us{% endblock %}
 
 {% block content %}
+<style>
+  .highlight-icon {
+    font-size: 1.8rem;
+    color: #004aad;
+  }
+
+  .benefit-card {
+    background-color: #fff;
+    border: 1px solid #dddcdc;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .benefit-card:hover {
+    box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .btn-eurapos {
+    background-color: #004aad;
+    color: #fff;
+    border-radius: 2rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-eurapos:hover {
+    background-color: #003080;
+  }
+
+  .section-heading {
+    font-weight: 700;
+    color: #004aad;
+  }
+
+  .cta-buttons a {
+    text-decoration: none;
+  }
+</style>
+
 <div class="container py-5">
-  <div class="text-center mb-4">
-    <h2 class="fw-bold">🤝 Why Partner With Eurapos?</h2>
-    <p class="lead text-muted">We help recruiters move faster, smarter, and at scale.</p>
+  <div class="text-center mb-5">
+    <h1 class="section-heading">Why Partner With Us</h1>
+    <p class="text-muted mt-3 fs-5">We’re not just a job portal — we’re your strategic hiring partner.</p>
   </div>
 
   <div class="row g-4">
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🎯 Precision Targeting</h5>
-        <p class="mb-0">Get matched with active, vetted candidates based on real-time job interest, skill tags, and referral-based credibility.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">🎯</div>
+        <h5 class="fw-bold mb-2">Find the Right Talent Faster</h5>
+        <p class="text-muted">
+          Access a growing pool of qualified job seekers filtered by industry, skills, and relocation readiness — welders, carpenters, plumbers and more.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">📊 Data-Driven Insights</h5>
-        <p class="mb-0">Access detailed engagement metrics and candidate intent scores to make smarter hiring decisions — no guessing required.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">📄</div>
+        <h5 class="fw-bold mb-2">Access Verified CVs</h5>
+        <p class="text-muted">
+          Explore our CV database to reach pre-screened candidates. Every profile is verified for authenticity and seriousness.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🚀 Instant Visibility</h5>
-        <p class="mb-0">Highlight your jobs in exclusive talent feeds and gain visibility among top-tier seekers — with zero wasted ad spend.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">✈️</div>
+        <h5 class="fw-bold mb-2">Employee Relocation, Simplified</h5>
+        <p class="text-muted">
+          We handle visa guidance and relocation support. You only register with MoM or your country’s authority — we take care of the rest.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🔐 Secure & Verified Talent</h5>
-        <p class="mb-0">Eurapos verifies candidate authenticity through activity signals, referrals, and platform interactions. You hire with confidence.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">✅</div>
+        <h5 class="fw-bold mb-2">Pre-Vetted Candidates</h5>
+        <p class="text-muted">
+          Our talent pool consists of professionals who’ve passed basic checks for experience and relocation intent.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">🔧</div>
+        <h5 class="fw-bold mb-2">Industry-Focused Hiring</h5>
+        <p class="text-muted">
+          From construction to hospitality and manufacturing — we specialize in high-demand trades and skills.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="benefit-card h-100">
+        <div class="highlight-icon mb-2">🤝</div>
+        <h5 class="fw-bold mb-2">A Growing Network of Trust</h5>
+        <p class="text-muted">
+          Be part of an early network of forward-thinking employers and get priority access to tools for hiring and onboarding.
+        </p>
       </div>
     </div>
   </div>
 
-  <div class="mt-5 text-center">
-    <a href="{% url 'recruiter:resume_access' %}" class="btn btn-primary px-4">📂 Explore Resume Access Plans</a>
+  <div class="text-center mt-5">
+    <h4 class="fw-bold mb-3">Partner with Eurapos Job today — and build your workforce without borders.</h4>
+    <div class="cta-buttons d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url 'home:contact' %}" class="btn btn-eurapos shadow-sm">📨 Contact Us</a>
+      <a class="btn btn-outline-primary rounded-pill fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#partnerModal">📋 Register Interest</a>
+    </div>
   </div>
 </div>
 {% endblock %}

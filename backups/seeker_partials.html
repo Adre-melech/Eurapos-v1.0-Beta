@@ -1,0 +1,237 @@
+  <!-- Job Applications -->
+  <h3 class="mb-4 text-primary fw-bold">📋 My Job Applications</h3>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Applied On</th>
+          <th>Status</th>
+          <th>Priority Review</th>
+          <th>Rating</th>
+          <th>CV</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in applications %}
+        <tr>
+          <td>
+            <a href="{% url 'jobs:job_detail' application.job.id %}" class="text-decoration-none text-primary fw-semibold">
+              {{ application.job.title }}
+            </a>
+          </td>
+          <td>{{ application.job.company_name }}</td>
+          <td>{{ application.applied_at|date:"F j, Y" }}</td>
+          <td><span class="badge bg-primary text-uppercase">{{ application.status }}</span></td>
+
+          <td>
+            {% if application.status == "Under Review" %}
+              {% if application.priority_review %}
+                <span class="badge bg-success">✅ Enabled ({{ application.purchased_priority_at|date:"F j, Y" }})</span>
+              {% else %}
+                <form method="POST" action="{% url 'jobs:buy_priority_review' application.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning btn-sm">Buy Priority Review (15 Credits)</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">❌ Not Available</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if application.rating %}
+              <span class="badge bg-info text-dark">{{ application.get_rating_display }}</span>
+            {% else %}
+              <form method="POST" action="{% url 'jobs:rate_application' application.id %}">
+                {% csrf_token %}
+                <select name="rating" class="form-select form-select-sm mb-1" aria-label="Rate Application">
+                  <option value="good">🙂 Good</option>
+                  <option value="okay">😐 Okay</option>
+                  <option value="bad">☹️ Bad</option>
+                </select>
+                <button type="submit" class="btn btn-secondary btn-sm">Rate</button>
+              </form>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if application.cv %}
+              <a href="{{ application.cv.url }}" target="_blank" class="text-decoration-none">📄 View CV</a>
+            {% else %}
+              <span class="text-danger">⚠ No CV uploaded</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">No applications found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ATS CV Orders -->
+  <h4 class="mb-4 text-primary fw-bold">📑 My ATS CV Orders</h4>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Requested On</th>
+          <th>Status</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in ats_requests %}
+        <tr>
+          <td>{{ request.order_id }}</td>
+          <td>{{ request.requested_at|date:"F j, Y, g:i A" }}</td>
+          <td>
+            {% if request.processed %}
+              <span class="badge bg-success">✅ Delivered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">🚀 Processing</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if request.cv_file %}
+              <a href="{{ request.cv_file.url }}" class="btn btn-sm btn-outline-primary">📥 Download</a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center text-muted">No ATS CV requests made.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Event Ticket Purchases -->
+  <h4 class="mb-4 text-primary fw-bold">🎫 My Event Ticket Purchases</h4>
+  <div class="table-responsive mb-5">
+    <table class="table table-hover table-bordered rounded shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Event Title</th>
+          <th>Confirmation Code</th>
+          <th>Purchased On</th>
+          <th>Status</th>
+          <th>Download Ticket</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in ticket_purchases %}
+        <tr>
+          <td>{{ ticket.order_id }}</td>
+          <td>{{ ticket.event.title }}</td>
+          <td>{{ ticket.confirmation_code }}</td>
+          <td>{{ ticket.purchased_at|date:"F j, Y, g:i A" }}</td>
+          <td>
+            {% if ticket.confirmed %}
+              <span class="badge bg-success">Delivered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ticket.confirmed %}
+              <a href="{% url 'events:download_ticket' ticket.id %}" class="btn btn-sm btn-outline-primary">
+                📥 Download
+              </a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-muted">No tickets purchased.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<h4 class="mb-4 text-success fw-bold">📄 My Visa Guide Downloads</h4>
+<div class="table-responsive mb-5">
+  <table class="table table-hover table-bordered rounded shadow-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>Country</th>
+        <th>Credits Used</th>
+        <th>Unlocked On</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for unlocked in unlocked_guides %}
+      <tr>
+        <td>{{ unlocked.guide.country }}</td>
+        <td>{{ unlocked.guide.credits_required }}</td>
+        <td>{{ unlocked.unlocked_at|date:"F j, Y, g:i A" }}</td>
+        <td>
+          {% if unlocked.guide.pdf_file %}
+            <a href="{{ unlocked.guide.pdf_file.url }}" class="btn btn-sm btn-outline-success" download>
+              📥 Download PDF
+            </a>
+          {% else %}
+            <span class="text-muted">Not available</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-center text-muted">No visa guides unlocked.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="buyAtsCvModal" tabindex="-1" aria-labelledby="buyAtsCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title" id="buyAtsCvModalLabel">📄 Upload your current CV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'seeker:buy_ats_cv' %}" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="modal-body">
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="mb-3">
+            {{ form.cv_file.label_tag }}
+            {{ form.cv_file|add_class:"form-control" }}
+            {% for error in form.cv_file.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <p>You need 30 credits to order an ATS CV.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Purchase and Upload CV (30 Credits)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

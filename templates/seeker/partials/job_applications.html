@@ -1,0 +1,85 @@
+<h3 class="mb-4 text-primary fw-bold">📋 My Job Applications</h3>
+
+{% if applications %}
+<div class="table-responsive mb-5 rounded-4 shadow-sm" style="overflow: hidden; border: 1px solid #dee2e6;">
+  <table class="table table-hover table-bordered align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+    <thead class="table-primary text-center text-uppercase small">
+      <tr>
+        <th scope="col" style="border-top-left-radius: 0.75rem;">Job Title</th>
+        <th scope="col">Company</th>
+        <th scope="col" style="min-width: 100px;">Applied On</th>
+        <th scope="col" style="min-width: 120px;">Status</th>
+        <th scope="col" style="min-width: 180px;">Priority Review</th>
+        <th scope="col" style="min-width: 140px;">Rating</th>
+        <th scope="col" style="min-width: 100px; border-top-right-radius: 0.75rem;">CV</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for application in applications %}
+      <tr>
+        <td>
+          <a href="{% url 'jobs:job_detail' application.job.id %}" class="text-primary fw-semibold text-decoration-none">
+            {{ application.job.title }}
+          </a>
+        </td>
+        <td class="text-muted small">{{ application.job.company_name }}</td>
+        <td class="text-center small">{{ application.applied_at|date:"M d, Y" }}</td>
+        <td class="text-center">
+          <span class="badge bg-primary text-uppercase">{{ application.status }}</span>
+        </td>
+        <td class="text-center">
+          {% if application.status == "Under Review" %}
+            {% if application.priority_review %}
+              <span class="badge bg-success">✅ Enabled ({{ application.purchased_priority_at|date:"M d, Y" }})</span>
+            {% else %}
+              <form method="POST" action="{% url 'jobs:buy_priority_review' application.id %}" class="d-inline-block m-0 p-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning btn-sm rounded-pill px-2">
+                  Buy Priority Review (15 Credits)
+                </button>
+              </form>
+            {% endif %}
+          {% else %}
+            <span class="text-muted small">❌ Not Available</span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if application.rating %}
+            <span class="badge bg-info text-dark">{{ application.get_rating_display }}</span>
+          {% else %}
+            <form method="POST" action="{% url 'jobs:rate_application' application.id %}" class="d-flex justify-content-center gap-1 align-items-center">
+              {% csrf_token %}
+              <select name="rating" class="form-select form-select-sm" aria-label="Rate Application" required>
+                <option value="" selected disabled>Rate</option>
+                <option value="good">🙂 Good</option>
+                <option value="okay">😐 Okay</option>
+                <option value="bad">☹️ Bad</option>
+              </select>
+              <button type="submit" class="btn btn-secondary btn-sm rounded-pill px-2">Rate</button>
+            </form>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if application.cv %}
+            <a href="{{ application.cv.url }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+              📄 View CV
+            </a>
+          {% else %}
+            <span class="text-danger small">⚠ No CV uploaded</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td style="border-bottom-left-radius: 0.75rem;" colspan="1"></td>
+        <td colspan="5"></td>
+        <td style="border-bottom-right-radius: 0.75rem;"></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% else %}
+  <p class="text-center text-muted fst-italic">No applications found.</p>
+{% endif %}

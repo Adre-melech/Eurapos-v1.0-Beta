@@ -1,0 +1,20 @@
+<!-- Visa Consultancy Discount -->
+<div class="card rounded-4 shadow-sm p-3 mb-5 border border-warning">
+  <h5 class="text-primary fw-bold mb-3">🎫 Visa Consultancy Discount</h5>
+  <p class="mb-4 small text-muted">
+    Redeem credits for <strong>10% off</strong> visa processing at selected consultancies. Valid for 30 days.
+  </p>
+
+  {% if visa_discount %}
+    <div class="text-success fw-semibold mb-3 fs-6">✅ Your Visa Discount is confirmed!</div>
+    <p class="mb-1"><strong>Order ID:</strong> {{ visa_discount.order_id }}</p>
+    <p class="mb-1"><strong>Coupon Code:</strong> {{ visa_discount.coupon_code }}</p>
+    <p class="text-muted mb-3 small">Valid Until: {{ visa_discount.valid_until|date:"M d, Y" }}</p>
+    <a href="{{ visa_discount.pdf_file.url }}" class="btn btn-sm btn-info rounded-pill px-4 shadow-sm">📥 Download PDF</a>
+  {% else %}
+    <form method="POST" action="{% url 'seeker:buy_visa_discount' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-warning rounded-pill px-4 fw-semibold shadow-sm">Purchase (40 Credits)</button>
+    </form>
+  {% endif %}
+</div>

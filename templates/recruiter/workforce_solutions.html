@@ -2,48 +2,127 @@
 {% block title %}Eurapos | Workforce Placement Solutions{% endblock %}
 
 {% block content %}
+<style>
+  .solution-icon {
+    font-size: 1.7rem;
+    color: #004aad;
+  }
+  .solution-card {
+    background-color: #fff;
+    border: 1px solid #dddcdc;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  .solution-card:hover {
+    box-shadow: 0 0.6rem 1.5rem rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
+  .btn-eurapos {
+    background-color: #004aad;
+    color: #fff;
+    border-radius: 2rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  .btn-eurapos:hover {
+    background-color: #003080;
+  }
+  .section-title {
+    font-weight: 700;
+    color: #004aad;
+  }
+  .cta-buttons a {
+    text-decoration: none;
+  }
+</style>
+
 <div class="container py-5">
   <div class="text-center mb-5">
-    <h2 class="fw-bold">🧩 Workforce Placement Solutions</h2>
-    <p class="lead text-muted">Deploy skilled talent at speed and scale — without compromising on quality.</p>
+    <h1 class="section-title">Workforce Placement Solutions</h1>
+    <p class="text-muted mt-3 fs-5">Finding the right employee shouldn’t be a struggle — and with Eurapos Job, it isn’t.</p>
   </div>
 
   <div class="row g-4">
-
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🛠️ Pre-Vetted Talent Pools</h5>
-        <p class="mb-0">Access curated candidates based on role-specific skills, verified experience, and active job-seeking signals.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">🔍</div>
+        <h5 class="fw-bold mb-2">Pre-Vetted Talent Pools</h5>
+        <p class="text-muted">
+          Access candidates who are pre-screened, skilled, and ready to deploy — including talent from construction, logistics, and more.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">📆 On-Demand Hiring</h5>
-        <p class="mb-0">Whether it’s short-term staff or long-term onboarding, our team can match you with candidates in hours — not weeks.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">⚡</div>
+        <h5 class="fw-bold mb-2">On-Demand Hiring</h5>
+        <p class="text-muted">
+          Need urgent placements? Get matched with relocation-ready candidates in hours, not days.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🔍 High-Intent Matching</h5>
-        <p class="mb-0">Our smart matching engine factors in candidate readiness, profile performance, and platform engagement to reduce drop-offs.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">✅</div>
+        <h5 class="fw-bold mb-2">Role-Specific Skill Matching</h5>
+        <p class="text-muted">
+          We don’t just forward CVs — we match candidates by real skills, verified experience, and job fit.
+        </p>
       </div>
     </div>
 
-    <div class="col-md-6">
-      <div class="border rounded p-4 h-100">
-        <h5 class="fw-bold">🤝 Collaborative Placements</h5>
-        <p class="mb-0">Need help managing onboarding, contracts, or compliance? Our placement team works alongside yours to simplify hiring.</p>
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">💼</div>
+        <h5 class="fw-bold mb-2">High-Intent Candidate Matching</h5>
+        <p class="text-muted">
+          Work with candidates actively seeking relocation and full-time employment for faster onboarding and higher retention.
+        </p>
       </div>
     </div>
 
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">🤝</div>
+        <h5 class="fw-bold mb-2">Collaborative Placement Services</h5>
+        <p class="text-muted">
+          Customize your hiring process — we support interviews, visa handling, and candidate relocation.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">🌍</div>
+        <h5 class="fw-bold mb-2">Global Reach, Local Integration</h5>
+        <p class="text-muted">
+          We guide you through local authority registration (MoM or equivalent) and handle the rest through our partners.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="solution-card">
+        <div class="solution-icon mb-2">📈</div>
+        <h5 class="fw-bold mb-2">Scalable Hiring for Any Business</h5>
+        <p class="text-muted">
+          From single hires to large team expansions, our services scale with your growth — efficiently and affordably.
+        </p>
+      </div>
+    </div>
   </div>
 
-  <div class="mt-5 text-center">
-    <a href="{% url 'recruiter:post_jobs' %}" class="btn btn-primary px-4">
-      📩 Post Jobs with Us
-    </a>
+  <div class="text-center mt-5">
+    <h4 class="fw-bold mb-3">Let us help you build a reliable, relocation-ready workforce — tailored to your needs.</h4>
+    <div class="cta-buttons d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url 'home:contact' %}" class="btn btn-eurapos shadow-sm">📨 Get in Touch</a>
+      <a class="btn btn-outline-primary rounded-pill fw-semibold shadow-sm"  data-bs-toggle="modal" data-bs-target="#partnerModal">📋 Register Interest</a>
+    </div>
   </div>
 </div>
 {% endblock %}

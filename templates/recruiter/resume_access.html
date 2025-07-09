@@ -2,73 +2,168 @@
 {% block title %}Eurapos | Resume Access Plans{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="fw-bold">📂 Resume Access Plans</h2>
-    <p class="lead text-muted">Browse and connect with verified, actively seeking candidates — smarter, faster, and with full transparency.</p>
-  </div>
 
-  <div class="row g-4">
+<style>
+  body {
+    background: #fff;
+    color: #004aad;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  h1, h2 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .plan-card {
+    border: 2px solid #dddcdc;
+    border-radius: 12px;
+    padding: 2rem;
+    transition: box-shadow 0.3s ease;
+    background: #fafafa;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .plan-card:hover {
+    box-shadow: 0 8px 24px rgb(0 74 173 / 0.2);
+    border-color: #004aad;
+    background: #ffffff;
+  }
+  .plan-header {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+  .plan-price {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #edcb1c;
+    margin-bottom: 1rem;
+  }
+  .plan-description {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 1.25rem;
+  }
+  ul.plan-features {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+  }
+  ul.plan-features li {
+    margin-bottom: 0.6rem;
+    padding-left: 1.5rem;
+    position: relative;
+    font-weight: 500;
+  }
+  ul.plan-features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #004aad;
+    font-weight: 700;
+  }
+  .best-seller {
+    background: #004aad;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    box-shadow: 0 2px 8px rgb(237 203 28 / 0.6);
+  }
+  .section-header {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #004aad;
+  }
+  .why-choose-list li {
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  @media (max-width: 576px) {
+    .plan-card {
+      padding: 1.5rem;
+    }
+    .section-header {
+      font-size: 1.6rem;
+    }
+  }
+</style>
 
-    <div class="col-md-4">
-      <div class="card h-100 border-primary">
-        <div class="card-header bg-primary text-white fw-bold text-center">
-          Basic
-        </div>
-        <div class="card-body">
-          <ul class="mb-4">
-            <li>🔎 Search 100 resumes/month</li>
-            <li>🟢 View contact info on profile</li>
-            <li>📁 Save up to 20 candidates</li>
-            <li>✅ Email support</li>
-          </ul>
-          <div class="text-center fw-bold">BDT 1,000/month</div>
-        </div>
-      </div>
+<header class="mb-5 text-center">
+  <h1 class="section-header">Resume Access Plans for Employers</h1>
+</header>
+
+<section class="row g-4 justify-content-center">
+  <!-- Starter Plan -->
+  <article class="col-12 col-md-6 col-lg-4">
+    <div class="plan-card position-relative">
+      <h2 class="plan-header">Starter Plan — Limited Access</h2>
+      <div class="plan-price">€99 / month</div>
+      <p class="plan-description">Perfect for small businesses or startups exploring international recruitment.</p>
+      <ul class="plan-features">
+        <li>Access up to 30 CVs monthly</li>
+        <li>Basic filtering by job category and title</li>
+        <li>View candidate profiles and shortlist</li>
+        <li>Email support included</li>
+      </ul>
+      <p><em>Ideal for employers looking to test our talent pool without commitment.</em></p>
     </div>
+  </article>
 
-    <div class="col-md-4">
-      <div class="card h-100 border-success">
-        <div class="card-header bg-success text-white fw-bold text-center">
-          Standard
-        </div>
-        <div class="card-body">
-          <ul class="mb-4">
-            <li>🔎 Search 500 resumes/month</li>
-            <li>📞 Full contact access + resume download</li>
-            <li>📁 Save up to 100 candidates</li>
-            <li>📊 Basic hiring insights</li>
-            <li>⚡ Priority email support</li>
-          </ul>
-          <div class="text-center fw-bold">BDT 3,500/month</div>
-        </div>
-      </div>
+  <!-- Professional Plan -->
+  <article class="col-12 col-md-6 col-lg-4">
+    <div class="plan-card position-relative">
+      <div class="best-seller">Best Seller</div>
+      <h2 class="plan-header">Professional Plan</h2>
+      <div class="plan-price">€249 / month</div>
+      <p class="plan-description">Our most popular plan, designed for companies with ongoing recruitment needs.</p>
+      <ul class="plan-features">
+        <li>Access up to 120 CVs monthly</li>
+        <li>Advanced filtering: skills, experience, location, availability</li>
+        <li>Download CVs and contact candidates directly</li>
+        <li>Priority customer support</li>
+        <li>Exclusive access to “ready to relocate” talent</li>
+        <li>Complimentary consultation for employee relocation assistance</li>
+      </ul>
+      <p><em>Great for mid-sized employers focused on quality hires and efficient recruitment.</em></p>
     </div>
+  </article>
 
-    <div class="col-md-4">
-      <div class="card h-100 border-dark">
-        <div class="card-header bg-dark text-white fw-bold text-center">
-          Premium
-        </div>
-        <div class="card-body">
-          <ul class="mb-4">
-            <li>🔎 Unlimited resume access</li>
-            <li>📞 Contact + download CVs instantly</li>
-            <li>📁 Unlimited shortlist folders</li>
-            <li>📊 Advanced analytics + filters</li>
-            <li>🎧 Dedicated account manager</li>
-          </ul>
-          <div class="text-center fw-bold">Custom pricing</div>
-        </div>
-      </div>
+  <!-- Enterprise Plan -->
+  <article class="col-12 col-md-6 col-lg-4">
+    <div class="plan-card position-relative">
+      <h2 class="plan-header">Enterprise Plan — Full Access</h2>
+      <div class="plan-price">€599 / month</div>
+      <p class="plan-description">Full access to our entire candidate database with no limits.</p>
+      <ul class="plan-features">
+        <li>Unlimited CV views and downloads</li>
+        <li>Complete filter options for niche and high-demand roles</li>
+        <li>Dedicated account manager for personalized recruitment support</li>
+        <li>Custom candidate matching and real-time alerts</li>
+        <li>Priority scheduling for visa and relocation services</li>
+        <li>Tailored onboarding and workforce placement support</li>
+      </ul>
+      <p><em>Ideal for large employers or recruitment agencies hiring at scale across Europe.</em></p>
     </div>
+  </article>
+</section>
 
-  </div>
-
-  <div class="mt-5 text-center">
-    <a href="{% url 'recruiter:post_jobs' %}" class="btn btn-outline-primary px-4">
-      🚀 Start Posting Jobs
-    </a>
-  </div>
-</div>
+<section class="mt-5">
+  <h2 class="section-header">Why Choose Eurapos Job Plans?</h2>
+  <ul class="why-choose-list list-unstyled fs-5 mx-auto" style="max-width: 600px;">
+    <li>Curated & Verified Talent: Access candidates with verified experience and relocation readiness.</li>
+    <li>Flexible & Transparent: Choose a plan that fits your hiring volume and budget.</li>
+    <li>Relocation Made Easy: Benefit from our partnered visa consultancy to simplify employee relocation.</li>
+    <li>Exclusive Beta Access: Early adopters get priority support and feature previews.</li>
+  </ul>
+</section>
 {% endblock %}
