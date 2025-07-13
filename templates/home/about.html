@@ -2,52 +2,72 @@
 {% block title %}Eurapos | About Us{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="fw-bold display-5">👋 About Us</h2>
-    <p class="lead text-secondary fst-italic">Empowering seekers and streamlining opportunities.</p>
-  </div>
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+      <h1 class="display-4 fw-bold text-primary">👋 Welcome to Eurapos</h1>
+      <p class="lead text-muted">Making Europe accessible — one opportunity at a time.</p>
+      <hr class="w-25 mx-auto" style="border-top: 3px solid #004aad;">
+    </div>
 
-  <div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
+    <!-- Mission Statement -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-10 col-xl-8">
+        <div class="bg-white p-4 rounded-4 shadow-sm">
+          <p class="fs-5">
+            <strong class="text-primary">Eurapos</strong> is more than a job platform — it’s a movement to make working in Europe accessible, transparent, and rewarding for everyone involved.
+          </p>
+          <p class="fs-5">
+            We empower job seekers from across the globe — especially those seeking stability and opportunity abroad. Whether you're aiming to build a career, support your family, or explore new horizons, Eurapos connects you to verified European jobs that fit your skills and goals.
+          </p>
+          <p class="fs-5 mb-0">
+            At the same time, we work with recruiters and companies eager to hire global talent. Our system simplifies the process — helping employers connect with the right candidates and seekers discover jobs they may never have known existed.
+          </p>
+        </div>
+      </div>
+    </div>
 
-      <p class="fs-5 mb-4">
-        Our platform connects motivated job seekers with meaningful opportunities, events, and exclusive access systems — all powered by smart credits, seamless notifications, and intuitive interactions.
-      </p>
+    <!-- What We Stand For -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-10 col-xl-8">
+        <h3 class="fw-bold text-primary mb-3">🌟 What We Stand For</h3>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100">
+              <h5 class="fw-bold text-dark mb-2">🔍 Transparency</h5>
+              <p class="mb-0 text-muted">Every interaction on Eurapos is visible, fair, and trackable. No hidden steps. No wasted time.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100">
+              <h5 class="fw-bold text-dark mb-2">⚡ Engagement</h5>
+              <p class="mb-0 text-muted">We keep job seekers active and informed with unlockable listings, referral credits, and event access.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <section class="mb-5">
-        <h3 class="text-primary fw-bold mb-3">🌟 What We Stand For</h3>
-        <ul class="list-group list-group-flush fs-5">
-          <li class="list-group-item px-0 border-0">
-            <strong>Transparency:</strong> Every interaction is trackable, visible, and fair.
-          </li>
-          <li class="list-group-item px-0 border-0">
-            <strong>Efficiency:</strong> Modal forms, AJAX updates, and smart filters make navigation effortless.
-          </li>
-          <li class="list-group-item px-0 border-0">
-            <strong>Engagement:</strong> Unlockable job listings, referral credits, and event ticketing keep seekers motivated.
-          </li>
-          <li class="list-group-item px-0 border-0">
-            <strong>User-first design:</strong> From password resets to dashboard UX, every detail is built with empathy.
-          </li>
-        </ul>
-      </section>
+    <!-- Belief Section -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-10 col-xl-8">
+        <div class="bg-light p-4 rounded-4 border-start border-4 border-primary shadow-sm">
+          <h4 class="fw-bold text-primary mb-2">🚀 Our Belief</h4>
+          <p class="fs-5 mb-0">
+            We believe that finding a job shouldn’t feel impossible — it should feel like progress. Eurapos is here to make that progress real for you.
+          </p>
+        </div>
+      </div>
+    </div>
 
-      <section class="mb-4">
-        <h3 class="text-primary fw-bold mb-3">🚀 Built By Builders</h3>
-        <p class="fs-5">
-          This platform is constantly evolving. Whether refining the admin dashboard, introducing dynamic credit systems, or enhancing notification flows — we believe in iterative progress and practical innovation.
-        </p>
-      </section>
-
-      <p class="fs-6 text-muted text-center mt-5">
-        For feedback, collaboration, or just to say hi —
-        <a href="{% url 'home:contact' %}" class="text-decoration-none fw-semibold" style="color:#004aad;">reach out here</a>.
-        We’d love to hear from you.
-      </p>
-
+    <!-- Call to Action -->
+    <div class="text-center">
+      <p class="text-muted mb-2">Have feedback or want to collaborate?</p>
+      <a href="{% url 'home:contact' %}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+        📩 Get in Touch
+      </a>
     </div>
   </div>
-</div>
-
+</section>
 {% endblock %}

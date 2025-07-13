@@ -11,7 +11,7 @@
       <p class="mb-4 small text-muted">Exclusive jobs are hidden. Unlock for 3 days access!</p>
       <form method="POST" action="{% url 'jobs:unlock_exclusive_jobs' %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-primary w-100 rounded-pill fw-semibold shadow-sm">Unlock (10 Credits)</button>
+        <button type="submit" class="btn btn-sm btn-primary w-100 rounded-pill fw-semibold shadow-sm">Unlock (50 Credits)</button>
       </form>
     {% else %}
       <p class="text-warning fw-semibold mb-3 small">
@@ -39,7 +39,7 @@
     {% with ats_status=seeker.ats_cv_order_available %}
       {% if ats_status.0 %}
         <button type="button" class="btn btn-sm btn-info w-100 rounded-pill fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#buyAtsCvModal">
-          Buy Now (30 Credits)
+          Buy Now (300 Credits)
         </button>
       {% else %}
         <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill" disabled>
@@ -62,7 +62,7 @@
         <button class="btn btn-sm btn-outline-success w-100 rounded-pill" disabled>Active</button>
       {% else %}
         <button class="btn btn-sm btn-success w-100 rounded-pill fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#whatsappModal">
-          Activate (20 Credits)
+          Activate (125 Credits)
         </button>
       {% endif %}
     {% endwith %}

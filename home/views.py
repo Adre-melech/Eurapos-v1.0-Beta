@@ -120,20 +120,22 @@ def homepage(request):
 
 
 
-@login_required
+
 def visa_guides_page(request):
     """Displays all visa guides and highlights which ones the seeker has unlocked."""
-    seeker = request.user
-
     visa_guides = VisaGuide.objects.order_by("country")
-    unlocked_guide_ids = UnlockedVisaGuide.objects.filter(
-        seeker=seeker
-    ).values_list("guide_id", flat=True)
+
+    unlocked_guide_ids = []
+    if request.user.is_authenticated and hasattr(request.user, 'seeker'):
+        unlocked_guide_ids = UnlockedVisaGuide.objects.filter(
+            seeker=request.user
+        ).values_list("guide_id", flat=True)
 
     return render(request, "home/visa_guides.html", {
         "visa_guides": visa_guides,
         "unlocked_guide_ids": unlocked_guide_ids,
     })
+
 
 def about_us(request):
     return render(request, "home/about.html")

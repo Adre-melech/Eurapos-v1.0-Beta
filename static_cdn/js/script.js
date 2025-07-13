@@ -1,28 +1,4 @@
   document.addEventListener("DOMContentLoaded", function () {
-    // === Cookie Consent + Time Zone ===
-    const banner = document.getElementById("cookie-consent");
-    if (!localStorage.getItem("consentGiven") && banner) {
-      banner.style.display = "block";
-    }
-
-    window.acceptConsent = function () {
-          const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-          fetch("{% url 'home:accept_consent' %}", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ timezone: timezone })
-          })
-          .then(response => {
-            if (response.ok) {
-              localStorage.setItem("consentGiven", "yes");
-              if (banner) banner.style.display = "none";
-        }
-      });
-    };
 
     // === Job Search & Filtering ===
     const searchInput = document.getElementById("searchInput");

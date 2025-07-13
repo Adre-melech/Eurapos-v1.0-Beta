@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
+{% load compress %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +16,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
   <!-- Custom CSS -->
-  <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+  {% compress css %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+  {% endcompress %}
 
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -166,7 +170,7 @@
              style="border-color: #edcb1c;">
           <div class="flex-grow-1 text-center text-md-start">
             <strong class="text-dark">🚀 Unlock WhatsApp Job Recommendations</strong> for 10 Days at just
-            <span class="fw-bold" style="color: #004aad;">20 credits</span>!
+            <span class="fw-bold" style="color: #004aad;">125 credits</span>!
           </div>
           <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
             <a href="{% url 'seeker:buy_whatsapp_recommendations' %}"
@@ -184,7 +188,7 @@
         <div class="alert alert-light border-start border-4 rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap"
              style="border-color: #5ce1e6;">
           <div class="flex-grow-1 text-center text-md-start">
-            Use your available credits on <strong class="text-success"> Endless Fly</strong> and <strong class="text-dark">🎯 save 10% instantly</strong> on our trusted Visa Consultancy service.
+            Use your available credits on <strong class="text-success"> Endless Fly</strong> and <strong class="text-dark">🎯 save 10% instantly</strong> Only for  <span class="fw-bold" style="color: #004aad;">500 credits</span>! on our trusted Visa Consultancy service.
           </div>
           <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
             <a href="{% url 'seeker:buy_visa_discount' %}"
@@ -279,29 +283,57 @@
 <style>
   #cookie-consent {
     opacity: 1;
-    transition: opacity 0.4s ease;
+    transition: all 0.4s ease;
+    transform: translateY(0);
   }
 
   #cookie-consent.hide {
     opacity: 0;
+    transform: translateY(100%);
     pointer-events: none;
+  }
+
+  .cookie-banner {
+    font-size: 0.95rem;
+    border-top: 3px solid #004aad;
+    background-color: #ffffff;
+  }
+
+  .cookie-banner a {
+    color: #004aad;
+    text-decoration: underline;
+  }
+
+  .cookie-banner a:hover {
+    text-decoration: none;
+  }
+
+  @media (max-width: 576px) {
+    .cookie-banner .btn {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .cookie-banner .consent-text {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>
 
 {% if not request.user.is_authenticated %}
-  <div id="cookie-consent" class="cookie-banner position-fixed bottom-0 w-100 bg-light p-3 shadow" style="display: none; z-index: 1050;">
-    <div class="container d-flex justify-content-between align-items-center">
-      <span>
-        🍪 By using this site, you agree to our
+  <div id="cookie-consent" class="cookie-banner position-fixed bottom-0 start-0 end-0 shadow-lg py-3 px-4" style="z-index: 1050; display: none;">
+    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center consent-text gap-2">
+      <span class="text-muted">
+        🍪 We use cookies to personalize content. By continuing, you agree to our
         <a href="{% url 'home:terms' %}" target="_blank">Terms</a>,
         <a href="{% url 'home:privacy' %}" target="_blank">Privacy Policy</a>,
-        and accept cookies.
+        and cookie usage.
       </span>
-      <button class="btn btn-sm btn-primary ms-3" onclick="acceptConsent()">Accept</button>
+      <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="acceptConsent()">Accept</button>
     </div>
   </div>
 {% endif %}
-
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -324,7 +356,8 @@
       .then(response => {
         if (response.ok) {
           localStorage.setItem("consentGiven", "yes");
-          banner.style.display = "none";
+          banner.classList.add("hide");
+          setTimeout(() => banner.remove(), 500);
         }
       });
     };
@@ -332,14 +365,15 @@
 </script>
 
 
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- jQuery & Custom JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{% static 'js/script.js' %}"></script>
-<script src="{% static 'js/home.js' %}"></script>
-<script src="{% static 'js/notification.js' %}"></script>
+<script src="{% static 'js/script.js' %}" defer></script>
+<script src="{% static 'js/home.js' %}" defer></script>
+<script src="{% static 'js/notification.js' %}" defer></script>
 
 <!-- Bootstrap Icons (for social links) -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">

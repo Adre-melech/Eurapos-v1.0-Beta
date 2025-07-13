@@ -1,0 +1,18 @@
+<!-- 🔐 Login to Buy Modal -->
+<div class="modal fade" id="loginToBuyModal" tabindex="-1" aria-labelledby="loginToBuyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginToBuyModalLabel">🔐 Login Required</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">You need to be logged in to purchase and view visa guides.</p>
+        <a href="{% url 'seeker:seeker_login' %}?next={% url 'home:visa_guides' %}"
+           class="btn btn-primary rounded-pill px-4">
+          🔑 Login to Continue
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

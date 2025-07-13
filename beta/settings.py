@@ -55,6 +55,13 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_q',
     'import_export',
+    'compressor',
+]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 MIDDLEWARE = [
