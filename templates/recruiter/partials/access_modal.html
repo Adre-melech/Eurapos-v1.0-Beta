@@ -1,0 +1,53 @@
+<!-- Resume Access Modal -->
+<div class="modal fade" id="resumeOrderModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="resumeOrderForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Resume Access Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="plan" id="modalPlanField">
+          <div class="mb-2"><input type="text" name="company_name" class="form-control" placeholder="Company Name (Optional)"></div>
+          <div class="mb-2"><input type="text" name="name" class="form-control" placeholder="Your Name" required></div>
+          <div class="mb-2"><input type="text" name="phone" class="form-control" placeholder="Phone Number" required></div>
+          <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email Address" required></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Submit Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openOrderModal(plan) {
+    document.getElementById("modalPlanField").value = plan;
+    new bootstrap.Modal(document.getElementById("resumeOrderModal")).show();
+  }
+
+  document.getElementById("resumeOrderForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetch("{% url 'recruiter:resume_access_order' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert("✅ Your order has been submitted. We'll contact you shortly.");
+        bootstrap.Modal.getInstance(document.getElementById("resumeOrderModal")).hide();
+        this.reset();
+      } else {
+        alert("⚠️ Something went wrong. Please try again.");
+      }
+    });
+  });
+</script>

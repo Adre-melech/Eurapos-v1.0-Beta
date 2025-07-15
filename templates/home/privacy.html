@@ -2,15 +2,21 @@
 {% block title %}Eurapos | Privacy Policy{% endblock %}
 
 {% block content %}
-
 <div class="container py-5">
-  <h2>🔐 Privacy Policy</h2>
-  <p>We are committed to protecting your personal data. Here's what you should know:</p>
-  <ul>
-    <li>We collect only necessary data to provide platform functionality.</li>
-    <li>Your credentials, job history, and notifications are securely stored.</li>
-    <li>We never sell or share your data with third parties without consent.</li>
-    <li>You may contact support for data access or deletion requests.</li>
-  </ul>
+  <h2 class="fw-bold mb-4">🔐 Privacy Policy</h2>
+  {% if effective_date %}
+    <p class="text-muted">🗓️ Effective Date: {{ effective_date|date:"F j, Y" }}</p>
+  {% endif %}
+  <p class="mt-2">At Eurapos (“we,” “us,” “our”), we are committed to safeguarding the personal data and digital integrity of every individual who engages with our website (the “Site”). This Privacy Policy delineates the categories of information we collect, the manner in which such data is utilized, and the rights accorded to users under applicable data protection regulations.
+  By continuing to access and use this Site, you consent to the practices described herein.
+  </p>
+  {% for section in sections %}
+    <div class="mb-4">
+      <h5 class="text-primary">{{ section.title }}</h5>
+      <p>{{ section.description }}</p>
+    </div>
+  {% empty %}
+    <p>No privacy policy sections available yet.</p>
+  {% endfor %}
 </div>
 {% endblock %}

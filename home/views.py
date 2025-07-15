@@ -9,7 +9,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods
-from home.models import ContactMessage
+from .models import ContactMessage, PolicySection
 from jobs.models import JobPost, JobCountry, Category, UnlockedExclusiveJob
 from seeker.models import VisaGuide, UnlockedVisaGuide, ConsentLog
 from events.models import EventTicket
@@ -182,8 +182,23 @@ def faq(request):
 
 @require_GET
 def terms_view(request):
-    return render(request, "home/terms.html")
+    sections = PolicySection.objects.filter(policy_type="terms").order_by("id")
+    latest_update = sections.order_by("-updated_at").first()
+    return render(request, "home/terms.html", {
+        "sections": sections,
+        "policy_label": "Terms & Conditions",
+        "effective_date": latest_update.updated_at if latest_update else None,
+    })
 
 @require_GET
 def privacy_view(request):
-    return render(request, "home/privacy.html")
+    sections = PolicySection.objects.filter(policy_type="privacy").order_by("id")
+    latest_update = sections.order_by("-updated_at").first()
+    return render(request, "home/privacy.html", {
+        "sections": sections,
+        "policy_label": "Privacy Policy",
+        "effective_date": latest_update.updated_at if latest_update else None,
+    })
+
+
+

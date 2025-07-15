@@ -5,19 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55ceac5c-e5e2-4a9d-a35f-ad0d49c37ebe" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/req.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/beta/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/beta/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/home/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/home/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/home/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/home/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/home/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/home/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static_cdn/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/static_cdn/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/events/event_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/events/event_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/events/event_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/events/event_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/about.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home/visa_guides.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/visa_guides.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/unlockables.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/unlockables.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/visa_discount.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/visa_discount.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recruiter/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruiter/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recruiter/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruiter/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recruiter/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruiter/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recruiter/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/recruiter/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/home/privacy.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/privacy.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/home/terms.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/terms.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/recruiter/resume_access.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/recruiter/resume_access.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

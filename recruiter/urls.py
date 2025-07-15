@@ -9,4 +9,5 @@ urlpatterns = [
     path("workforce-solutions/", views.workforce_solutions, name="workforce_solutions"),
     path("post-jobs/", views.post_jobs, name="post_jobs"),
     path("partner-register/", views.partner_register, name="partner_register"),
+    path("resume-access/order/", views.place_resume_access_order, name="resume_access_order"),
 ]
