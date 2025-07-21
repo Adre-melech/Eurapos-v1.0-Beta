@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404, render
 from django.utils.timezone import now
 from django.contrib import messages
+from adminpanel.utils import notify_admin
 from django.core.mail import send_mail
 from notifications.models import Notification
 from .models import EventTicket, TicketPurchase
@@ -33,7 +34,7 @@ def event_detail(request, event_id):
 
 @login_required
 def purchase_ticket(request, event_id):
-    """Handles event ticket purchases using credits."""
+    """Handles event ticket purchases using credits and notifies admin."""
     event = get_object_or_404(EventTicket, id=event_id)
     seeker = request.user
 
@@ -63,15 +64,23 @@ def purchase_ticket(request, event_id):
             recipient_list=[seeker.email],
         )
 
-        # ✅ Trigger in-app notification
+        # ✅ In-app notification
         Notification.objects.create(
             seeker=seeker,
             message=f"🎟 You purchased a ticket for '{event.title}'. Confirmation Code: {purchase.confirmation_code}"
         )
 
+        # ✅ Admin panel notification
+        notify_admin(
+            message=f"🎟 Event ticket purchased by {seeker.email} for '{event.title}' "
+                    f"(Event ID: {event.id}, Order ID: {purchase.order_id})",
+            type="event_ticket"
+        )
+
         messages.success(
             request,
-            f"✅ Ticket purchased! Order ID: {purchase.order_id}. Confirmation Code: {purchase.confirmation_code} Will be receiving Ticket within 3 working days."
+            f"✅ Ticket purchased! Order ID: {purchase.order_id}. Confirmation Code: {purchase.confirmation_code}. "
+            "You will receive the ticket within 3 working days."
         )
     else:
         messages.error(request, "❌ Not enough credits to buy this ticket.")

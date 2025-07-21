@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.timezone import now
 from import_export.admin import ExportMixin
 from notifications.models import Notification
-from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide, UnlockedVisaGuide, ConsentLog
+from .models import Seeker, ATSResumeRequest, VisaDiscount, VisaGuide, UnlockedVisaGuide, ConsentLog, UserActivity, SuspiciousLoginAlert
 
 
 # === Seeker Admin ===
@@ -79,8 +79,30 @@ class VisaGuideAdmin(admin.ModelAdmin):
     search_fields = ("country",)
 
 
+class UserActivityAdmin(admin.ModelAdmin):
+    list_display = (
+        "ip_address",
+        "user_display",
+        "session_key",
+        "path",
+        "method",
+        "timestamp",
+    )
+    list_filter = ("method", "timestamp")
+    search_fields = ("user__username", "session_key", "path", "ip_address", "user_agent", "referrer")
+    readonly_fields = ("user", "session_key", "path", "method", "timestamp", "ip_address", "user_agent", "referrer")
+    ordering = ("-timestamp",)
+
+    def user_display(self, obj):
+        return obj.user.username if obj.user else "Anonymous"
+    user_display.short_description = "User"
+
+
+
+
 admin.site.register(VisaGuide, VisaGuideAdmin)
 admin.site.register(VisaDiscount, VisaDiscountAdmin)
 admin.site.register(ATSResumeRequest, ATSResumeRequestAdmin)
 admin.site.register(Seeker, SeekerAdmin)
 admin.site.register(ConsentLog, ConsentLogAdmin)
+admin.site.register(UserActivity, UserActivityAdmin)

@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.timezone import now
 from datetime import timedelta
+from adminpanel.utils import notify_admin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods
 from .models import ContactMessage, PolicySection
 from jobs.models import JobPost, JobCountry, Category, UnlockedExclusiveJob
-from seeker.models import VisaGuide, UnlockedVisaGuide, ConsentLog
+from seeker.models import VisaGuide, UnlockedVisaGuide, ConsentLog, Seeker
 from events.models import EventTicket
 
 
@@ -35,8 +36,6 @@ def accept_consent(request):
         )
 
         return JsonResponse({"status": "ok"})
-
-
 
 
 def homepage(request):
@@ -100,6 +99,8 @@ def homepage(request):
 
         exclusive_jobs = JobPost.objects.filter(id__in=unlocked_jobs).order_by("-created_at")[:6]
 
+
+
     context = {
         "jobs": jobs,
         "categories": categories,
@@ -114,11 +115,13 @@ def homepage(request):
         "exclusive_jobs": exclusive_jobs,
         "event_tickets": event_tickets,
         "total_events_count": total_events_count,
+        # SEO Tags
+        "title": "Software Engineer Jobs in Germany",
+        "meta_description": "Explore the latest tech jobs in Germany and unlock visa support through Eurapos.",
+        "meta_keywords": "germany, software engineer, jobs, visa, eurapos, germany jobs, germany software engineer jobs",
     }
 
     return render(request, "home/index.html", context)
-
-
 
 
 def visa_guides_page(request):
@@ -149,24 +152,33 @@ def rewards(request):
 @require_http_methods(["GET", "POST"])
 def send_contact(request):
     if request.method == "POST":
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        message = request.POST.get("message")
+        name = request.POST.get("name", "").strip()
+        email = request.POST.get("email", "").strip()
+        message_text = request.POST.get("message", "").strip()
 
         # Basic validation
-        if not name or not email or not message:
+        if not name or not email or not message_text:
             messages.error(request, "⚠️ Please fill out all fields.")
             return redirect("home:send_contact")
 
-        # Save to DB (optional)
-        ContactMessage.objects.create(name=name, email=email, message=message)
+        # Save to DB
+        ContactMessage.objects.create(name=name, email=email, message=message_text)
+
+        # ✅ Notify admin panel
+        notify_admin(
+            message=(
+                f"📬 Contact form submitted by {name} ({email})\n\n"
+                f"{message_text}"
+            ),
+            type="contact_form"
+        )
 
         # Optional email to admin
         send_mail(
-            subject=f"New Contact from {name}",
-            message=message,
+            subject=f"📫 New Contact from {name}",
+            message=message_text,
             from_email=email,
-            recipient_list=["support@example.com"],  # update this
+            recipient_list=["support@example.com"],
             fail_silently=True
         )
 
@@ -177,8 +189,10 @@ def send_contact(request):
 
 
 
+
 def faq(request):
     return render(request, "home/faq.html")
+
 
 @require_GET
 def terms_view(request):
@@ -190,6 +204,7 @@ def terms_view(request):
         "effective_date": latest_update.updated_at if latest_update else None,
     })
 
+
 @require_GET
 def privacy_view(request):
     sections = PolicySection.objects.filter(policy_type="privacy").order_by("id")
@@ -199,6 +214,3 @@ def privacy_view(request):
         "policy_label": "Privacy Policy",
         "effective_date": latest_update.updated_at if latest_update else None,
     })
-
-
-

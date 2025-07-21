@@ -2,11 +2,24 @@ from django.db import models
 from django.utils.timezone import now
 from seeker.models import Seeker
 
+
 class AdminNotification(models.Model):
-    """Stores in-app admin notifications for various activities."""
+    """Stores in-app admin notifications for various platform events."""
+
+    TYPE_CHOICES = [
+        ("job_application", "New Job Application"),
+        ("priority_application", "Priority Application"),
+        ("whatsapp_job", "WhatsApp Job Alert"),
+        ("ats_cv_request", "ATS CV Request"),
+        ("event_ticket", "Event Ticket Bought"),
+        ("visa_guide", "Visa Guide Sold"),
+        ("contact_form", "Contact Form Submission"),
+    ]
+
     message = models.TextField()
+    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default="contact_form")
     created_at = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)  # Tracks if notification has been read
+    read = models.BooleanField(default=False)
 
     def mark_as_read(self):
         """Marks notification as read."""
@@ -14,7 +27,9 @@ class AdminNotification(models.Model):
         self.save(update_fields=["read"])
 
     def __str__(self):
-        return f"Admin Notification - {self.created_at} ({'Read' if self.read else 'Unread'})"
+        status = "✅ Read" if self.read else "🔔 Unread"
+        label = dict(self.TYPE_CHOICES).get(self.type, "Unknown")
+        return f"[{label}] {self.created_at.strftime('%Y-%m-%d %H:%M')} — {status}"
 
 
 class HiddenJobAccess(models.Model):
@@ -32,4 +47,5 @@ class HiddenJobAccess(models.Model):
 
     def __str__(self):
         return f"Hidden Job Access - {self.seeker.username} ({'Active' if self.active else 'Expired'})"
+
 

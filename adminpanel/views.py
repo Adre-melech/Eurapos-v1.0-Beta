@@ -1,15 +1,21 @@
 from datetime import timedelta
+from django.db.models import Avg, Max, Count
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils.timezone import now
+from django.views.decorators.http import require_POST
+
 from jobs.models import UnlockedExclusiveJob
 from events.models import TicketPurchase, EventTicket
 from jobs.models import JobPost, Application, Category, JobTitle, JobCountry, SeekerCountry
-from seeker.models import Seeker, ATSResumeRequest, VisaDiscount, UnlockedVisaGuide, VisaGuide
+from seeker.models import Seeker, ATSResumeRequest, VisaDiscount, UnlockedVisaGuide, VisaGuide, UserActivity, \
+    SuspiciousLoginAlert
 from notifications.models import Notification
+from collections import defaultdict
 from adminpanel.models import AdminNotification, HiddenJobAccess
 
 def is_staff_user(user):
@@ -43,6 +49,7 @@ def admin_dashboard(request):
     pending_tickets = TicketPurchase.objects.filter(confirmed=False).select_related('seeker', 'event').order_by(
         '-purchased_at')[:10]
     ats_requests = ATSResumeRequest.objects.filter(processed=False).order_by("-requested_at")
+
 
     return render(request, "adminpanel/dashboard.html", {
         "jobs_count": jobs_count,
@@ -864,3 +871,46 @@ def unlocked_access_users(request):
         "unlocked_visa_guides": unlocked_visa_guides,
         "visa_purchases": visa_purchases,
     })
+
+
+def activity_summary(request):
+    data = UserActivity.objects.values("is_authenticated").annotate(count=Count("id"))
+    return render(request, "adminpanel/activity_summary.html", {"data": data})
+
+
+def alert_dashboard(request):
+    stats = SuspiciousLoginAlert.objects.aggregate(
+        avg_score=Avg("behavior_score"),
+        max_score=Max("behavior_score"),
+        total_alerts=Count("id")
+    )
+    return render(request, "admin/alert_dashboard.html", {"stats": stats})
+
+
+def admin_notifications_view(request):
+    all_notifications = AdminNotification.objects.all().order_by("-created_at")
+    categories = [
+        {"key": "job_application", "label": "Job Application"},
+        {"key": "priority_application", "label": "Priority Application"},
+        {"key": "whatsapp_job", "label": "WhatsApp Job"},
+        {"key": "ats_cv_request", "label": "ATS CV Request"},
+        {"key": "event_ticket", "label": "Event Ticket"},
+        {"key": "visa_guide", "label": "Visa Guide"},
+        {"key": "contact_form", "label": "Contact Form"},
+    ]
+
+    grouped = defaultdict(list)
+    for note in all_notifications:
+        grouped[note.type].append(note)
+
+    return render(request, "adminpanel/notifications.html", {
+        "grouped": dict(grouped),
+        "categories": categories
+    })
+
+@require_POST
+def mark_as_read(request, notification_id):
+    note = get_object_or_404(AdminNotification, id=notification_id)
+    note.mark_as_read()
+    return redirect("adminpanel:admin_notifications_view")
+

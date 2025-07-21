@@ -3,6 +3,7 @@ from django.conf import settings
 import random, string
 from django.utils.timezone import localtime
 import logging
+from adminpanel.utils import notify_admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import PasswordResetView
@@ -253,12 +254,18 @@ def buy_ats_cv(request):
             # Create ATSResumeRequest with uploaded CV
             ats_request = ATSResumeRequest.objects.create(
                 seeker=seeker,
-                cv=form.cleaned_data["cv_file"]  # Assuming your model has a FileField named 'cv'
+                cv=form.cleaned_data["cv_file"]
             )
             ats_request.generate_order_id()
             ats_request.save()
 
-            # Send confirmation email (same as before)
+            # ✅ Notify admin of ATS CV request
+            notify_admin(
+                message=f"📄 ATS CV requested by {seeker.email} (Order ID: {ats_request.order_id})",
+                type="ats_cv_request"
+            )
+
+            # Send confirmation email
             if seeker.email:
                 try:
                     send_mail(
@@ -290,10 +297,6 @@ def buy_ats_cv(request):
             )
             return redirect("seeker:dashboard")
 
-        else:
-            # Form invalid, will render again with errors below
-            pass
-
     else:
         form = ATSCVUploadForm()
 
@@ -321,11 +324,10 @@ def buy_whatsapp_recommendations(request):
             "whatsapp_optin_started", "whatsapp_optin_expires"
         ])
 
-        send_mail(
-            subject="📢 New WhatsApp Job Notification Purchase!",
-            message=f"User {seeker.username} ({whatsapp_number}) has purchased WhatsApp job recommendations for 10 days.",
-            from_email="noreply@eurapos.com",
-            recipient_list=["admin@eurapos.com"],
+        # ✅ Notify admin panel
+        notify_admin(
+            message=f"📲 WhatsApp job alert purchased by {seeker.email} ({whatsapp_number}) for 10 days.",
+            type="whatsapp_job"
         )
 
         messages.success(request, "✅ WhatsApp job notifications enabled for 10 days!")
@@ -384,7 +386,7 @@ def buy_visa_discount(request):
 
 
 def unlock_visa_guide(request, guide_id):
-    """Handles Visa Guide unlocking using credits."""
+    """Handles Visa Guide unlocking using credits and notifies admin."""
     guide = get_object_or_404(VisaGuide, id=guide_id)
     seeker = request.user
 
@@ -394,12 +396,10 @@ def unlock_visa_guide(request, guide_id):
 
         UnlockedVisaGuide.objects.create(seeker=seeker, guide=guide)
 
-        # Email Notification to Admin
-        send_mail(
-            subject="📄 New Visa Guide Purchase!",
-            message=f"User {seeker.username} purchased the {guide.country} Visa Guide.",
-            from_email="noreply@eurapos.com",
-            recipient_list=["admin@eurapos.com"],
+        # ✅ Create notification in admin panel
+        notify_admin(
+            message=f"🗺️ {seeker.email} unlocked the {guide.country} Visa Guide (Guide ID: {guide.id})",
+            type="visa_guide"
         )
 
         messages.success(request, f"✅ You have unlocked the {guide.country} Visa Guide! You can now download it anytime.")

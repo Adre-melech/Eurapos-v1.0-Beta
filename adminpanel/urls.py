@@ -20,7 +20,9 @@ from .views import (
     # ATS Management
     mark_ats_processed, upload_event_ticket, confirm_event_ticket, mark_priority_done, all_applications,
     priority_applications_list, whatsapp_subscribers_list, ats_requests_list, delivered_ats_resumes_list,
-    all_pending_event_tickets, delivered_event_tickets, unlocked_access_users, manage_exclusive_access
+    all_pending_event_tickets, delivered_event_tickets, unlocked_access_users, manage_exclusive_access,
+
+    activity_summary, admin_notifications_view, mark_as_read,
 )
 
 app_name = "adminpanel"
@@ -66,7 +68,7 @@ urlpatterns = [
     path("edit-job-country/<int:country_id>/", edit_job_country, name="edit_job_country"),
     path("delete-job-country/<int:country_id>/", delete_job_country, name="delete_job_country"),
 
-path("exclusive-access/", manage_exclusive_access, name="manage_exclusive_access"),
+    path("exclusive-access/", manage_exclusive_access, name="manage_exclusive_access"),
 
     # Seeker Management
     path("update-application-status/<int:application_id>/", update_application_status, name="update_application_status"),
@@ -105,4 +107,8 @@ path("exclusive-access/", manage_exclusive_access, name="manage_exclusive_access
     path('priority-applications/', priority_applications_list, name='priority_applications_list'),
     path('whatsapp-subscribers/', whatsapp_subscribers_list, name='whatsapp_subscribers_list'),
     path('priority-application/done/<int:app_id>/', mark_priority_done, name='mark_priority_done'),
+
+    path("activity-summary/", activity_summary, name="activity_summary"),
+    path("notifications/", admin_notifications_view, name="admin_notifications_view"),
+    path("notifications/<int:notification_id>/read/", mark_as_read, name="mark_as_read"),
 ]

@@ -11,11 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env file from the same directory as settings.py
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 # Error Message
 MESSAGE_TAGS = {messages.ERROR: 'danger'}
@@ -24,12 +28,12 @@ MESSAGE_TAGS = {messages.ERROR: 'danger'}
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j!np9h=l6h@8u821ai6w%7e)n9@)cs*#@b8p5fl!68@$icdxaw'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -56,6 +60,8 @@ INSTALLED_APPS = [
     'django_q',
     'import_export',
     'compressor',
+    'sslserver',
+    "django.contrib.sitemaps",
 ]
 
 STATICFILES_FINDERS = [
@@ -72,6 +78,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'seeker.middleware.ActivityLoggerMiddleware',
+    "beta.cache_middleware.CacheControlMiddleware",
 ]
 
 ROOT_URLCONF = 'beta.urls'
@@ -175,8 +183,24 @@ AUTH_USER_MODEL = "seeker.Seeker"
 # SMTP Configuration
 ADMINS = [("Eurapos Team", "eurapos.main@gmail.com")]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mailtrap.io'
-EMAIL_HOST_USER = 'b4f2e9ed6053b4'
-EMAIL_HOST_PASSWORD = 'a6e0af113a63e6'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS") == "True"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL")
+ADMIN_WHATSAPP_NUMBER = os.environ.get("ADMIN_WHATSAPP_NUMBER")
+
+SECURE_HSTS_SECONDS = os.environ.get("SECURE_HSTS_SECONDS")  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get("SECURE_HSTS_INCLUDE_SUBDOMAINS") == "True"
+SECURE_HSTS_PRELOAD = os.environ.get("SECURE_HSTS_PRELOAD") == "True"
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT") == "True"
+
+X_FRAME_OPTIONS = os.environ.get("X_FRAME_OPTIONS")
+
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE") == "True"
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE") == "True"
+SECURE_BROWSER_XSS_FILTER = os.environ.get("SECURE_BROWSER_XSS_FILTER") == "True"
+SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get("SECURE_CONTENT_TYPE_NOSNIFF") == "True"

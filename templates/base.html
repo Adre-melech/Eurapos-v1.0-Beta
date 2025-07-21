@@ -8,7 +8,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Find global jobs, visa services & career growth.{% endblock %}">
+  <meta name="robots" content="index, follow">
 
+  <link rel="preconnect" href="https://cdn.eurapos.com">
+
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
   <!-- Favicon -->
   <link rel="icon" href="{% static 'img/ico.ico' %}" type="image/x-icon">
 
@@ -33,7 +38,7 @@
   <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm fixed-top py-2">
     <div class="container">
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-decoration-none" href="{% url 'home:home' %}">
-        <img src="{% static 'img/logo.png' %}" alt="Eurapos" style="height: 40px;">
+        <img src="{% static 'img/logo.png' %}" alt="Eurapos" loading="lazy" style="height: 40px;">
       </a>
 
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -165,35 +170,48 @@
   {% if request.user.is_authenticated %}
     <div class="container mt-4">
 
-      {% if not request.user.receive_whatsapp_jobs %}
-        <div class="alert alert-light border-start border-4 rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap mb-3"
-             style="border-color: #edcb1c;">
-          <div class="flex-grow-1 text-center text-md-start">
-            <strong class="text-dark">🚀 Unlock WhatsApp Job Recommendations</strong> for 10 Days at just
-            <span class="fw-bold" style="color: #004aad;">125 credits</span>!
+      {% if request.user.whatsapp_jobs_cooldown_expires %}
+        {% if request.user.whatsapp_jobs_cooldown_expires > now %}
+          <div class="alert alert-warning rounded shadow-sm">
+            WhatsApp job recommendations are currently in cooldown.
+            <strong>Available again on:</strong> {{ request.user.whatsapp_jobs_cooldown_expires|date:"F j, Y, g:i a" }}
           </div>
-          <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-            <a href="{% url 'seeker:buy_whatsapp_recommendations' %}"
-               class="btn btn-sm text-white"
-               style="background-color: #004aad;"
-               data-bs-toggle="modal" data-bs-target="#whatsappModal">
-              Activate Now
-            </a>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        </div>
+        {% else %}
+          {# cooldown is over, show the activate prompt #}
+          {% if not request.user.receive_whatsapp_jobs %}
+            <div class="alert alert-light border-start border-4 rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap mb-3"
+                style="border-color: #edcb1c;">
+              <div class="flex-grow-1 text-center text-md-start">
+                <strong class="text-dark">🚀 Unlock WhatsApp Job Recommendations</strong> for 10 Days at just
+                <span class="fw-bold" style="color: #004aad;">125 credits</span>!
+              </div>
+              <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                <a href="{% url 'seeker:buy_whatsapp_recommendations' %}"
+                  class="btn btn-sm text-white"
+                  style="background-color: #004aad;"
+                  data-bs-toggle="modal" data-bs-target="#whatsappModal">
+                  Activate Now
+                </a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
       {% endif %}
 
+      {# Visa Discount alert remains unchanged #}
       {% if not request.user.visa_discount_redeemed %}
         <div class="alert alert-light border-start border-4 rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap"
-             style="border-color: #5ce1e6;">
+            style="border-color: #5ce1e6;">
           <div class="flex-grow-1 text-center text-md-start">
-            Use your available credits on <strong class="text-success"> Endless Fly</strong> and <strong class="text-dark">🎯 save 10% instantly</strong> Only for  <span class="fw-bold" style="color: #004aad;">500 credits</span>! on our trusted Visa Consultancy service.
+            Use your available credits on <strong class="text-success">Endless Fly</strong> and
+            <strong class="text-dark">🎯 save 10% instantly</strong> Only for 
+            <span class="fw-bold" style="color: #004aad;">500 credits</span>! on our trusted Visa Consultancy service.
           </div>
           <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
             <a href="{% url 'seeker:buy_visa_discount' %}"
-               class="btn btn-sm text-white"
-               style="background-color: #004aad;">
+              class="btn btn-sm text-white"
+              style="background-color: #004aad;">
               Redeem Now
             </a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -338,8 +356,34 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const banner = document.getElementById("cookie-consent");
+    const acceptBtn = document.getElementById("cookieAccept");
+
     if (!localStorage.getItem("consentGiven") && banner) {
       banner.style.display = "block";
+    }
+
+    function preloadAssets() {
+      const assets = [
+        "/static/fonts/europa-bold.woff2",
+        "/static/images/home-banner.webp",
+        "/static/js/main.bundle.js",
+        "/static/css/main.css"
+      ];
+
+      assets.forEach((asset) => {
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.href = asset;
+
+        // Infer type from extension
+        if (asset.endsWith(".woff2")) link.as = "font";
+        else if (asset.endsWith(".js")) link.as = "script";
+        else if (asset.endsWith(".css")) link.as = "style";
+        else if (asset.endsWith(".webp") || asset.endsWith(".jpg")) link.as = "image";
+
+        link.crossOrigin = "anonymous"; // for fonts, if needed
+        document.head.appendChild(link);
+      });
     }
 
     window.acceptConsent = function () {
@@ -358,9 +402,16 @@
           localStorage.setItem("consentGiven", "yes");
           banner.classList.add("hide");
           setTimeout(() => banner.remove(), 500);
+          preloadAssets(); // 👈 Trigger preload after consent
         }
       });
     };
+
+    if (acceptBtn) {
+      acceptBtn.addEventListener("click", () => {
+        acceptConsent(); // 👈 Call your consent handler
+      });
+    }
   });
 </script>
 

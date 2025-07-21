@@ -235,3 +235,29 @@ class UnlockedVisaGuide(models.Model):
 
     def __str__(self):
         return f"{self.seeker.username} unlocked {self.guide.country}"
+
+
+class UserActivity(models.Model):
+    user = models.ForeignKey(Seeker, on_delete=models.SET_NULL, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    is_authenticated = models.BooleanField(default=False)
+    path = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    referrer = models.TextField(null=True, blank=True)
+    is_suspicious = models.BooleanField(default=False)
+
+    def __str__(self):
+        who = self.user.username if self.user else f"Session {self.session_key}"
+        return f"{who} visited {self.path} via {self.method} at {self.timestamp}"
+
+
+class SuspiciousLoginAlert(models.Model):
+    user = models.ForeignKey(Seeker, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40)
+    suspicious_count = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)

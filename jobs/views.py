@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from .models import JobPost, JobCountry, Category, UnlockedExclusiveJob
 from notifications.models import Notification
 from adminpanel.models import HiddenJobAccess
+from adminpanel.utils import notify_admin
 from seeker.models import Seeker
 from datetime import timedelta
 from django.utils import timezone
@@ -323,7 +324,7 @@ def job_detail(request, job_id):
 
 @login_required
 def apply_job(request, job_id):
-    """Handles job application submission & awards credits."""
+    """Handles job application submission, awards credits, and notifies admin."""
     job = get_object_or_404(JobPost, id=job_id)
     seeker = request.user
 
@@ -351,10 +352,17 @@ def apply_job(request, job_id):
         seeker.credits += 5
         seeker.save()
 
+        # ✅ Trigger admin notification
+        notify_admin(
+            message=f"🧑‍💻 {seeker.email} applied to '{job.title}' (Job ID: {job.id})",
+            type="job_application"
+        )
+
         messages.success(request, "Application submitted! You earned 5 credits.")
         return redirect("jobs:job_detail", job_id=job_id)
 
     return redirect("jobs:job_detail", job_id=job_id)
+
 
 
 def send_job_alerts():
@@ -441,12 +449,13 @@ def unlock_hr_info(request, job_id):
 
 
 def buy_priority_review(request, application_id):
+    """Handles purchase of priority HR review and notifies admin."""
     application = get_object_or_404(Application, id=application_id)
     seeker = application.seeker
 
     if seeker != request.user:
         messages.error(request, "Unauthorized action.")
-        return redirect("dashboard")  # Redirect to dashboard instead
+        return redirect("dashboard")
 
     if application.priority_review:
         messages.info(request, "You have already purchased priority HR review.")
@@ -455,11 +464,19 @@ def buy_priority_review(request, application_id):
         seeker.save(update_fields=["credits"])
         application.priority_review = True
         application.save(update_fields=["priority_review"])
+
+        # ✅ Notify admin of priority review purchase
+        notify_admin(
+            message=f"⚡ {seeker.email} purchased priority HR review for '{application.job.title}' (Job ID: {application.job.id})",
+            type="priority_application"
+        )
+
         messages.success(request, "Priority HR review purchased successfully!")
     else:
         messages.error(request, "Insufficient credits to buy priority HR review.")
 
-    return redirect("seeker:dashboard")  # Updated redirect
+    return redirect("seeker:dashboard")
+
 
 
 @login_required
