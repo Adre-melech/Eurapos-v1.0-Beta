@@ -8,8 +8,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{% endblock %}</title>
-  <meta name="description" content="{% block description %}Explore visa jobs and guides across countries. Start your journey today.{% endblock %}">
-  <meta name="keywords" content="{% block keywords %}jobs abroad, visa jobs, international careers, Eurapos{% endblock %}">
+  <meta name="description" content="{% block description %}{% endblock %}">
+  <meta name="keywords" content="{% block keywords %}{% endblock %}">
 
   <meta name="robots" content="index, follow">
 
@@ -38,9 +38,10 @@
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm fixed-top py-2">
-    <div class="container">
+    <div class="container"> 
+      <!-- Logo -->
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-decoration-none" href="{% url 'home:home' %}">
-        <img src="{% static 'img/logo.png' %}" alt="Eurapos" loading="lazy" style="height: 40px;">
+        <img src="{% static 'img/logo.png' %}" alt="Eurapos" loading="lazy" style="height: 40px;"><small class="text-muted"><span class="badge bg-secondary">v0.9.0</span></small>
       </a>
 
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -284,6 +285,11 @@
         <a href="{% url 'home:terms' %}" class="text-decoration-none text-muted me-3">Terms & Conditions</a>
         <a href="{% url 'home:privacy' %}" class="text-decoration-none text-muted">Privacy Policy</a>
       </div>
+    </div>
+    <div class="container text-center">
+      <span class="text-muted small">
+        🚀 <strong>Eurapos</strong> <span class="badge bg-secondary">Beta v0.9.0</span>
+      </span>
     </div>
   </div>
 </footer>
