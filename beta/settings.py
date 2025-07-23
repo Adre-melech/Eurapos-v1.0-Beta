@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+
+from django.conf.global_settings import SESSION_SAVE_EVERY_REQUEST
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
 
@@ -62,6 +64,8 @@ INSTALLED_APPS = [
     'compressor',
     'sslserver',
     "django.contrib.sitemaps",
+    "cloudinary",
+    "cloudinary_storage"
 ]
 
 STATICFILES_FINDERS = [
@@ -80,6 +84,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'seeker.middleware.ActivityLoggerMiddleware',
     "beta.cache_middleware.CacheControlMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'beta.urls'
@@ -109,9 +114,9 @@ WSGI_APPLICATION = 'beta.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.getenv("DB_NAME"),
     }
 }
 
@@ -170,8 +175,18 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_cdn')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET")
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -187,7 +202,7 @@ EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS") == "True"
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL") == "True"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL")
@@ -201,6 +216,8 @@ SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT") == "True"
 X_FRAME_OPTIONS = os.environ.get("X_FRAME_OPTIONS")
 
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE") == "True"
+SESSION_COOKIE_AGE = int(os.getenv("SESSION_COOKIE_AGE", "1800"))
+SESSION_SAVE_EVERY_REQUEST = os.environ.get("SESSION_SAVE_EVERY_REQUEST") == "True"
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE") == "True"
 SECURE_BROWSER_XSS_FILTER = os.environ.get("SECURE_BROWSER_XSS_FILTER") == "True"
 SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get("SECURE_CONTENT_TYPE_NOSNIFF") == "True"

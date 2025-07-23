@@ -1,5 +1,6 @@
 from django.db import models
 from seeker.models import Seeker
+from cloudinary.models import CloudinaryField
 import random
 import string
 
@@ -7,7 +8,7 @@ import string
 class EventTicket(models.Model):
     """Stores event details"""
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to="event_images/")
+    image = CloudinaryField("Event Image", folder="eurapos/events/", blank=True, null=True)
     credits_required = models.PositiveIntegerField()
     available_until = models.DateField()
     description = models.TextField(blank=True, null=True)

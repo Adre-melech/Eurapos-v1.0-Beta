@@ -1,4 +1,6 @@
 import random, string
+
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
@@ -171,6 +173,7 @@ class ATSResumeRequest(models.Model):
     def __str__(self):
         return f"Order {self.order_id} - ATS CV for {self.seeker.username}"
 
+
     def save(self, *args, **kwargs):
         is_update = self.pk is not None
         if is_update:
@@ -219,8 +222,23 @@ class VisaDiscount(models.Model):
 class VisaGuide(models.Model):
     """Stores Visa Guidelines uploaded by the admin"""
     country = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="visa_guides/")
-    pdf_file = models.FileField(upload_to="visa_guides/")
+    image = CloudinaryField(
+        "Visa Guide Image",
+        folder="eurapos/visa_guides/images/",
+        tags=["visa_guide", "cover_image"],
+        blank=True,
+        null=True
+    )
+
+    pdf_file = CloudinaryField(
+        "Visa Guide PDF",
+        folder="eurapos/visa_guides/documents/",
+        tags=["visa_guide", "pdf_file"],
+        resource_type="raw",  # important for non-image files like PDF
+        blank=True,
+        null=True
+    )
+
     credits_required = models.PositiveIntegerField(default=20)  # Set cost in credits
 
     def __str__(self):

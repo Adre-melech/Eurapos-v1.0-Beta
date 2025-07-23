@@ -3,6 +3,7 @@ from django.db import models
 from datetime import timedelta
 from django.utils.timezone import now
 from adminpanel.models import AdminNotification
+from cloudinary.models import CloudinaryField
 from django.apps import apps  # Helps prevent circular imports
 
 class SeekerCountry(models.Model):
@@ -108,7 +109,7 @@ class Application(models.Model):
     seeker = models.ForeignKey("seeker.Seeker", on_delete=models.CASCADE)
     job = models.ForeignKey(JobPost, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Submitted")
-    cv = models.FileField(upload_to="cv_uploads/", blank=True, null=True)  # Allows CV to be optional
+    cv = CloudinaryField("CV File", folder="eurapos/cvs/", resource_type="raw", blank=True, null=True)
     applied_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     rating = models.CharField(max_length=10, choices=RATING_CHOICES, blank=True, null=True)  # Emoji rating
@@ -152,7 +153,7 @@ class Application(models.Model):
             subject="🚀 Priority HR Review Purchased!",
             message=f"User {self.seeker.username} has purchased Priority Review for {self.job.title}. Please process it immediately.",
             from_email="noreply@eurapos.com",
-            recipient_list=["admin@eurapos.com"],
+            recipient_list=["info@eurapos.com"],
         )
 
         # In-App Notification

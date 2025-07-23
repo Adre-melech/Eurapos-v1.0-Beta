@@ -178,7 +178,7 @@ def send_contact(request):
             subject=f"📫 New Contact from {name}",
             message=message_text,
             from_email=email,
-            recipient_list=["support@example.com"],
+            recipient_list=["info@eurapos.com"],
             fail_silently=True
         )
 
