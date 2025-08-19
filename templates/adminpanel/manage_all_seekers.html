@@ -2,7 +2,7 @@
 {% block title %}Dashboard | Admin Panel{% endblock %}
 {% block content %}
 
-<h3 class="mb-4">👥 Manage All Seekers</h3>
+<h3 class="mb-4">ðŸ‘¥ Manage All Seekers</h3>
 
 <table class="table table-bordered table-hover">
   <thead class="table-light">
@@ -19,9 +19,9 @@
   <tbody>
     {% for seeker in seekers %}
       <tr>
-        <td>{{ seeker.seeker_id|default:"—" }}</td>
+        <td>{{ seeker.seeker_id|default:"â€”" }}</td>
         <td>{{ seeker.username }}</td>
-        <td>{{ seeker.referral_id|default:"—" }}</td>
+        <td>{{ seeker.referral_id|default:"â€”" }}</td>
         <td>{{ seeker.email }}</td>
         <td>{{ seeker.credits }}</td>
         <td>

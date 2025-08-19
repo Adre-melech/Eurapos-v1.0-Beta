@@ -5,6 +5,7 @@
 <table class="table table-bordered">
     <thead class="thead-dark">
         <tr>
+            <th>ID</th>
             <th>Job Title</th>
             <th>Company</th>
             <th>Salary</th>
@@ -15,6 +16,7 @@
     <tbody>
         {% for job in jobs %}
         <tr>
+            <td>{{ job.job_id }}</td>
             <td>{{ job.title }}</td>
             <td>{{ job.company_name }}</td>
             <td>{{ job.salary }}</td>

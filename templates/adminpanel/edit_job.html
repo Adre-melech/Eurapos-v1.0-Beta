@@ -1,10 +1,28 @@
 {% extends "adminpanel/adminbase.html" %}
 
 {% block content %}
-<h2>Edit Job Post</h2>
+<h2 class="text-center mt-3">Edit Job Post</h2>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <!-- Image -->
+    <div class="mb-3">
+        <label>Job Image</label>
+        {% if job.image %}
+            <div class="mb-2">
+                <img src="{{ job.image.url }}" alt="{{ job.image_alt }}" style="max-width: 100%; height: auto;">
+            </div>
+        {% endif %}
+        <input type="file" name="image" class="form-control">
+    </div>
+
+    <!-- Image Alt -->
+    <div class="mb-3">
+        <label>Image Alt Text</label>
+        <input type="text" name="image_alt" class="form-control" value="{{ job.image_alt }}">
+    </div>
+
     <div class="mb-3">
         <label>Job Title</label>
         <input type="text" name="title" class="form-control" value="{{ job.title }}" required>
@@ -25,17 +43,71 @@
         <input type="date" name="deadline" class="form-control" value="{{ job.deadline|date:'Y-m-d' }}" required>
     </div>
 
+    <!-- Overview -->
     <div class="mb-3">
-        <label>Job Description</label>
-        <textarea name="description" class="form-control" rows="5" required>{{ job.description }}</textarea>
+        <label>Job Overview</label>
+        <textarea name="Overview" class="form-control rich-text" rows="4" required>{{ job.Overview }}</textarea>
+    </div>
+
+    <!-- Responsibilities -->
+    <div class="mb-3">
+        <label>Responsibilities</label>
+        <textarea name="responsibilities" class="form-control rich-text" rows="4">{{ job.responsibilities }}</textarea>
+    </div>
+
+    <!-- Requirements -->
+    <div class="mb-3">
+        <label>Requirements</label>
+        <textarea name="requirements" class="form-control rich-text" rows="4" required>{{ job.requirements }}</textarea>
+    </div>
+
+    <!-- Country -->
+    <div class="mb-3">
+        <label class="form-label">Country</label>
+        <select name="country" class="form-select" required>
+            {% for country in countries %}
+                <option value="{{ country.id }}" {% if job.country and job.country.id == country.id %}selected{% endif %}>
+                    {{ country.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Category -->
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-select" required>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if job.category and job.category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+
+    <!-- HR Contact Info -->
+    <h4 class="mt-4">HR Contact Details</h4>
+
+    <div class="mb-3">
+      <label class="form-label">HR Name</label>
+      <input type="text" name="hr_name" class="form-control" value="{{ job.hr_name }}" required>
     </div>
 
     <div class="mb-3">
-        <label>Required Skills</label>
-        <textarea name="required_skills" class="form-control" rows="4" required>{{ job.required_skills }}</textarea>
+      <label class="form-label">HR Phone</label>
+      <input type="text" name="hr_phone" class="form-control" value="{{ job.hr_phone }}" required>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100">Update Job</button>
-    <p class="text-center mt-3"><a href="{% url 'adminpanel:manage_jobs' %}" class="text-secondary">Back to Job Management</a></p>
+    <div class="mb-3">
+      <label class="form-label">HR Email</label>
+      <input type="email" name="hr_email" class="form-control" value="{{ job.hr_email }}" required>
+    </div>
+
+        <button type="submit" class="btn btn-primary w-100">Update Job</button>
+
+    <p class="text-center mt-3">
+        <a href="{% url 'adminpanel:manage_jobs' %}" class="text-secondary">Back to Job Management</a>
+    </p>
 </form>
 {% endblock %}

@@ -27,7 +27,7 @@ urlpatterns = [
 
     path("ajax_search/", ajax_search, name="ajax_search"),
 
-    path("<int:job_id>/", job_detail, name="job_detail"),
+    path("<slug:slug>/", job_detail, name="job_detail"),
     path("<int:job_id>/apply/", apply_job, name="apply_job"),
     path("rate/<int:application_id>/", rate_application, name="rate_application"),
 

@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container py-5">
-  <h2 class="mb-4 text-primary fw-bold">🔔 All Notifications</h2>
+  <h2 class="mb-4 text-primary fw-bold">ðŸ”” All Notifications</h2>
   <ul class="list-group">
     {% for notification in notifications %}
       <li class="list-group-item d-flex justify-content-between align-items-center {% if not notification.read %}bg-light fw-bold{% endif %}">
@@ -15,7 +15,7 @@
         {% if not notification.read %}
           <form method="POST" action="{% url 'seeker:mark_notification_read' notification.id %}">
             {% csrf_token %}
-            <button class="btn btn-sm btn-outline-secondary" onclick="return confirm('Mark as read?');">✔ Mark Read</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="return confirm('Mark as read?');">âœ” Mark Read</button>
           </form>
         {% endif %}
       </li>

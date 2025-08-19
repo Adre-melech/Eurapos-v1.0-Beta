@@ -34,7 +34,7 @@
             <td>{{ event.title }}</td>
             <td>{{ event.credits_required }}</td>
             <td>{{ event.available_until|date:"M d, Y" }}</td>
-            <td>{{ event.description|truncatewords:20 }}</td>
+            <td>{{ event.description|safe|truncatewords:20 }}</td>
             <td>
               <a href="{% url 'adminpanel:edit_event' event.id %}" class="btn btn-sm btn-primary">✏️ Edit</a>
               <form method="post" action="{% url 'adminpanel:delete_event' event.id %}" class="d-inline">

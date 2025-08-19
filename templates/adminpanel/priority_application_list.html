@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container-fluid">
-  <h3 class="mb-4">🔥 All Priority Applications</h3>
+  <h3 class="mb-4">ðŸ”¥ All Priority Applications</h3>
 
   {% if priority_applications %}
     <div class="table-responsive">
@@ -25,7 +25,7 @@
               <td>
                 <form method="post" action="{% url 'adminpanel:mark_priority_done' app.id %}">
                   {% csrf_token %}
-                  <button class="btn btn-sm btn-outline-danger">✅ Done</button>
+                  <button class="btn btn-sm btn-outline-danger">âœ… Done</button>
                 </form>
               </td>
             </tr>

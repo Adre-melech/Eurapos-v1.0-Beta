@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 from adminpanel.models import AdminNotification
 from cloudinary.models import CloudinaryField
+from django.utils.text import slugify
 from django.apps import apps  # Helps prevent circular imports
 
 class SeekerCountry(models.Model):
@@ -37,20 +38,25 @@ class JobTitle(models.Model):
 
 class JobPost(models.Model):
     job_id = models.CharField(max_length=10, unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+
+    # ✅ Image Fields for Display
+    image = CloudinaryField('jobimage', null=True, blank=True)
+    image_alt = models.CharField(max_length=255, help_text="Alt text for accessibility", blank=True)
+
     title = models.CharField(max_length=200)
     company_name = models.CharField(max_length=200)
     salary = models.CharField(max_length=100)
     deadline = models.DateField()
-    description = models.TextField()
-    required_skills = models.TextField()
+    Overview = models.TextField()
+    responsibilities = models.TextField(blank=True, help_text="Outline the responsibilities for this position")
+    requirements = models.TextField()
 
     country = models.ForeignKey(JobCountry, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
 
-    exclusive_job = models.BooleanField(default=False)  # Marks hidden jobs
+    exclusive_job = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)
-
-    # ✅ Added `created_at` field to track recent jobs
     created_at = models.DateTimeField(auto_now_add=True)
 
     # HR Contact Info
@@ -59,12 +65,19 @@ class JobPost(models.Model):
     hr_email = models.EmailField()
 
     def save(self, *args, **kwargs):
-        """Automatically assigns job_id if not provided."""
+        # Auto-generate job_id if missing
         if not self.job_id:
             last_job = JobPost.objects.order_by('-id').first()
             new_id = f"JB{str(last_job.id + 1).zfill(3)}" if last_job else "JB001"
             self.job_id = new_id
+
+        # Auto-generate slug using title + job_id
+        if not self.slug:
+            base_slug = slugify(self.title)
+            self.slug = f"{base_slug}-{self.job_id.lower()}"
+
         super().save(*args, **kwargs)
+
 
     def increment_views(self):
         """Increment job views when accessed."""

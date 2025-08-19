@@ -6,4 +6,4 @@ class JobsConfig(AppConfig):
     name = 'jobs'
 
     def ready(self):
-        import jobs.signals  # 📢 Automatically register signal handlers on startup
+        import jobs.signals  # ðŸ“¢ Automatically register signal handlers on startup

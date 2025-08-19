@@ -1,3 +1,4 @@
 User-agent: *
-Disallow: /admin/
-Sitemap: https://localhost/sitemap.xml
+Disallow: /dark-panel/
+Disallow: /dahaka-darl/
+Sitemap: https://eurapos.com/sitemap.xml

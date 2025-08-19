@@ -6,8 +6,13 @@ from django.core.mail import send_mail
 from django.dispatch import receiver
 from django.utils.timezone import now
 from seeker.models import UserActivity, SuspiciousLoginAlert
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from seeker.models import ConsentLog
+from seeker.utils import get_country_from_ip
 
 logger = logging.getLogger(__name__)
+
 
 @receiver(user_logged_in)
 def stitch_user_activity(sender, request, user, **kwargs):
@@ -83,3 +88,9 @@ def calculate_behavior_score(session_key):
             score += 3
 
     return score
+
+
+@receiver(pre_save, sender=ConsentLog)
+def populate_country(sender, instance, **kwargs):
+    if not instance.country:
+        instance.country = get_country_from_ip(instance.ip_address)

@@ -1,4 +1,5 @@
 import os
+import requests
 from django.conf import settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -14,7 +15,7 @@ def generate_visa_discount_pdf(seeker, order_id, coupon_code, valid_until, purch
     # Create the PDF
     c = canvas.Canvas(full_path, pagesize=A4)
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(72, 800, "🎫 Visa Consultancy Discount Confirmation")
+    c.drawString(72, 800, "ðŸŽ« Visa Consultancy Discount Confirmation")
 
     c.setFont("Helvetica", 12)
     c.drawString(72, 770, f"Name: {seeker.username}")
@@ -22,9 +23,18 @@ def generate_visa_discount_pdf(seeker, order_id, coupon_code, valid_until, purch
     c.drawString(72, 730, f"Coupon Code: {coupon_code}")
     c.drawString(72, 710, f"Valid Until: {valid_until.strftime('%B %d, %Y')}")
     c.drawString(72, 690, f"Redeemed On: {purchased_at.strftime('%B %d, %Y')}")
-    c.drawString(72, 660, "📌 Present this PDF to participating consultancies for 10% off.")
+    c.drawString(72, 660, "ðŸ“Œ Present this PDF to participating consultancies for 10% off.")
 
     c.showPage()
     c.save()
 
     return f"visa_discount_pdfs/{filename}"
+
+
+def get_country_from_ip(ip):
+    try:
+        response = requests.get(f"https://ipapi.co/{ip}/country_name/")
+        if response.status_code == 200:
+            return response.text.strip()
+    except:
+        return None

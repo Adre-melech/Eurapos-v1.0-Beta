@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Eurapos | 🎯 Recommended Jobs{% endblock %}
+{% block title %}Eurapos | ðŸŽ¯ Recommended Jobs{% endblock %}
 
 {% load static %}
 
 {% block content %}
-<h3 class="mb-4 fw-bold text-primary">🎯 Recommended Jobs for You</h3>
+<h3 class="mb-4 fw-bold text-primary">ðŸŽ¯ Recommended Jobs for You</h3>
 
 {% if recommended_jobs %}
   <div class="row g-4">
@@ -18,7 +18,7 @@
               <i class="bi bi-geo-alt me-1"></i> {{ job.location }} &nbsp;|&nbsp;
               <i class="bi bi-clock-history me-1"></i> Posted {{ job.created_at|timesince }} ago
             </p>
-            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary btn-sm mt-auto rounded-pill px-4 shadow-sm">
+            <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-primary btn-sm mt-auto rounded-pill px-4 shadow-sm">
               View Details
             </a>
           </div>

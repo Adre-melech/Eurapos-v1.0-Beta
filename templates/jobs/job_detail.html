@@ -85,6 +85,14 @@ job details Europe, job info Bangladeshi workers, visa support job, credits diye
     <div class="col-lg-8 order-2 order-lg-1">
       <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
+
+          <!-- Job Image (if any) -->
+          {% if job.image %}
+            <div class="text-center mb-4">
+              <img src="{{ job.image.url }}" alt="{{ job.image_alt|default:'Job Image' }}" loading="lazy" width="300" class="img-fluid rounded shadow-sm" />
+            </div>
+          {% endif %}
+
           <h2 class="card-title text-primary fw-bold">{{ job.title }}</h2>
 
           <!-- Flash Messages -->
@@ -112,17 +120,18 @@ job details Europe, job info Bangladeshi workers, visa support job, credits diye
 
           <hr>
 
-          <h5>Description</h5>
-          <p class="mt-3 lh-lg">{{ job.description|default:"[NO DESCRIPTION]"|linebreaks }}</p>
+            <h5>Job Overview</h5>
+            <div class="mt-3 lh-lg">{{ job.Overview|default:"[NO DESCRIPTION]"|safe }}</div>
 
-          {% if job.required_skills %}
-            <h5 class="mt-4">Required Skills</h5>
-            <ul class="list-unstyled skills-list ms-3">
-              {% for skill in job.required_skills.splitlines %}
-                <li>{{ skill }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
+            {% if job.responsibilities %}
+              <h4 class="mt-5 mb-3"><i class="bi bi-list-task text-success"></i> Responsibilities</h4>
+              <div class="lh-lg">{{ job.responsibilities|safe }}</div>
+            {% endif %}
+
+            {% if job.requirements %}
+              <h4 class="mt-5 mb-3"><i class="bi bi-check2-circle text-warning"></i> Requirements</h4>
+              <div class="lh-lg">{{ job.requirements|safe }}</div>
+            {% endif %}
         </div>
       </div>
 
@@ -183,7 +192,7 @@ job details Europe, job info Bangladeshi workers, visa support job, credits diye
                 <form method="POST" action="{% url 'jobs:unlock_hr_info' job.id %}">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-warning rounded-pill mt-2 px-4 shadow-sm">
-                    Unlock for 10 Credits
+                    Unlock for 30 Credits
                   </button>
                 </form>
               {% endif %}
@@ -203,7 +212,14 @@ job details Europe, job info Bangladeshi workers, visa support job, credits diye
 
     <!-- Right content: visible only on lg+ -->
     <aside class="col-lg-4 order-1 order-lg-2 d-none d-lg-block">
-      <div class="job-info-panel">
+      <div class="job-info-panel text-center">
+
+        {% if job.image %}
+          <div class="mb-4">
+            <img src="{{ job.image.url }}" alt="{{ job.image_alt|default:'Job Image' }}" loading="lazy" class="img-fluid rounded shadow-sm" width="250">
+          </div>
+        {% endif %}
+
         <div><i class="bi bi-building"></i> Company: <strong>{{ job.company_name }}</strong></div>
         <div><i class="bi bi-geo-alt"></i> Location: <strong>{{ job.country.name }}</strong></div>
         <div><i class="bi bi-tags"></i> Category: <strong>{{ job.category.name }}</strong></div>
@@ -211,10 +227,11 @@ job details Europe, job info Bangladeshi workers, visa support job, credits diye
         <div><i class="bi bi-calendar-event"></i> Deadline: <strong class="text-danger">{{ job.deadline|date:"F j, Y" }}</strong></div>
       </div>
     </aside>
+
   </div>
 </div>
 
-<!-- Rating Modal -->
+
 <!-- Rating Modal -->
 {% if application and application.status != "Rejected" %}
 <!-- Rating Modal -->

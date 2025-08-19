@@ -12,7 +12,7 @@ exclusive Europe jobs, locked jobs Europe, unlock job with credits, special job 
 {% block content %}
 <div class="container py-5">
   <h2 class="mb-5 text-success fw-bold" style="font-size: 2rem;">
-    🌟 Exclusive Jobs You've Unlocked
+    ðŸŒŸ Exclusive Jobs You've Unlocked
   </h2>
 
   {% if exclusive_jobs %}
@@ -24,9 +24,9 @@ exclusive Europe jobs, locked jobs Europe, unlock job with credits, special job 
               <h5 class="card-title fw-semibold text-success mb-2">{{ job.title }}</h5>
               <p class="text-muted mb-2">{{ job.company_name }}</p>
               <span class="badge bg-light text-success mb-4" style="font-weight: 600;">
-                {{ job.category.name }} &nbsp;•&nbsp; {{ job.country.name }}
+                {{ job.category.name }} &nbsp;â€¢&nbsp; {{ job.country.name }}
               </span>
-              <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-success mt-auto rounded-pill px-4 shadow-sm">
+              <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-success mt-auto rounded-pill px-4 shadow-sm">
                 View Job
               </a>
             </div>
@@ -38,7 +38,7 @@ exclusive Europe jobs, locked jobs Europe, unlock job with credits, special job 
     <div class="alert alert-warning text-center py-5 rounded-4 shadow-sm" style="font-size: 1.1rem;">
       <p class="mb-3">You haven't unlocked any exclusive jobs yet.</p>
       <a href="{% url 'jobs:unlock_exclusive_jobs' %}" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
-        🚀 Unlock Now with Credits
+        ðŸš€ Unlock Now with Credits
       </a>
     </div>
   {% endif %}

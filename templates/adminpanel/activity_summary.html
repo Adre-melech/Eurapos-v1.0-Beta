@@ -1,10 +1,85 @@
 {% extends "adminpanel/adminbase.html" %}
 
 {% block content %}
+
 <h2>User Activity Summary</h2>
+<p>Total Activities: {{ total }}</p>
 <ul>
   {% for entry in data %}
-    <li>{{ entry.is_authenticated|yesno:"Registered,Anonymous" }}: {{ entry.count }}</li>
+    <li>
+      {{ entry.is_authenticated|yesno:"Registered,Anonymous" }}:
+      {{ entry.count }} ({{ entry.percent }}%)
+      <div style="background:#eee;width:100%;margin-top:4px;">
+        <div style="width:{{ entry.percent }}%;background:#3f51b5;color:white;padding:2px 6px;">
+          {{ entry.percent }}%
+        </div>
+      </div>
+    </li>
   {% endfor %}
 </ul>
+
+<h2>Activity by Hour</h2>
+<p>Total Activities: {{ total }}</p>
+<ul>
+  {% for entry in data %}
+    <li>
+      {{ entry.hour }}:00 → {{ entry.count }} ({{ entry.percent }}%)
+      <div style="background:#eee;width:100%;margin-top:4px;">
+        <div style="width:{{ entry.percent }}%;background:#009688;color:white;padding:2px 6px;">
+          {{ entry.percent }}%
+        </div>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+<h2>🌐 Geographic Activity</h2>
+<p>Total Activities: <strong>{{ total }}</strong></p>
+
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color:#f2f2f2;">
+      <th style="text-align:left; padding:8px;">Country</th>
+      <th style="text-align:right; padding:8px;">Count</th>
+      <th style="text-align:left; padding:8px;">Percent</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in geo_data %}
+    <tr>
+      <td style="padding:8px;">
+        {{ entry.country|default:"Unknown" }}
+        {% if entry.country == "Unknown" %}
+          <span style="color:#999;">(IP geolocation failed)</span>
+        {% endif %}
+      </td>
+      <td style="text-align:right; padding:8px;">{{ entry.count }}</td>
+      <td style="padding:8px;">
+        <div style="background-color:#e0e0e0; border-radius:5px; overflow:hidden; height:18px;">
+          <div style="width:{{ entry.percent }}%; background-color:#4CAF50; height:100%; text-align:center; color:white;">
+            {{ entry.percent }}%
+          </div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Role-Based Activity</h2>
+<p>Total: {{ role_total }}</p>
+<ul>
+  {% for entry in role_data %}
+    <li>{{ entry.user__profile__role|default:"N/A" }}: {{ entry.count }} ({{ entry.percent }}%)</li>
+  {% endfor %}
+</ul>
+
+<h2>Partner-Based Activity</h2>
+<p>Total: {{ partner_total }}</p>
+<ul>
+  {% for entry in partner_data %}
+    <li>{{ entry.user__profile__partner_name|default:"N/A" }}: {{ entry.count }} ({{ entry.percent }}%)</li>
+  {% endfor %}
+</ul>
+
 {% endblock %}

@@ -1,4 +1,4 @@
-<h4 class="mb-4 text-primary fw-bold">📑 My ATS CV Orders</h4>
+<h4 class="mb-4 text-primary fw-bold">ðŸ“‘ My ATS CV Orders</h4>
 <div class="table-responsive mb-5 rounded-4 shadow-sm" style="overflow: hidden; border: 1px solid #dee2e6;">
   <table class="table table-hover table-bordered align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
     <thead class="table-primary text-center small text-uppercase">
@@ -16,18 +16,18 @@
         <td class="text-center small">{{ request.requested_at|date:"M d, Y, g:i A" }}</td>
         <td class="text-center">
           {% if request.processed %}
-            <span class="badge bg-success">✅ Delivered</span>
+            <span class="badge bg-success">âœ… Delivered</span>
           {% else %}
-            <span class="badge bg-warning text-dark">🚀 Processing</span>
+            <span class="badge bg-warning text-dark">ðŸš€ Processing</span>
           {% endif %}
         </td>
         <td class="text-center">
           {% if request.cv_file %}
             <a href="{{ request.cv_file.url }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-              📥 Download
+              ðŸ“¥ Download
             </a>
           {% else %}
-            <span class="text-muted">—</span>
+            <span class="text-muted">â€”</span>
           {% endif %}
         </td>
       </tr>

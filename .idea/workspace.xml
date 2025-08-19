@@ -6,9 +6,71 @@
   <component name="ChangeListManager">
     <list default="true" id="55ceac5c-e5e2-4a9d-a35f-ad0d49c37ebe" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/euraposbeta" beforeDir="false" afterPath="$PROJECT_DIR$/euraposbeta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/req.txt" beforeDir="false" afterPath="$PROJECT_DIR$/req.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/migrations/0002_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adminpanel/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/adminpanel/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beta/.env" beforeDir="false" afterPath="$PROJECT_DIR$/beta/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beta/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/beta/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beta/static/robots.txt" beforeDir="false" afterPath="$PROJECT_DIR$/beta/static/robots.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beta/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/beta/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/euraposbeta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/events/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/events/migrations/0002_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/home/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobs/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/migrations/0002_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobs/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobs/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/jobs/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications/migrations/0002_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/recruiter/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/seeker/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/seeker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/seeker/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/seeker/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/seeker/signals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/seeker/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/seeker/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/activity_summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/activity_summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/add_event.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/add_event.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/add_job.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/add_job.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/adminbase.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/adminbase.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/all_applications.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/all_applications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/ats_requests_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/ats_requests_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/delivered_ats_resumes.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/delivered_ats_resumes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/edit_event.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/edit_event.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/edit_job.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/edit_job.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/manage_all_seekers.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/manage_all_seekers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/manage_categories.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/manage_categories.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/manage_events.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/manage_events.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/manage_jobs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/manage_jobs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/manage_seeker.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/manage_seeker.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/priority_application_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/priority_application_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminpanel/whatsapp_subscribers_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminpanel/whatsapp_subscribers_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/events/event_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/events/event_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/events/event_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/events/event_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/home/contact.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/contact.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/home/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/exclusive_jobs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/exclusive_jobs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/hot_jobs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/hot_jobs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/job_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/job_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/job_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/job_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/near_deadline_jobs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/near_deadline_jobs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/partials/all_jobs_result.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/partials/all_jobs_result.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/partials/job_results.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/partials/job_results.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/jobs/recommended_jobs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/jobs/recommended_jobs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/notifications/notifications_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/notifications/notifications_page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/recruiter/why_partner.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/recruiter/why_partner.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/ats_orders.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/ats_orders.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/buy_ats_modal.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/buy_ats_modal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/tickets.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/tickets.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/visa_discount.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/visa_discount.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/seeker/partials/visa_guides.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/seeker/partials/visa_guides.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

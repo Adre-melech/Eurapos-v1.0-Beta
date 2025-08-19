@@ -58,7 +58,7 @@ class Seeker(AbstractUser):
         self.credits += amount
         self.save(update_fields=["credits"])
 
-        # ✅ Lazy import and notify if there's a reason
+        # âœ… Lazy import and notify if there's a reason
         if reason:
             from notifications.models import Notification
             Notification.objects.create(
@@ -79,7 +79,6 @@ class Seeker(AbstractUser):
         latest_discount = VisaDiscount.objects.filter(seeker=self).order_by('-purchased_at').first()
         return latest_discount and latest_discount.valid_until >= timezone.now().date()
 
-
     def grant_daily_login_reward(self):
         today = timezone.localdate()
         if not hasattr(self, '_last_credit_date') or self._last_credit_date != today:
@@ -95,11 +94,11 @@ class Seeker(AbstractUser):
         if referrer:
             referrer.add_credits(50)
 
-            # ✅ Lazy import to avoid circular import error
+            # âœ… Lazy import to avoid circular import error
             from notifications.models import Notification
             Notification.objects.create(
                 seeker=referrer,
-                message="🎉 Congrats! Someone used your referral code. You've earned 50 bonus credits!"
+                message="ðŸŽ‰ Congrats! Someone used your referral code. You've earned 50 bonus credits!"
             )
 
     def enable_whatsapp_recommendations(self):
@@ -111,7 +110,7 @@ class Seeker(AbstractUser):
             return True
         return False
 
-    # ✅ Can order ATS CV again (after 15 days)
+    # âœ… Can order ATS CV again (after 15 days)
     def ats_cv_order_available(self):
         ATSResumeRequest = apps.get_model('seeker', 'ATSResumeRequest')
         last_order = ATSResumeRequest.objects.filter(seeker=self).order_by('-requested_at').first()
@@ -120,7 +119,7 @@ class Seeker(AbstractUser):
             return days_passed >= 15, max(0, 15 - days_passed)
         return True, 0
 
-    # ✅ WhatsApp recommendation status (active within 10 days)
+    # âœ… WhatsApp recommendation status (active within 10 days)
     def whatsapp_recommendation_status(self):
         if self.whatsapp_optin_expires:
             remaining = (self.whatsapp_optin_expires - now()).days
@@ -128,8 +127,7 @@ class Seeker(AbstractUser):
                 return True, remaining
         return False, 0
 
-
-    # ✅ Can unlock exclusive jobs again (after 3 days)
+    # âœ… Can unlock exclusive jobs again (after 3 days)
     def can_unlock_exclusive_jobs(self):
         UnlockedExclusiveJob = apps.get_model('jobs', 'UnlockedExclusiveJob')
         last_unlock = UnlockedExclusiveJob.objects.filter(seeker=self).order_by('-unlocked_at').first()
@@ -147,11 +145,13 @@ class Seeker(AbstractUser):
 
 class ConsentLog(models.Model):
     ip_address = models.GenericIPAddressField()
+    country = models.CharField(max_length=100, blank=True, null=True)
+
     timezone = models.CharField(max_length=100)
     accepted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.ip_address} – {self.timezone} @ {self.accepted_at}"
+        return f"{self.ip_address} â€“ {self.timezone} @ {self.accepted_at}"
 
 
 class ATSResumeRequest(models.Model):
@@ -173,7 +173,6 @@ class ATSResumeRequest(models.Model):
     def __str__(self):
         return f"Order {self.order_id} - ATS CV for {self.seeker.username}"
 
-
     def save(self, *args, **kwargs):
         is_update = self.pk is not None
         if is_update:
@@ -182,7 +181,7 @@ class ATSResumeRequest(models.Model):
                 from notifications.models import Notification  # Lazy import to avoid circular import
                 Notification.objects.create(
                     seeker=self.seeker,
-                    message="📄 Your ATS-optimized CV has been delivered! You can now download it from your dashboard."
+                    message="ðŸ“„ Your ATS-optimized CV has been delivered! You can now download it from your dashboard."
                 )
 
         super().save(*args, **kwargs)
@@ -192,7 +191,7 @@ class VisaDiscount(models.Model):
     """Tracks purchases of 10% visa consultancy discount"""
     seeker = models.ForeignKey(Seeker, on_delete=models.CASCADE)
     purchased_at = models.DateTimeField(auto_now_add=True)
-    valid_until = models.DateField(null=True, blank=True)  # ✅ New field for 30-day validity
+    valid_until = models.DateField(null=True, blank=True)  # âœ… New field for 30-day validity
     order_id = models.CharField(max_length=12, unique=True, blank=True)  # Order tracking ID
     coupon_code = models.CharField(max_length=12, unique=True, blank=True)  # Generates coupon code
     pdf_file = models.FileField(upload_to="visa_discount_pdfs/", blank=True, null=True)  # Stores discount PDF
@@ -200,7 +199,6 @@ class VisaDiscount(models.Model):
     def generate_coupon_code(self):
         """Generates a unique coupon code"""
         if not self.coupon_code:
-            self.coupon_code = "VISA-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
             self.save(update_fields=["coupon_code"])
 
     def generate_order_id(self):

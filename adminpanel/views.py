@@ -8,19 +8,22 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST
-
+from cloudinary.utils import cloudinary_url
 from jobs.models import UnlockedExclusiveJob
 from events.models import TicketPurchase, EventTicket
 from jobs.models import JobPost, Application, Category, JobTitle, JobCountry, SeekerCountry
 from seeker.models import Seeker, ATSResumeRequest, VisaDiscount, UnlockedVisaGuide, VisaGuide, UserActivity, \
-    SuspiciousLoginAlert
+    SuspiciousLoginAlert, ConsentLog
+from django.db.models.functions import ExtractHour
 from notifications.models import Notification
 from collections import defaultdict
 from adminpanel.models import AdminNotification, HiddenJobAccess
 
+
 def is_staff_user(user):
     """Checks if the user is a staff member"""
     return user.is_authenticated and user.is_staff
+
 
 @user_passes_test(is_staff_user)
 @login_required
@@ -50,7 +53,6 @@ def admin_dashboard(request):
         '-purchased_at')[:10]
     ats_requests = ATSResumeRequest.objects.filter(processed=False).order_by("-requested_at")
 
-
     return render(request, "adminpanel/dashboard.html", {
         "jobs_count": jobs_count,
         "applications_count": applications_count,
@@ -73,7 +75,19 @@ def admin_dashboard(request):
 
 @staff_member_required
 def all_applications(request):
+    # Fetch all applications with related seeker and job
     apps = Application.objects.select_related('seeker', 'job').order_by('-applied_at')
+
+    # Add a temporary attribute for a signed CV download URL
+    for app in apps:
+        if app.cv:
+            signed_url, _ = cloudinary_url(
+                app.cv.public_id,
+                resource_type="raw",
+                type="authenticated"  # generates a signed URL
+            )
+            app.signed_cv_url = signed_url
+
     return render(request, "adminpanel/all_applications.html", {"applications": apps})
 
 
@@ -154,12 +168,14 @@ def admin_login(request):
 
     return render(request, "adminpanel/login.html")
 
+
 @login_required
 def admin_logout(request):
     """Logs out the admin user"""
     logout(request)
     messages.success(request, "You have logged out successfully.")
     return redirect("adminpanel:admin_login")
+
 
 @staff_member_required
 def add_job(request):
@@ -171,17 +187,37 @@ def add_job(request):
         deadline = request.POST.get("deadline")
         category_id = request.POST.get("category")
         country_id = request.POST.get("country")
+        overview = request.POST.get("Overview")
+        responsibilities = request.POST.get("responsibilities", "")
+        requirements = request.POST.get("requirements")
+        hr_name = request.POST.get("hr_name")
+        hr_phone = request.POST.get("hr_phone")
+        hr_email = request.POST.get("hr_email")
+        image_alt = request.POST.get("image_alt")
+        exclusive_job = True if request.POST.get("exclusive_job") else False
+        image = request.FILES.get("image")  # Handles uploaded image file
 
+        # Foreign keys
         category = get_object_or_404(Category, id=category_id)
         country = get_object_or_404(JobCountry, id=country_id)
 
+        # Create job post
         JobPost.objects.create(
             title=title,
             company_name=company_name,
             salary=salary,
             deadline=deadline,
             category=category,
-            country=country
+            country=country,
+            Overview=overview,
+            responsibilities=responsibilities,
+            requirements=requirements,
+            hr_name=hr_name,
+            hr_phone=hr_phone,
+            hr_email=hr_email,
+            image=image,
+            image_alt=image_alt,
+            exclusive_job=exclusive_job
         )
 
         # ✅ Notify all seekers of new job post
@@ -197,7 +233,10 @@ def add_job(request):
     categories = Category.objects.all()
     countries = JobCountry.objects.all()
 
-    return render(request, "adminpanel/add_job.html", {"categories": categories, "countries": countries})
+    return render(request, "adminpanel/add_job.html", {
+        "categories": categories,
+        "countries": countries
+    })
 
 
 @staff_member_required
@@ -205,6 +244,7 @@ def manage_jobs(request):
     """Displays all posted jobs for admins to edit or delete."""
     jobs = JobPost.objects.all()
     return render(request, "adminpanel/manage_jobs.html", {"jobs": jobs})
+
 
 @staff_member_required
 def delete_job(request, job_id):
@@ -218,6 +258,7 @@ def delete_job(request, job_id):
 
     return render(request, "adminpanel/confirm_delete_job.html", {"job": job})
 
+
 @staff_member_required
 def edit_job(request, job_id):
     """Allows admins to edit a job post."""
@@ -230,12 +271,40 @@ def edit_job(request, job_id):
         job.deadline = request.POST.get("deadline")
         job.description = request.POST.get("description")
         job.required_skills = request.POST.get("required_skills")
+        job.Overview = request.POST.get("Overview")
+        job.responsibilities = request.POST.get("responsibilities", "")
+        job.requirements = request.POST.get("requirements")
+
+        # Fetch the country and category objects by their ID from POST
+        country_id = request.POST.get("country")
+        category_id = request.POST.get("category")
+        if country_id:
+            job.country = get_object_or_404(JobCountry, id=country_id)
+        if category_id:
+            job.category = get_object_or_404(Category, id=category_id)
+
+        job.hr_name = request.POST.get("hr_name")
+        job.hr_phone = request.POST.get("hr_phone")
+        job.hr_email = request.POST.get("hr_email")
+        job.image_alt = request.POST.get("image_alt")
+        job.exclusive_job = True if request.POST.get("exclusive_job") else False
+
+        # Only update image if a new one is uploaded
+        if 'image' in request.FILES:
+            job.image = request.FILES['image']
+
         job.save()
         messages.success(request, "Job updated successfully.")
         return redirect("adminpanel:manage_jobs")
 
-    return render(request, "adminpanel/edit_job.html", {"job": job})
+    countries = JobCountry.objects.all()
+    categories = Category.objects.all()
 
+    return render(request, "adminpanel/edit_job.html", {
+        "job": job,
+        "countries": countries,
+        "categories": categories
+    })
 
 
 @staff_member_required
@@ -263,6 +332,7 @@ def manage_categories(request):
     """Displays all job categories for admins to edit or delete"""
     return render(request, "adminpanel/manage_categories.html", {"categories": Category.objects.all()})
 
+
 @staff_member_required
 def edit_category(request, category_id):
     """Allows admin to edit a job category"""
@@ -275,6 +345,7 @@ def edit_category(request, category_id):
         return redirect("adminpanel:manage_categories")
 
     return render(request, "adminpanel/edit_category.html", {"category": category})
+
 
 @staff_member_required
 def delete_category(request, category_id):
@@ -319,6 +390,7 @@ def manage_job_titles(request):
     """Displays all job titles for admins to edit or delete"""
     return render(request, "adminpanel/manage_job_titles.html", {"job_titles": JobTitle.objects.all()})
 
+
 @staff_member_required
 def edit_job_title(request, job_title_id):
     """Allows admin to edit a job title"""
@@ -331,6 +403,7 @@ def edit_job_title(request, job_title_id):
         return redirect("adminpanel:manage_job_titles")
 
     return render(request, "adminpanel/edit_job_title.html", {"job_title": job_title})
+
 
 @staff_member_required
 def delete_job_title(request, job_title_id):
@@ -381,6 +454,7 @@ def update_application_status(request, application_id):
 def manage_seeker_countries(request):
     """Displays all seeker countries for admins to edit or delete"""
     return render(request, "adminpanel/manage_seeker_countries.html", {"seeker_countries": SeekerCountry.objects.all()})
+
 
 @staff_member_required
 def edit_seeker_country(request, country_id):
@@ -498,6 +572,7 @@ def manage_job_countries(request):
     """Displays all job countries for admins to edit or delete"""
     return render(request, "adminpanel/manage_job_countries.html", {"job_countries": JobCountry.objects.all()})
 
+
 @staff_member_required
 def edit_job_country(request, country_id):
     """Allows admin to edit a job country"""
@@ -510,6 +585,7 @@ def edit_job_country(request, country_id):
         return redirect("adminpanel:manage_job_countries")
 
     return render(request, "adminpanel/edit_job_country.html", {"country": country})
+
 
 @staff_member_required
 def delete_job_country(request, country_id):
@@ -535,10 +611,11 @@ def manage_seeker(request, seeker_id):
         return redirect("adminpanel:admin_dashboard")
 
     if request.method == "POST" and "update" in request.POST:
-        seeker.full_name = request.POST.get("full_name", seeker.full_name)
+        seeker.first_name = request.POST.get("first_name", seeker.first_name)
+        seeker.last_name = request.POST.get("last_name", seeker.last_name)
+        seeker.username = request.POST.get("username", seeker.username)
         seeker.email = request.POST.get("email", seeker.email)
         seeker.phone = request.POST.get("phone", seeker.phone)
-        seeker.address = request.POST.get("address", seeker.address)
         seeker.country = get_object_or_404(SeekerCountry, id=request.POST.get("country", seeker.country.id))
         seeker.job_title = get_object_or_404(JobTitle, id=request.POST.get("job_title", seeker.job_title.id))
         seeker.save()
@@ -789,12 +866,15 @@ def mark_ticket_delivered(request, ticket_id):
     messages.success(request, "✅ Ticket marked as delivered.")
     return redirect("adminpanel:admin_dashboard")
 
+
 @staff_member_required
 def priority_applications_list(request):
     priority_applications = Application.objects.filter(
         priority_review=True
     ).select_related('seeker', 'job').order_by('-purchased_priority_at')
-    return render(request, "adminpanel/priority_application_list.html", {"priority_applications": priority_applications})
+    return render(request, "adminpanel/priority_application_list.html",
+                  {"priority_applications": priority_applications})
+
 
 @staff_member_required
 def whatsapp_subscribers_list(request):
@@ -803,6 +883,7 @@ def whatsapp_subscribers_list(request):
         whatsapp_optin_expires__gte=now()
     ).order_by("-whatsapp_optin_expires")
     return render(request, "adminpanel/whatsapp_subscribers_list.html", {"whatsapp_users": whatsapp_users})
+
 
 @staff_member_required
 def mark_priority_done(request, app_id):
@@ -875,7 +956,71 @@ def unlocked_access_users(request):
 
 def activity_summary(request):
     data = UserActivity.objects.values("is_authenticated").annotate(count=Count("id"))
-    return render(request, "adminpanel/activity_summary.html", {"data": data})
+    total = sum(entry["count"] for entry in data)
+    for entry in data:
+        entry["percent"] = round((entry["count"] / total) * 100, 2)
+    return render(request, "adminpanel/activity_summary.html", {"data": data, "total": total})
+
+
+def time_of_day_activity(request):
+    hourly_data = (
+        UserActivity.objects
+        .annotate(hour=ExtractHour("timestamp"))
+        .values("hour")
+        .annotate(count=Count("id"))
+        .order_by("hour")
+    )
+    total = sum(entry["count"] for entry in hourly_data)
+    for entry in hourly_data:
+        entry["percent"] = round((entry["count"] / total) * 100, 2)
+    return render(request, "adminpanel/time_of_day.html", {"data": hourly_data, "total": total})
+
+
+def geo_activity(request):
+    geo_data = (
+        ConsentLog.objects
+        .values("country")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+
+    total = sum(entry["count"] for entry in geo_data)
+
+    for entry in geo_data:
+        entry["country"] = entry["country"] or "Unknown"
+        entry["percent"] = round((entry["count"] / total) * 100, 2)
+
+    return render(request, "adminpanel/geo_activity.html", {
+        "geo_data": geo_data,
+        "total": total
+    })
+
+
+def role_partner_activity(request):
+    role_data = (
+        UserActivity.objects
+        .values("user__profile__role")
+        .annotate(count=Count("id"))
+    )
+    partner_data = (
+        UserActivity.objects
+        .values("user__profile__partner_name")
+        .annotate(count=Count("id"))
+    )
+    role_total = sum(entry["count"] for entry in role_data)
+    partner_total = sum(entry["count"] for entry in partner_data)
+
+    for entry in role_data:
+        entry["percent"] = round((entry["count"] / role_total) * 100, 2)
+    for entry in partner_data:
+        entry["percent"] = round((entry["count"] / partner_total) * 100, 2)
+
+    return render(request, "adminpanel/role_partner_summary.html", {
+        "role_data": role_data,
+        "partner_data": partner_data,
+        "role_total": role_total,
+        "partner_total": partner_total,
+    })
 
 
 def alert_dashboard(request):
@@ -907,6 +1052,7 @@ def admin_notifications_view(request):
         "grouped": dict(grouped),
         "categories": categories
     })
+
 
 @require_POST
 def mark_as_read(request, notification_id):

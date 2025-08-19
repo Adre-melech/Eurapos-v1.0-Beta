@@ -27,9 +27,9 @@ class AdminNotification(models.Model):
         self.save(update_fields=["read"])
 
     def __str__(self):
-        status = "✅ Read" if self.read else "🔔 Unread"
+        status = "âœ… Read" if self.read else "ðŸ”” Unread"
         label = dict(self.TYPE_CHOICES).get(self.type, "Unknown")
-        return f"[{label}] {self.created_at.strftime('%Y-%m-%d %H:%M')} — {status}"
+        return f"[{label}] {self.created_at.strftime('%Y-%m-%d %H:%M')} â€” {status}"
 
 
 class HiddenJobAccess(models.Model):

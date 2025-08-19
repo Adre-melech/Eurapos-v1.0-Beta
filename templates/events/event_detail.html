@@ -37,7 +37,7 @@
 
       <div class="d-flex justify-content-center mb-4">
         <span class="badge bg-primary fs-6 px-4 py-2 shadow">
-          🎟 {{ event.credits_required }} Credits
+          ðŸŽŸ {{ event.credits_required }} Credits
         </span>
       </div>
 
@@ -46,20 +46,20 @@
       </p>
 
       <p class="text-muted fs-5" style="white-space: pre-line; line-height: 1.6;">
-        {{ event.description }}
+        {{ event.description|safe }}
       </p>
 
       <div class="mt-4 text-center">
         {% if user.is_authenticated %}
           {% if purchased %}
             <div class="alert alert-success py-3 fs-5">
-              ✅ You’ve already purchased a ticket for this event.
+              âœ… Youâ€™ve already purchased a ticket for this event.
             </div>
           {% else %}
             <form method="post" action="{% url 'events:purchase_ticket' event.id %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-success btn-lg px-5 shadow">
-                🎟 Buy Ticket Now
+                ðŸŽŸ Buy Ticket Now
               </button>
             </form>
           {% endif %}

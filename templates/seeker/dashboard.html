@@ -6,7 +6,7 @@
 <div class="container py-4">
 
   <h2 class="mb-5 text-center text-primary fw-bold">
-    👋 {{ greeting }},
+    ðŸ‘‹ {{ greeting }},
     {% if seeker.first_name or seeker.last_name %}
       {{ seeker.first_name }} {{ seeker.last_name }}
       <span class="text-muted fs-6">({{ seeker.username }})</span>
@@ -32,7 +32,7 @@
     <div class="col-md-6">
       <div class="card shadow rounded-4 border-primary border-2">
         <div class="card-body text-center">
-          <h5 class="card-title text-primary">💰 Available Credits</h5>
+          <h5 class="card-title text-primary">ðŸ’° Available Credits</h5>
           <p class="display-5 fw-bold">{{ seeker.credits }}</p>
         </div>
       </div>
@@ -40,13 +40,13 @@
     <div class="col-md-6">
       <div class="card shadow rounded-4 border-success border-2">
         <div class="card-body text-center">
-          <h5 class="card-title text-success">🎯 Referral Program</h5>
+          <h5 class="card-title text-success">ðŸŽ¯ Referral Program</h5>
           <p class="mb-2">Share your referral ID and earn <strong>50 Credits</strong> per friend:</p>
 
           <div class="d-flex justify-content-center align-items-center bg-light border rounded p-2">
             <span id="referralId" class="fw-bold me-2">{{ seeker.referral_id }}</span>
             <button id="copyReferralBtn" class="btn btn-sm btn-outline-primary" title="Copy to clipboard">
-              📋 Copy
+              ðŸ“‹ Copy
             </button>
           </div>
 
@@ -60,7 +60,7 @@
   <div class="card shadow rounded-4 border-0 mb-5">
     <div class="card-body p-4">
       <div class="mb-4 text-center">
-        <h4 class="fw-bold text-primary">👤 Your Profile Details</h4>
+        <h4 class="fw-bold text-primary">ðŸ‘¤ Your Profile Details</h4>
         <p class="text-muted mb-0">Update your personal information anytime</p>
       </div>
 
@@ -97,7 +97,7 @@
 
         <div class="mt-4 text-center">
           <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">
-            💾 Save Changes
+            ðŸ’¾ Save Changes
           </button>
         </div>
       </form>
@@ -110,8 +110,6 @@
     {% include 'seeker/partials/unlockables.html' %}
   </div>
 
-  <!-- Visa Discount -->
-  {% include 'seeker/partials/visa_discount.html' %}
 
 
   <!-- Applications -->

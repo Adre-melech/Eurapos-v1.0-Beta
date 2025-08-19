@@ -27,8 +27,8 @@ sitemaps = {"static": StaticViewSitemap}
 urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path('admin/', admin.site.urls),
-    path('adminpanel/', include('adminpanel.urls', namespace='adminpanel')),
+    path('dahaka-dark/', admin.site.urls),
+    path('dark-panel/', include('adminpanel.urls', namespace='adminpanel')),
     path('', include('home.urls', namespace='home')),
     path('jobs/', include('jobs.urls', namespace='jobs')),
     path('seeker/', include('seeker.urls', namespace='seeker')),

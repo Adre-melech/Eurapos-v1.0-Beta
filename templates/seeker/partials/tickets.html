@@ -1,4 +1,4 @@
-<h4 class="mb-4 text-primary fw-bold">🎫 My Event Ticket Purchases</h4>
+<h4 class="mb-4 text-primary fw-bold">ðŸŽ« My Event Ticket Purchases</h4>
 
 <div class="table-responsive mb-5 rounded-4 shadow-sm" style="overflow: hidden; border: 1px solid #dee2e6;">
   <table class="table table-hover table-bordered align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
@@ -29,10 +29,10 @@
         <td class="text-center">
           {% if ticket.confirmed %}
             <a href="{% url 'events:download_ticket' ticket.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-              📥 Download
+              ðŸ“¥ Download
             </a>
           {% else %}
-            <span class="text-muted">—</span>
+            <span class="text-muted">â€”</span>
           {% endif %}
         </td>
       </tr>

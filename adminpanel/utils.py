@@ -19,7 +19,7 @@ def notify_admin(message: str, type: str = "contact_form", email: bool = True):
     if email:
         subject_type = type.replace("_", " ").title()
         send_mail(
-            subject=f"📢 Admin Alert: {subject_type}",
+            subject=f"ðŸ“¢ Admin Alert: {subject_type}",
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[settings.ADMIN_NOTIFICATION_EMAIL],

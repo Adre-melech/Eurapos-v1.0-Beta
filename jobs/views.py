@@ -299,10 +299,10 @@ def exclusive_jobs(request):
 
 
 
-def job_detail(request, job_id):
+def job_detail(request, slug):
     """Displays detailed job information & application status, including HR contact unlocking."""
 
-    job = get_object_or_404(JobPost, id=job_id)
+    job = get_object_or_404(JobPost, slug=slug)
 
     # ✅ Increment job views when accessed
     job.increment_views()
@@ -331,14 +331,14 @@ def apply_job(request, job_id):
     # Prevent duplicate applications
     if Application.objects.filter(seeker=seeker, job=job).exists():
         messages.warning(request, "You have already applied for this job.")
-        return redirect("jobs:job_detail", job_id=job_id)
+        return redirect("jobs:job_detail", slug=job.slug)
 
     if request.method == "POST":
         cv_file = request.FILES.get("cv")
 
         if not cv_file:
             messages.error(request, "Please upload a CV to apply.")
-            return redirect("jobs:job_detail", job_id=job_id)
+            return redirect("jobs:job_detail", slug=job.slug)
 
         # Create and save the application
         Application.objects.create(
@@ -359,9 +359,9 @@ def apply_job(request, job_id):
         )
 
         messages.success(request, "Application submitted! You earned 5 credits.")
-        return redirect("jobs:job_detail", job_id=job_id)
+        return redirect("jobs:job_detail", slug=job.slug)
 
-    return redirect("jobs:job_detail", job_id=job_id)
+    return redirect("jobs:job_detail", slug=job.slug)
 
 
 
